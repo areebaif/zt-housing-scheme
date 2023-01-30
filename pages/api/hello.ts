@@ -4,14 +4,17 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-type Data = {
-  name: string;
-};
+export async function getStaticProps() {
+  // Call an external API endpoint to get posts.
+  // You can use any data fetching library
+  const data = await prisma.plot.findMany();
+  const plots = data;
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<any>
-) {
-  const users = await prisma.plot.findMany();
-  res.status(200).json({ data: users });
+  // By returning { props: { posts } }, the Blog component
+  // will receive `posts` as a prop at build time
+  return {
+    props: {
+      plots,
+    },
+  };
 }
