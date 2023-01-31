@@ -10,16 +10,26 @@ datasource db {
   url = env("DATABASE_URL")
   relationMode = "foreignKeys"
 }
+enum Status {
+paid 
+fully_paid 
+registry_transferred 
+not_sold
+
+}
 
 model Plot {
   id Int @id
   dimension String?  @db.VarChar(255)
   square_feet Int?
-  has_sold String?  @db.VarChar(10)
-  sell_date  DateTime?
-  sell_price Int?
+  status Status
+  sold_date  DateTime?
+  fully_sold_date DateTime?
+  sold_price Int?
   created_at DateTime @default(now())
   customer_id Int?
+  registry_transfer_date DateTime?
+  registry_given_to String?
 }
 
 model Customer {
@@ -39,12 +49,11 @@ model Payments {
   payment_date DateTime
   payment_value Int
 }
+
 model Sale_Registry {
   id Int @id @default(autoincrement())
   plot_id Int @unique
   customer_id Int?
   created_at DateTime @default(now())
-  sale_registry_handed_over_to String
-  sale_registry_handed_over_to_date DateTime
 }
 

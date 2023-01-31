@@ -6,20 +6,15 @@ import { prisma } from "../db/prisma";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export async function getStaticProps() {
-  // Call an external API endpoint to get posts.
-  // You can use any data fetching library
-  const data = await prisma.plot.findMany({
-    select: { id: true, dimension: true },
-  });
-  const test = data[3];
-  const plots = test;
-
+export async function getServerSideProps() {
+  const data = await prisma.plot.findMany({});
+  const plots = data;
+  console.log(plots);
   // By returning { props: { posts } }, the Blog component
   // will receive `posts` as a prop at build time
   return {
     props: {
-      plots,
+      plots: JSON.parse(JSON.stringify(plots)),
     },
   };
 }
@@ -35,7 +30,6 @@ export default function Home({ plots }: { plots: any }) {
       </Head>
       <main className={styles.main}>
         <div className={styles.description}>
-          <ul>{plots.dimension}</ul>
           <p>
             Get started by editing&nbsp;
             <code className={styles.code}>pages/index.tsx</code>

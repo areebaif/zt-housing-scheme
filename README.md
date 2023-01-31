@@ -39,4 +39,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 Have planetscale cli installed brew install planetscale/tap/pscale
 To use prisma command with terninal prefix prisma command with npx since we installed prsima with package manager
+Open a terminal and connect to planetscale databased to this branch
 connect to your databse from your computer pscale connect [database_name] [branch_name] --port [port_number]
+In the .env file
+3309 is the port number
+DATABASE_URL = 'mysql://root@127.0.0.1:3309/<DATABASE_NAME>'
