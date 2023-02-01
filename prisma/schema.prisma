@@ -11,11 +11,18 @@ datasource db {
   relationMode = "foreignKeys"
 }
 
+enum Status {
+  partially_paid
+  fully_paid
+  registry_transferred
+  not_sold
+}
+
 model Plot {
   id Int @id
   dimension String?  @db.VarChar(255)
   square_feet Int?
-  status String?
+  status Status
   sold_date  DateTime?
   fully_sold_date DateTime?
   sold_price Int?
@@ -46,7 +53,6 @@ model Payments {
 model Sale_Registry {
   id Int @id @default(autoincrement())
   plot_id Int @unique
-  customer_id Int?
   created_at DateTime @default(now())
 }
 
