@@ -7,7 +7,7 @@ import Link from "next/link";
 
 // resuable function. can be used anywhere this value is cached
 
-const allPlots = () => {
+const AllPlots = () => {
   const [isNotSold, setIsNotSold] = React.useState(false);
   const [isSold, setIsSold] = React.useState(false);
 
@@ -94,4 +94,4 @@ const allPlots = () => {
   );
 };
 
-export default allPlots;
+export default AllPlots;
