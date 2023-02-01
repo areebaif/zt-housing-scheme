@@ -14,14 +14,14 @@ export interface Plot {
   id: number;
   dimension?: string | null;
   square_feet?: number | null;
-  status?: Status;
-  sold_date?: string | Date;
-  fully_sold_date?: string | Date;
-  sold_price?: number;
+  status: string | null;
+  sold_date: Date | null;
+  fully_sold_date: Date | null;
+  sold_price: number | null;
   created_at: string | Date;
   customer_id: number | null;
-  registry_transfer_date?: string | Date;
-  registry_given_to?: string;
+  registry_transfer_date: Date | null;
+  registry_given_to: string | null;
 }
 
 export default async function allPosts(
