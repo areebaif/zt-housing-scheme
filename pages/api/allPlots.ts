@@ -8,6 +8,7 @@ export default async function allPosts(
   req: NextApiRequest,
   res: NextApiResponse<Plot[]>
 ) {
+  console.log(" I was hit@!!!!!!!!!!!!!!!!!!!!!!!!");
   const data = await prisma.plot.findMany({});
   res.status(200).json(data);
 }

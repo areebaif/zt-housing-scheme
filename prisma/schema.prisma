@@ -12,10 +12,10 @@ datasource db {
 }
 
 enum Status {
+  not_sold
   partially_paid
   fully_paid
   registry_transferred
-  not_sold
 }
 
 model Plot {
@@ -46,7 +46,7 @@ model Payments {
   description String?  @db.VarChar(255)
   plot_id Int
   customer_id Int
-  payment_date DateTime
+  payment_date DateTime @default(now())
   payment_value Int
 }
 
