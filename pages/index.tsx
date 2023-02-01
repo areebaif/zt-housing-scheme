@@ -4,8 +4,7 @@ import * as ReactQuery from "@tanstack/react-query";
 import { Inter } from "@next/font/google";
 import styles from "@/styles/Home.module.css";
 import { prisma } from "../db/prisma";
-
-import { Plots } from "./api/allPlots";
+import { Plot } from "./api/allPlots";
 
 const inter = Inter({ subsets: ["latin"] });
 // resuable function. can be used anywhere this value is cached
@@ -16,7 +15,7 @@ export const fetchAllPosts = async () => {
       "Content-Type": "application/json",
     },
   });
-  const res: Plots[] = await response.json();
+  const res: Plot[] = await response.json();
   return res;
 };
 

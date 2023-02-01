@@ -14,7 +14,7 @@ export interface Plot {
   id: number;
   dimension?: string | null;
   square_feet?: number | null;
-  status: Status;
+  status?: Status;
   sold_date?: string | Date;
   fully_sold_date?: string | Date;
   sold_price?: number;

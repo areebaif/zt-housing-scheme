@@ -15,7 +15,7 @@ model Plot {
   id Int @id
   dimension String?  @db.VarChar(255)
   square_feet Int?
-  status String
+  status String?
   sold_date  DateTime?
   fully_sold_date DateTime?
   sold_price Int?
