@@ -10,19 +10,12 @@ datasource db {
   url = env("DATABASE_URL")
   relationMode = "foreignKeys"
 }
-enum Status {
-paid 
-fully_paid 
-registry_transferred 
-not_sold
-
-}
 
 model Plot {
   id Int @id
   dimension String?  @db.VarChar(255)
   square_feet Int?
-  status Status
+  status String
   sold_date  DateTime?
   fully_sold_date DateTime?
   sold_price Int?

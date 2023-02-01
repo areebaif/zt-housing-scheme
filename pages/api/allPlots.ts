@@ -10,11 +10,11 @@ enum Status {
   not_sold = "not_sold",
 }
 
-export interface Plots {
+export interface Plot {
   id: number;
   dimension?: string | null;
   square_feet?: number | null;
-  status?: Status;
+  status: Status;
   sold_date?: string | Date;
   fully_sold_date?: string | Date;
   sold_price?: number;
@@ -26,7 +26,7 @@ export interface Plots {
 
 export default async function allPosts(
   req: NextApiRequest,
-  res: NextApiResponse<Plots[]>
+  res: NextApiResponse<Plot[]>
 ) {
   const data = await prisma.plot.findMany({});
   res.status(200).json(data);
