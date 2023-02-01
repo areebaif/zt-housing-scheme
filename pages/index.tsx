@@ -1,25 +1,31 @@
 import Head from "next/head";
 import Image from "next/image";
+import * as ReactQuery from "@tanstack/react-query";
 import { Inter } from "@next/font/google";
 import styles from "@/styles/Home.module.css";
 import { prisma } from "../db/prisma";
 
+import { Plots } from "./api/allPlots";
+
 const inter = Inter({ subsets: ["latin"] });
-
-export async function getServerSideProps() {
-  const data = await prisma.plot.findMany({});
-  const plots = data;
-  console.log(plots);
-  // By returning { props: { posts } }, the Blog component
-  // will receive `posts` as a prop at build time
-  return {
-    props: {
-      plots: JSON.parse(JSON.stringify(plots)),
+// resuable function. can be used anywhere this value is cached
+export const fetchAllPosts = async () => {
+  const response = await fetch("/api/allPlots", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
     },
-  };
-}
+  });
+  const res: Plots[] = await response.json();
+  return res;
+};
 
-export default function Home({ plots }: { plots: any }) {
+export default function Home() {
+  const response = ReactQuery.useQuery(["allPosts"], fetchAllPosts, {
+    staleTime: Infinity,
+    cacheTime: Infinity,
+  });
+  console.log(response.data);
   return (
     <>
       <Head>
