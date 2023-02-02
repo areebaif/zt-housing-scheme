@@ -19,7 +19,6 @@ export default async function newCustomer(
     plotId,
   } = req.body;
   const date = new Date(sold_date);
-  console.log(" date!!!!!!!!", date);
   const customerMaxId = await prisma.customer.aggregate({
     _max: {
       id: true,
