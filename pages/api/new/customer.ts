@@ -10,7 +10,7 @@ export default async function newCustomer(
     name,
     son_of,
     cnic,
-    recurring_payment_month,
+
     status,
     sold_date,
     sold_price,
@@ -33,7 +33,6 @@ export default async function newCustomer(
       name,
       son_of,
       cnic,
-      recurring_payment_month,
     },
   });
   const updatePlot = prisma.plot.update({
