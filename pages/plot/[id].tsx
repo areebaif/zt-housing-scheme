@@ -11,12 +11,12 @@ import {
   Button,
 } from "@mantine/core";
 import * as React from "react";
-import { fetchPlotById, PlotDetail } from "../../r-query/functions";
+import { fetchPlotById } from "../../r-query/functions";
+import { PlotDetail } from "../api/plot/[id]";
 
 const PlotPage = () => {
   const [plotDetail, setPlotDetail] = React.useState<PlotDetail>();
   const router = useRouter();
-  console.log(router.query, "lol");
   const plotId = router.query?.id as string;
   const fetchplot = ReactQuery.useQuery({
     queryKey: ["plotById", plotId],
@@ -36,8 +36,7 @@ const PlotPage = () => {
   }
   // Set local state data if it does not exist
   const data = fetchplot.data!;
-  console.log(data, "data");
-  console.log(plotDetail, "plot detail");
+
   if (!plotDetail) {
     setPlotDetail(data);
   }
