@@ -3,15 +3,14 @@ import * as React from "react";
 import { Checkbox, Group, Table, Grid, Text } from "@mantine/core";
 import { Plot } from "@prisma/client";
 import { fetchAllPlots } from "@/r-query/functions";
+import { PlotsSelectFields } from "../pages/api/plot/all";
 
 import { useRouter } from "next/router";
 
 // resuable function. can be used anywhere this value is cached
 
 const AllPlots = () => {
-  const [isNotSold, setIsNotSold] = React.useState(false);
-  const [isSold, setIsSold] = React.useState(false);
-  const [plots, setPlots] = React.useState<Plot[]>();
+  const [plots, setPlots] = React.useState<PlotsSelectFields[]>();
   const router = useRouter();
 
   const fetchPlots = ReactQuery.useQuery(["allPlots"], fetchAllPlots, {

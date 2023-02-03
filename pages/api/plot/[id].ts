@@ -12,7 +12,7 @@ interface PlotDetail {
 
 export default async function allPosts(
   req: NextApiRequest,
-  res: NextApiResponse<PlotDetail | { error: "error" } | Plot>
+  res: NextApiResponse<PlotDetail | { error: "error" }>
 ) {
   try {
     const plotId = req.query.id as string;
@@ -44,7 +44,7 @@ export default async function allPosts(
       };
       res.status(200).json(plotDetail);
     } else {
-      res.status(200).json(plot);
+      res.status(200).json({ plot: plot });
     }
   } catch (err) {
     //TODO: error handling

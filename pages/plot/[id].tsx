@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import * as ReactQuery from "@tanstack/react-query";
-
 import {
   Checkbox,
   Group,
@@ -17,6 +16,7 @@ import { fetchPlotById, PlotDetail } from "../../r-query/functions";
 const PlotPage = () => {
   const [plotDetail, setPlotDetail] = React.useState<PlotDetail>();
   const router = useRouter();
+  console.log(router.query, "lol");
   const plotId = router.query?.id as string;
   const fetchplot = ReactQuery.useQuery({
     queryKey: ["plotById", plotId],
@@ -36,6 +36,8 @@ const PlotPage = () => {
   }
   // Set local state data if it does not exist
   const data = fetchplot.data!;
+  console.log(data, "data");
+  console.log(plotDetail, "plot detail");
   if (!plotDetail) {
     setPlotDetail(data);
   }
@@ -49,7 +51,7 @@ const PlotPage = () => {
     dateString = dateParsed;
   }
 
-  const paymentRows = plotDetail?.payments?.map((element) => {
+  const paymentHistoryRows = plotDetail?.payment_history?.map((element) => {
     const date = new Date(`${element.payment_date}`);
     const dateParsed = `${date.getDate()}-${
       date.getMonth() + 1
@@ -65,12 +67,37 @@ const PlotPage = () => {
     );
   });
 
+  const paymentPlanRows = plotDetail?.payment_plan?.map((element) => {
+    const date = new Date(`${element.payment_date}`);
+    const dateParsed = `${date.getDate()}-${
+      date.getMonth() + 1
+    }-${date?.getFullYear()}`;
+    dateString = dateParsed;
+    return (
+      <tr key={element.id}>
+        <td>{element.plot_id}</td>
+        <td>{plotDetail?.customer?.name}</td>
+        <td>{plotDetail?.customer?.son_of}</td>
+        <td>{dateString}</td>
+        <td>{element.payment_value}</td>
+      </tr>
+    );
+  });
+
   return (
     <React.Fragment>
       <Divider my="sm" variant="dashed" />
       <Group position="apart" mt="md" mb="xs">
         <Text weight={500}>Basic Information </Text>
-        <Button onClick={() => router.push(`/plot/sale`)}>Add Sale</Button>
+        <Button
+          onClick={() =>
+            router.push(
+              `/plot/sale/${plotId}?dimension=${plotDetail?.plot?.dimension}&squareFeet=${plotDetail?.plot?.square_feet}`
+            )
+          }
+        >
+          Add Sale
+        </Button>
       </Group>
       <Divider my="sm" variant="dashed" />
       <Flex direction="column" align="flex-start" gap="md" justify="flex-start">
@@ -92,7 +119,24 @@ const PlotPage = () => {
       </Flex>
       <Divider my="sm" variant="dashed" />
       <Group position="apart" mt="md" mb="xs">
-        <Text weight={500}>Payment Hostory</Text>
+        <Text weight={500}>Payment Plan</Text>
+      </Group>
+      <Divider my="sm" variant="dashed" />
+      <Table highlightOnHover>
+        <thead>
+          <tr>
+            <th>Plot Number</th>
+            <th>Customer Name</th>
+            <th>Son/ of</th>
+            <th>Estimated Payment Date</th>
+            <th>Estimated Payment Value</th>
+            <th>Recurring Payment Days</th>
+          </tr>
+        </thead>
+        <tbody>{paymentPlanRows}</tbody>
+      </Table>
+      <Group position="apart" mt="md" mb="xs">
+        <Text weight={500}>Payment History</Text>
         <Button onClick={() => router.push(`/payment/add`)}>Add Payment</Button>
       </Group>
       <Divider my="sm" variant="dashed" />
@@ -105,7 +149,7 @@ const PlotPage = () => {
             <th>Value</th>
           </tr>
         </thead>
-        <tbody>{paymentRows}</tbody>
+        <tbody>{paymentHistoryRows}</tbody>
       </Table>
     </React.Fragment>
   );

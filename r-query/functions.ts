@@ -1,9 +1,11 @@
-import { Plot, Status, Customer, Payments } from "@prisma/client";
+import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
+import { PlotsSelectFields } from "../pages/api/plot/all";
 
 export interface PlotDetail {
   plot: Plot;
   customer?: Customer | null;
-  payments?: Payments[];
+  payment_history?: Payments[];
+  payment_plan?: Payment_Plan[];
 }
 
 export const fetchAllPlots = async () => {
@@ -13,7 +15,7 @@ export const fetchAllPlots = async () => {
       "Content-Type": "application/json",
     },
   });
-  const res: Plot[] = await response.json();
+  const res: PlotsSelectFields[] = await response.json();
   return res;
 };
 

@@ -22,6 +22,7 @@ model Plot {
   id Int @id
   dimension String?  @db.VarChar(255)
   square_feet Int?
+  development_charges Int?
   status Status
   sold_date  DateTime?
   fully_sold_date DateTime?
@@ -35,10 +36,18 @@ model Plot {
 model Customer {
   id Int @id @default(autoincrement())
   name String  @db.VarChar(255)
-  son_of String  @db.VarChar(255)
+  son_of String?  @db.VarChar(255)
   cnic String  @db.VarChar(15)
-  recurring_payment_month Int
   created_at DateTime @default(now())
+}
+
+model Payment_Plan {
+  id Int @id @default(autoincrement())
+  plot_id Int
+  customer_id Int
+  payment_date DateTime? @default(now())
+  payment_value Int?
+  payment_plan_recurring_payment_days Int?
 }
 
 model Payments {
