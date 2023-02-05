@@ -45,7 +45,7 @@ model Payment_Plan {
   id Int @id @default(autoincrement())
   plot_id Int
   customer_id Int
-  payment_date DateTime? @default(now())
+  payment_date DateTime?
   payment_value Int?
   payment_plan_recurring_payment_days Int?
 }
@@ -55,7 +55,7 @@ model Payments {
   description String?  @db.VarChar(255)
   plot_id Int
   customer_id Int
-  payment_date DateTime @default(now())
+  payment_date DateTime
   payment_value Int
 }
 

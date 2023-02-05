@@ -3,6 +3,7 @@ import * as ReactQuery from "@tanstack/react-query";
 import { Group, Table, Text, Divider, Flex, Button } from "@mantine/core";
 import * as React from "react";
 import { fetchPlotById } from "../../r-query/functions";
+import { Payments, Payment_Plan } from "@prisma/client";
 
 const PlotPage = () => {
   const router = useRouter();
@@ -26,42 +27,12 @@ const PlotPage = () => {
     return <span>Error: error occured</span>;
   }
   // Set local state data if it does not exist
-  const plotDetail = fetchplot.data!;
+  const plotDetail = fetchplot.data;
 
-  // formatDate
-  let dateString = "";
-  if (plotDetail?.plot?.sold_date) {
-    const date = new Date(`${plotDetail?.plot.sold_date}`);
-    dateString = date.toDateString();
-  }
+  // we will calculate total payment from payment History
   let totalPayment: number = 0;
-  const paymentHistoryRows = plotDetail?.payment_history?.map((element) => {
-    totalPayment = totalPayment + element.payment_value;
-    const date = new Date(`${element.payment_date}`);
-    dateString = date.toDateString();
-    return (
-      <tr key={element.id}>
-        <td>{element.id}</td>
-        <td>{element.description}</td>
-        <td>{dateString}</td>
-        <td>{element.payment_value}</td>
-      </tr>
-    );
-  });
-
-  const paymentPlanRows = plotDetail?.payment_plan?.map((element) => {
-    const date = new Date(`${element.payment_date}`);
-    dateString = date.toDateString();
-    return (
-      <tr key={element.id}>
-        <td>{element.plot_id}</td>
-        <td>{plotDetail?.customer?.name}</td>
-        <td>{plotDetail?.customer?.son_of}</td>
-        <td>{dateString}</td>
-        <td>{element.payment_value}</td>
-        <td>{element.payment_plan_recurring_payment_days}</td>
-      </tr>
-    );
+  plotDetail?.payment_history?.forEach((item) => {
+    totalPayment = totalPayment + item.payment_value;
   });
 
   return (
@@ -89,58 +60,135 @@ const PlotPage = () => {
       <Text weight={500}>Sell Information </Text>
       <Divider my="sm" variant="dashed" />
       <Flex direction="column" align="flex-start" gap="md" justify="flex-start">
-        <Text>Sell Price: {plotDetail?.plot?.sold_price} </Text>
-        <Text>Sell Date: {dateString} </Text>
+        <Text>
+          Sell Price:{" "}
+          {`${plotDetail?.plot?.sold_price}`.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            ","
+          )}{" "}
+        </Text>
+        <Text>
+          Sell Date: {new Date(`${plotDetail?.plot.sold_date}`).toDateString()}{" "}
+        </Text>
+        <Text>
+          Total Payment Recieved:{" "}
+          {`${totalPayment}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+        </Text>
         <Text>
           Customer Name: {plotDetail?.customer?.name} Son/of:{" "}
           {plotDetail?.customer?.son_of}{" "}
         </Text>
         <Text>Customer cnic: {plotDetail?.customer?.cnic}</Text>
       </Flex>
-      <Divider my="sm" variant="dashed" />
-      <Group position="apart" mt="md" mb="xs">
-        <Text weight={500}>Payment Plan</Text>
-      </Group>
-      <Divider my="sm" variant="dashed" />
-      <Table highlightOnHover>
-        <thead>
-          <tr>
-            <th>Plot Number</th>
-            <th>Customer Name</th>
-            <th>Son/ of</th>
-            <th>Estimated Payment Date</th>
-            <th>Estimated Payment Value</th>
-            <th>Recurring Payment Days</th>
-          </tr>
-        </thead>
-        <tbody>{paymentPlanRows}</tbody>
-      </Table>
-      <Group position="apart" mt="md" mb="xs">
-        <Text weight={500}>Payment History</Text>
-        <Button
-          onClick={() =>
-            router.push(
-              `/payment/add/${plotId}?customerId=${plotDetail?.customer?.id}&customerName=${plotDetail?.customer?.name}&sonOf=${plotDetail?.customer?.son_of}&cnic=${plotDetail?.customer?.cnic}`
-            )
-          }
-        >
-          Add Payment
-        </Button>
-      </Group>
-      <Divider my="sm" variant="dashed" />
-      <Table highlightOnHover>
-        <thead>
-          <tr>
-            <th>Payment Number</th>
-            <th>Description</th>
-            <th>Date</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>{paymentHistoryRows}</tbody>
-      </Table>
+      {plotDetail.plot.status !== "not_sold" ? (
+        <React.Fragment>
+          <Divider my="sm" variant="dashed" />
+          <Text weight={500}>Payment Plan</Text>
+          <Divider my="sm" variant="dashed" />
+          <PaymentPlanTable
+            tableRows={plotDetail.payment_plan}
+            customerName={plotDetail?.customer?.name}
+            sonOf={plotDetail?.customer?.son_of}
+          />
+          <Divider my="sm" variant="dashed" />
+          <Group position="apart" mt="md" mb="xs">
+            <Text weight={500}>Payment History</Text>
+            <Button
+              onClick={() =>
+                router.push(
+                  `/payment/add/${plotId}?customerId=${plotDetail?.customer?.id}&customerName=${plotDetail?.customer?.name}&sonOf=${plotDetail?.customer?.son_of}&cnic=${plotDetail?.customer?.cnic}`
+                )
+              }
+            >
+              Add Payment
+            </Button>
+          </Group>
+          <Divider my="sm" variant="dashed" />
+          <PaymentHistoryTable tableRows={plotDetail.payment_history} />
+        </React.Fragment>
+      ) : (
+        <div></div>
+      )}
     </React.Fragment>
   );
 };
 
 export default PlotPage;
+
+export interface PaymentPlanTable {
+  tableRows?: Payment_Plan[];
+  customerName?: string;
+  sonOf?: string | null;
+}
+
+export interface PaymentHistoryTable {
+  tableRows?: Payments[];
+}
+
+export const PaymentPlanTable: React.FC<PaymentPlanTable> = (
+  PaymentPlanTable
+) => {
+  const { tableRows, customerName, sonOf } = PaymentPlanTable;
+  const paymentPlanRows = tableRows?.map((element) => {
+    const date = new Date(`${element.payment_date}`);
+    return (
+      <tr key={element.id}>
+        <td>{element.plot_id}</td>
+        <td>{customerName}</td>
+        <td>{sonOf}</td>
+        <td>{date.toDateString()}</td>
+        <td>
+          {`${element.payment_value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+        </td>
+      </tr>
+    );
+  });
+
+  return (
+    <Table highlightOnHover>
+      <thead>
+        <tr>
+          <th>Plot Number</th>
+          <th>Customer Name</th>
+          <th>Son/ of</th>
+          <th>Estimated Payment Date</th>
+          <th>Estimated Payment Value</th>
+        </tr>
+      </thead>
+      <tbody>{paymentPlanRows}</tbody>
+    </Table>
+  );
+};
+
+export const PaymentHistoryTable: React.FC<PaymentHistoryTable> = (
+  PaymentHistoryTable
+) => {
+  const { tableRows } = PaymentHistoryTable;
+  const paymentHistoryRows = tableRows?.map((element) => {
+    const date = new Date(`${element.payment_date}`);
+    return (
+      <tr key={element.id}>
+        <td>{element.id}</td>
+        <td>{element.description}</td>
+        <td>{date.toDateString()}</td>
+        <td>
+          {`${element.payment_value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+        </td>
+      </tr>
+    );
+  });
+
+  return (
+    <Table highlightOnHover>
+      <thead>
+        <tr>
+          <th>Payment Number</th>
+          <th>Description</th>
+          <th>Date</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>{paymentHistoryRows}</tbody>
+    </Table>
+  );
+};

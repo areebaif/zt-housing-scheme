@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-
 import {
   Box,
   TextInput,
@@ -12,12 +11,14 @@ import {
   Autocomplete,
   Button,
 } from "@mantine/core";
+import dayjs from "dayjs";
 import { DatePicker } from "@mantine/dates";
 import { fetchAllCustomers, postAddPlotSale } from "@/r-query/functions";
 import {
   UpsertTableRows,
   TableRowItem,
 } from "../../../components/TableRowsUpsert";
+import { formatAddTime } from "@/utilities";
 
 const NewPlot = () => {
   const queryClient = useQueryClient();
@@ -49,9 +50,7 @@ const NewPlot = () => {
     React.useState<{ id: number; cnic: string; value: string }[]>([]);
   const [existingCustomerUserSelect, setExisitngCustomerUserSelect] =
     React.useState("");
-  // recurring payment plan props
-  const [recurringPaymentPlan, setRecurringPaymentPlane] =
-    React.useState<string>("");
+
   // table props
   const [tableRows, setTableRows] = React.useState<TableRowItem[]>([]);
 
@@ -92,16 +91,11 @@ const NewPlot = () => {
         "please select either from existing customer or add a new customer"
       );
     // payment plan fields validation
-    if (!recurringPaymentPlan && !tableRows.length)
+    if (!tableRows.length)
       throw new Error("please enter a payment plan for customer");
-
-    if (recurringPaymentPlan && tableRows.length)
-      throw new Error(
-        "please either select a fixed payment plan or recurring payment plan "
-      );
     // format date
-    const date = new Date(`${sellDate}`);
-    const soldDateString = date.toISOString();
+
+    const soldDateString = formatAddTime(`${sellDate}`);
 
     const data = {
       plotId,
@@ -115,12 +109,10 @@ const NewPlot = () => {
         sonOf,
         existingCustomer: existingCustomerUserSelect,
       },
-      paymentPlan: {
-        fixedPaymentPlan: tableRows,
-        recurringPaymentPlan,
-      },
+      paymentPlan: tableRows,
     };
-    mutation.mutate(data);
+    console.log("submit data", data);
+    //mutation.mutate(data);
   };
 
   React.useEffect(() => {
@@ -290,24 +282,13 @@ const NewPlot = () => {
         />
       </Flex>
       <Text td="underline">Payment Plan</Text>
-      <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
-        <TextInput
-          value={recurringPaymentPlan}
-          onChange={(event) =>
-            setRecurringPaymentPlane(event.currentTarget.value)
-          }
-          label="recurring payment plan"
-          placeholder="enter value in days"
-        />
-        <Box sx={(theme) => ({ padding: theme.spacing.lg })}>
-          <Text>or</Text>
-        </Box>
-        <UpsertTableRows
-          tableHeader="Payment Plan"
-          tableRows={tableRows}
-          setTableRows={setTableRows}
-        />
-      </Flex>
+
+      <UpsertTableRows
+        tableHeader="Payment Plan"
+        tableRows={tableRows}
+        setTableRows={setTableRows}
+      />
+
       <Group position="right">
         <Button onClick={onSubmitForm} variant="outline">
           Submit

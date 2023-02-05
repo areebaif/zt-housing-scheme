@@ -18,9 +18,8 @@ export default async function addPayment(
     const parsedPlotId = parseInt(plotId);
 
     const parsedTableRows = payment.map((item) => {
-      console.log(item);
       return {
-        payment_date: new Date(item.date),
+        payment_date: item.dateISOString,
         payment_value: item.value!,
         plot_id: parsedPlotId,
         customer_id: parsedCustomerId,
@@ -30,27 +29,6 @@ export default async function addPayment(
 
     const updatePayment = await prisma.payments.createMany({
       data: parsedTableRows,
-    });
-    const plot = await prisma.plot.findUnique({
-      where: {
-        id: parsedPlotId,
-      },
-    });
-    if (!plot) throw new Error("no plot found with number ");
-    const customer = await prisma.customer.findUnique({
-      where: {
-        id: parsedCustomerId,
-      },
-    });
-    const payments = await prisma.payments.findMany({
-      where: {
-        plot_id: parsedPlotId,
-      },
-    });
-    const paymentPlan = await prisma.payment_Plan.findMany({
-      where: {
-        plot_id: parsedPlotId,
-      },
     });
 
     res.status(201).json({ created: true });

@@ -46,7 +46,7 @@ export const postAddPlotSale = async (data: any) => {
     },
     body: JSON.stringify(data),
   });
-  const res: any = await response.json();
+  const res: { created: true } = await response.json();
   return res;
 };
 
@@ -62,6 +62,6 @@ export const postPlotPayment = async (data: {
     },
     body: JSON.stringify(data),
   });
-  const res: PlotDetail = await response.json();
+  const res: { created: true } = await response.json();
   return res;
 };
