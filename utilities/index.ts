@@ -1,3 +1,4 @@
 import { formatAddTime } from "./time";
+import { compare } from "./compare";
 
-export { formatAddTime };
+export { formatAddTime, compare };

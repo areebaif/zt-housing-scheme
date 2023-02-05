@@ -79,7 +79,16 @@ export default async function upsertPlots(
         customer_id: customerId,
       };
     });
-    paymentPlanArray = [...paymentPlanParse];
+    paymentPlanArray = [
+      {
+        description: "down payment",
+        payment_value: downPayment,
+        customer_id: customerId,
+        plot_id: parsedPlotId,
+        payment_date: soldDateString,
+      },
+      ...paymentPlanParse,
+    ];
     const payment_plan = prisma.payment_Plan.createMany({
       data: paymentPlanArray,
     });
