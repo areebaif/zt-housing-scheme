@@ -1,19 +1,8 @@
 import { useRouter } from "next/router";
 import * as ReactQuery from "@tanstack/react-query";
-import {
-  Checkbox,
-  Group,
-  Table,
-  Grid,
-  Text,
-  Divider,
-  Flex,
-  Button,
-} from "@mantine/core";
+import { Group, Table, Text, Divider, Flex, Button } from "@mantine/core";
 import * as React from "react";
 import { fetchPlotById } from "../../r-query/functions";
-import { PlotDetail } from "../api/plot/[id]";
-import { InfiniteQueryObserver } from "@tanstack/react-query";
 
 const PlotPage = () => {
   const router = useRouter();
@@ -38,7 +27,6 @@ const PlotPage = () => {
   }
   // Set local state data if it does not exist
   const plotDetail = fetchplot.data!;
-  console.log(plotDetail, " i am detai;");
 
   // formatDate
   let dateString = "";
@@ -46,8 +34,9 @@ const PlotPage = () => {
     const date = new Date(`${plotDetail?.plot.sold_date}`);
     dateString = date.toDateString();
   }
-
+  let totalPayment: number = 0;
   const paymentHistoryRows = plotDetail?.payment_history?.map((element) => {
+    totalPayment = totalPayment + element.payment_value;
     const date = new Date(`${element.payment_date}`);
     dateString = date.toDateString();
     return (

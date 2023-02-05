@@ -252,7 +252,6 @@ const NewPlot = () => {
           }}
         />
       </Flex>
-
       <Text td="underline">Customer Details</Text>
       <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
         <Autocomplete
