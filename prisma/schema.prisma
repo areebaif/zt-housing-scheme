@@ -43,11 +43,11 @@ model Customer {
 
 model Payment_Plan {
   id Int @id @default(autoincrement())
+  description String?
   plot_id Int
   customer_id Int
   payment_date DateTime?
   payment_value Int?
-  payment_plan_recurring_payment_days Int?
 }
 
 model Payments {

@@ -47,7 +47,9 @@ const NewPlot = () => {
   const [newCustomerCNIC, setNewCustomerCNIC] = React.useState("");
   // existing customer props
   const [existingCustomerBackendData, setExistingCustomerBackendData] =
-    React.useState<{ id: number; cnic: string; value: string }[]>([]);
+    React.useState<{ id: number; cnic: string; value: string }[] | undefined>(
+      []
+    );
   const [existingCustomerUserSelect, setExisitngCustomerUserSelect] =
     React.useState("");
 
@@ -122,7 +124,9 @@ const NewPlot = () => {
     setPlotId(plot);
     setDimension(dimension);
     setSquareFeet(squareFeet);
-  }, [routerReady]);
+    setExistingCustomerBackendData(fetchCustomers.data);
+  }, [routerReady, fetchCustomers.data]);
+  
   if (fetchCustomers.isLoading) {
     // TODO: loading component
     return <span>Loading...</span>;
@@ -132,12 +136,6 @@ const NewPlot = () => {
     return <span>Error: error occured</span>;
   }
   // this has to remain outside useEffect otherwise throws error
-  if (fetchCustomers.data) {
-    const data = fetchCustomers.data;
-    if (!existingCustomerBackendData.length) {
-      setExistingCustomerBackendData(data);
-    }
-  }
 
   return router.query.plotId ? (
     <React.Fragment>
