@@ -37,7 +37,7 @@ model Customer {
   id Int @id @default(autoincrement())
   name String  @db.VarChar(255)
   son_of String?  @db.VarChar(255)
-  cnic String  @db.VarChar(15)
+  cnic String @unique  @db.VarChar(15)
   created_at DateTime @default(now())
 }
 

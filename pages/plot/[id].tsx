@@ -13,11 +13,13 @@ import {
 import * as React from "react";
 import { fetchPlotById } from "../../r-query/functions";
 import { PlotDetail } from "../api/plot/[id]";
+import { InfiniteQueryObserver } from "@tanstack/react-query";
 
 const PlotPage = () => {
-  const [plotDetail, setPlotDetail] = React.useState<PlotDetail>();
   const router = useRouter();
   const plotId = router.query?.id as string;
+
+  // backend data fetch
   const fetchplot = ReactQuery.useQuery({
     queryKey: ["plotById", plotId],
     queryFn: () => fetchPlotById(plotId),
@@ -35,27 +37,19 @@ const PlotPage = () => {
     return <span>Error: error occured</span>;
   }
   // Set local state data if it does not exist
-  const data = fetchplot.data!;
+  const plotDetail = fetchplot.data!;
+  console.log(plotDetail, " i am detai;");
 
-  if (!plotDetail) {
-    setPlotDetail(data);
-  }
   // formatDate
   let dateString = "";
   if (plotDetail?.plot?.sold_date) {
     const date = new Date(`${plotDetail?.plot.sold_date}`);
-    const dateParsed = `${date.getDate()}-${
-      date.getMonth() + 1
-    }-${date?.getFullYear()}`;
-    dateString = dateParsed;
+    dateString = date.toDateString();
   }
 
   const paymentHistoryRows = plotDetail?.payment_history?.map((element) => {
     const date = new Date(`${element.payment_date}`);
-    const dateParsed = `${date.getDate()}-${
-      date.getMonth() + 1
-    }-${date?.getFullYear()}`;
-    dateString = dateParsed;
+    dateString = date.toDateString();
     return (
       <tr key={element.id}>
         <td>{element.id}</td>
@@ -68,10 +62,7 @@ const PlotPage = () => {
 
   const paymentPlanRows = plotDetail?.payment_plan?.map((element) => {
     const date = new Date(`${element.payment_date}`);
-    const dateParsed = `${date.getDate()}-${
-      date.getMonth() + 1
-    }-${date?.getFullYear()}`;
-    dateString = dateParsed;
+    dateString = date.toDateString();
     return (
       <tr key={element.id}>
         <td>{element.plot_id}</td>
@@ -79,6 +70,7 @@ const PlotPage = () => {
         <td>{plotDetail?.customer?.son_of}</td>
         <td>{dateString}</td>
         <td>{element.payment_value}</td>
+        <td>{element.payment_plan_recurring_payment_days}</td>
       </tr>
     );
   });
@@ -95,7 +87,7 @@ const PlotPage = () => {
             )
           }
         >
-          Add Sale
+          {plotDetail?.plot.status === "not_sold" ? "Add Sale" : "Edit Details"}
         </Button>
       </Group>
       <Divider my="sm" variant="dashed" />
@@ -136,7 +128,15 @@ const PlotPage = () => {
       </Table>
       <Group position="apart" mt="md" mb="xs">
         <Text weight={500}>Payment History</Text>
-        <Button onClick={() => router.push(`/payment/add`)}>Add Payment</Button>
+        <Button
+          onClick={() =>
+            router.push(
+              `/payment/add/${plotId}?customerId=${plotDetail?.customer?.id}&customerName=${plotDetail?.customer?.name}&sonOf=${plotDetail?.customer?.son_of}&cnic=${plotDetail?.customer?.cnic}`
+            )
+          }
+        >
+          Add Payment
+        </Button>
       </Group>
       <Divider my="sm" variant="dashed" />
       <Table highlightOnHover>

@@ -1,6 +1,6 @@
-import * as ReactQuery from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
-import { Checkbox, Group, Table, Grid, Text } from "@mantine/core";
+import { Checkbox, Group, Table, Grid, Text, Flex } from "@mantine/core";
 import { Plot } from "@prisma/client";
 import { fetchAllPlots } from "@/r-query/functions";
 import { PlotsSelectFields } from "../pages/api/plot/all";
@@ -9,11 +9,10 @@ import { useRouter } from "next/router";
 
 // resuable function. can be used anywhere this value is cached
 
-const AllPlots = () => {
-  const [plots, setPlots] = React.useState<PlotsSelectFields[]>();
+const AllPlots: React.FC = () => {
   const router = useRouter();
 
-  const fetchPlots = ReactQuery.useQuery(["allPlots"], fetchAllPlots, {
+  const fetchPlots = useQuery(["allPlots"], fetchAllPlots, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
@@ -27,8 +26,8 @@ const AllPlots = () => {
     return <span>Error: error occured</span>;
   }
   // Set local state data if it does not exist
-  const data = fetchPlots.data!;
-  if (!plots) setPlots(data);
+  const plots = fetchPlots.data;
+  console.log("data", plots);
   // table data
   const notSoldPlots = plots?.filter((element) => {
     return element.status === "not_sold";
@@ -66,44 +65,48 @@ const AllPlots = () => {
   ));
 
   return (
-    <Grid>
-      <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
-        <Table highlightOnHover>
-          <thead>
-            <tr>
-              <th colSpan={3}>
-                <Text align="center">Sold</Text>
-              </th>
-            </tr>
-            <tr>
-              <th>Plot Number</th>
-              <th>Square ft</th>
-              <th>Dimension</th>
-            </tr>
-          </thead>
-          <tbody>{soldRows}</tbody>
-          <tfoot>{soldRowCount}</tfoot>
-        </Table>
-      </Grid.Col>
-      <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
-        <Table highlightOnHover>
-          <thead>
-            <tr>
-              <th colSpan={3}>
-                <Text align="center">Not Sold</Text>
-              </th>
-            </tr>
-            <tr>
-              <th>Plot Number</th>
-              <th>Square ft</th>
-              <th>Dimension</th>
-            </tr>
-          </thead>
-          <tbody>{notSoldRows}</tbody>
-          <tfoot>{notSoldRowCount}</tfoot>
-        </Table>
-      </Grid.Col>
-    </Grid>
+    <React.Fragment>
+      <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
+        <Text>Total Sold {soldPlots?.length}</Text>
+        <Text>Total Not Sold {notSoldPlots?.length}</Text>
+      </Flex>
+      <Grid>
+        <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
+          <Table highlightOnHover>
+            <thead>
+              <tr>
+                <th colSpan={3}>
+                  <Text align="center">Sold</Text>
+                </th>
+              </tr>
+              <tr>
+                <th>Plot Number</th>
+                <th>Square ft</th>
+                <th>Dimension</th>
+              </tr>
+            </thead>
+            <tbody>{soldRows}</tbody>
+          </Table>
+        </Grid.Col>
+        <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
+          <Table highlightOnHover>
+            <thead>
+              <tr>
+                <th colSpan={3}>
+                  <Text align="center">Not Sold</Text>
+                </th>
+              </tr>
+              <tr>
+                <th>Plot Number</th>
+                <th>Square ft</th>
+                <th>Dimension</th>
+              </tr>
+            </thead>
+            <tbody>{notSoldRows}</tbody>
+          </Table>
+        </Grid.Col>
+      </Grid>
+    </React.Fragment>
   );
 };
 

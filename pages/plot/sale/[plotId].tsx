@@ -1,8 +1,7 @@
 import * as React from "react";
 import { useRouter } from "next/router";
-import { useForm } from "@mantine/form";
-import * as ReactQuery from "@tanstack/react-query";
-import { IconChevronDown } from "@tabler/icons";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+
 import {
   Box,
   TextInput,
@@ -10,116 +9,144 @@ import {
   NumberInput,
   Flex,
   Text,
-  Table,
-  Select,
   Autocomplete,
   Button,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
-import { fetchAllCustomers } from "@/r-query/functions";
+import { fetchAllCustomers, postAddPlotSale } from "@/r-query/functions";
+import {
+  UpsertTableRows,
+  TableRowItem,
+} from "../../../components/TableRowsUpsert";
 
 const NewPlot = () => {
+  const queryClient = useQueryClient();
+  // router props
   const router = useRouter();
   const query = router.query;
+  const routerReady = router.isReady;
+  // plot metadata props
   const [plotId, setPlotId] = React.useState("");
   const [dimension, setDimension] = React.useState("");
   const [squareFeet, setSquareFeet] = React.useState("");
+  // sell info props
   const [sellPrice, setSellPrice] = React.useState<number | undefined>(
     undefined
   );
+  const [downPayment, setDownPayment] = React.useState<number | undefined>(
+    undefined
+  );
+  const [developmentCharges, setDevelopmentCharges] = React.useState<
+    number | undefined
+  >(0);
   const [sellDate, setSellDate] = React.useState<Date | null>(null);
+  // new customer props
   const [newCustomerName, setNewCustomerName] = React.useState("");
   const [sonOf, setSonOf] = React.useState("");
   const [newCustomerCNIC, setNewCustomerCNIC] = React.useState("");
-  const [fixedPaymentPlan, setFixedPaymentPlan] = React.useState<any[]>([]);
+  // existing customer props
   const [existingCustomerBackendData, setExistingCustomerBackendData] =
     React.useState<{ id: number; cnic: string; value: string }[]>([]);
   const [existingCustomerUserSelect, setExisitngCustomerUserSelect] =
     React.useState("");
-  const [paymentPlanDateItem, setPaymentPlanDateItem] =
-    React.useState<Date | null>(null);
-  const [paymentPlanValueItem, setPaymentPlanValueItem] = React.useState<
-    number | undefined
-  >(undefined);
-  const [recurringPaymentPlan, setRecurringPaymentPlane] = React.useState<
-    string | undefined
-  >(undefined);
+  // recurring payment plan props
+  const [recurringPaymentPlan, setRecurringPaymentPlane] =
+    React.useState<string>("");
+  // table props
+  const [tableRows, setTableRows] = React.useState<TableRowItem[]>([]);
 
-  const fetchCustomers = ReactQuery.useQuery({
+  // fetch exisitng customer data from backend
+  const fetchCustomers = useQuery({
     queryKey: ["allCustomers"],
     queryFn: () => fetchAllCustomers(),
     staleTime: Infinity,
     cacheTime: Infinity,
   });
+
+  const mutation = useMutation({
+    mutationFn: postAddPlotSale,
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      router.push("/");
+    },
+  });
+  const onSubmitForm = () => {
+    // plot and sell information validation
+    if (!plotId || !sellDate || !sellPrice || !downPayment)
+      throw new Error(
+        "please provide plotNumber, Sell Date ad Sell Price to submit the form"
+      );
+    // customer data fields validation
+    if (
+      !existingCustomerUserSelect &&
+      (!newCustomerName || !newCustomerCNIC || !sonOf)
+    )
+      throw new Error(
+        "Please enter customer data: Either select an existing customer or enter information for new customer"
+      );
+    if (
+      existingCustomerUserSelect &&
+      (newCustomerName || newCustomerCNIC || sonOf)
+    )
+      throw new Error(
+        "please select either from existing customer or add a new customer"
+      );
+    // payment plan fields validation
+    if (!recurringPaymentPlan && !tableRows.length)
+      throw new Error("please enter a payment plan for customer");
+
+    if (recurringPaymentPlan && tableRows.length)
+      throw new Error(
+        "please either select a fixed payment plan or recurring payment plan "
+      );
+    // format date
+    const date = new Date(`${sellDate}`);
+    const soldDateString = date.toISOString();
+
+    const data = {
+      plotId,
+      sellPrice,
+      soldDateString,
+      downPayment,
+      developmentCharges,
+      customer: {
+        newCustomerCNIC,
+        newCustomerName,
+        sonOf,
+        existingCustomer: existingCustomerUserSelect,
+      },
+      paymentPlan: {
+        fixedPaymentPlan: tableRows,
+        recurringPaymentPlan,
+      },
+    };
+    mutation.mutate(data);
+  };
+
+  React.useEffect(() => {
+    const plot = query.plotId as string;
+    const dimension = query.dimension as string;
+    const squareFeet = query.squareFeet as string;
+    setPlotId(plot);
+    setDimension(dimension);
+    setSquareFeet(squareFeet);
+  }, [routerReady]);
   if (fetchCustomers.isLoading) {
     // TODO: loading component
-    console.log("loading");
     return <span>Loading...</span>;
   }
 
   if (fetchCustomers.isError) {
     return <span>Error: error occured</span>;
   }
-  // Set local state data if it does not exist
-  const data = fetchCustomers.data!;
-
-  if (!existingCustomerBackendData.length) {
-    setExistingCustomerBackendData(data);
-  }
-  if (query.plotId) {
-    const plot = query.plotId as string;
-    const dimension = query.dimension as string;
-    const squareFeet = query.squareFeet as string;
-    if (!plotId.length) {
-      setPlotId(plot);
-      setDimension(dimension);
-      setSquareFeet(squareFeet);
+  // this has to remain outside useEffect otherwise throws error
+  if (fetchCustomers.data) {
+    const data = fetchCustomers.data;
+    if (!existingCustomerBackendData.length) {
+      setExistingCustomerBackendData(data);
     }
   }
 
-  const onRowDelete = (key: number) => {
-    console.log(key, "key");
-    let paymentPlanDelete = [];
-    if (fixedPaymentPlan.length) {
-      paymentPlanDelete = fixedPaymentPlan.filter(
-        (item, index) => index !== key - 1
-      );
-    }
-    setFixedPaymentPlan(paymentPlanDelete);
-  };
-
-  const onAddRow = () => {
-    const paymentPlanAdd = [];
-    if (fixedPaymentPlan.length) {
-      fixedPaymentPlan.forEach((item) => paymentPlanAdd.push(item));
-    }
-    const key = fixedPaymentPlan?.length + 1;
-    const date = new Date(`${paymentPlanDateItem}`);
-    const dateString = date.toDateString();
-
-    paymentPlanAdd.push(
-      <tr key={key}>
-        <td>{dateString}</td>
-        <td>{paymentPlanValueItem}</td>
-        <td>
-          <Button variant="outline" onClick={() => onRowDelete(key)}>
-            Delete
-          </Button>
-        </td>
-      </tr>
-    );
-    setFixedPaymentPlan(paymentPlanAdd);
-    setPaymentPlanValueItem(undefined);
-    setPaymentPlanDateItem(null);
-  };
-
-  const onSubmitForm = () => {
-    // plotId: ploId
-    // sell: sell Price Sell Date
-    // customer:Customer Name/ son of/ CNIC OR existing Customer
-    // payment plan: either fixed or recurring payment plan
-    // validation of each
-  };
   return router.query.plotId ? (
     <React.Fragment>
       <Text td="underline">Plot Details</Text>
@@ -128,12 +155,18 @@ const NewPlot = () => {
           value={plotId}
           onChange={(event) => setPlotId(event.currentTarget.value)}
           withAsterisk
+          error={
+            isNaN(parseInt(plotId)) ? "please enter a valid plot number" : ""
+          }
           label="Plot Number"
           placeholder="plot number"
         />
         <TextInput
           value={squareFeet}
           onChange={(event) => setSquareFeet(event.currentTarget.value)}
+          error={
+            isNaN(parseInt(squareFeet)) ? "please enter a valid dimension" : ""
+          }
           label="Square ft"
           placeholder="square ft"
         />
@@ -146,6 +179,15 @@ const NewPlot = () => {
       </Flex>
       <Text td="underline">Sell Detail</Text>
       <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
+        <DatePicker
+          inputFormat="ddd MMM D YYYY"
+          label={"select date"}
+          placeholder={"dd/mm/yyyy"}
+          withAsterisk
+          error={!sellDate}
+          value={sellDate}
+          onChange={setSellDate}
+        />
         <NumberInput
           label="Sell Price"
           value={sellPrice}
@@ -164,16 +206,53 @@ const NewPlot = () => {
               : "";
           }}
         />
-        <DatePicker
-          inputFormat="DD/MM/YYYY"
-          label={"select date"}
-          placeholder={"dd/mm/yyyy"}
+        <NumberInput
+          label="Down Payment"
+          value={downPayment}
+          placeholder={"enter down payment"}
           withAsterisk
-          error={!sellDate}
-          value={sellDate}
-          onChange={setSellDate}
+          onChange={(val) => setDownPayment(val)}
+          parser={(downPayment) => downPayment?.replace(/\$\s?|(,*)/g, "")}
+          error={
+            downPayment
+              ? downPayment < 1
+                ? "enter values above 0"
+                : false
+              : true
+          }
+          formatter={(value) => {
+            return value
+              ? !Number.isNaN(parseFloat(value))
+                ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : ""
+              : "";
+          }}
+        />
+        <NumberInput
+          label="development charges"
+          value={developmentCharges}
+          placeholder={"enter down payment"}
+          onChange={(val) => setDevelopmentCharges(val)}
+          parser={(developmentCharges) =>
+            developmentCharges?.replace(/\$\s?|(,*)/g, "")
+          }
+          error={
+            developmentCharges
+              ? developmentCharges < 0
+                ? "enter values 0 or more than 0"
+                : false
+              : false
+          }
+          formatter={(value) => {
+            return value
+              ? !Number.isNaN(parseFloat(value))
+                ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : ""
+              : "";
+          }}
         />
       </Flex>
+
       <Text td="underline">Customer Details</Text>
       <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
         <Autocomplete
@@ -224,66 +303,11 @@ const NewPlot = () => {
         <Box sx={(theme) => ({ padding: theme.spacing.lg })}>
           <Text>or</Text>
         </Box>
-        <Table highlightOnHover>
-          <thead>
-            <tr>
-              <th colSpan={3}>
-                <Text align="center">fixed payment plan</Text>
-              </th>
-            </tr>
-            <tr>
-              <th>Date</th>
-              <th>Value</th>
-              <th>Add or Delete Values</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fixedPaymentPlan}
-            <tr>
-              <td>
-                <DatePicker
-                  inputFormat="DD/MM/YYYY"
-                  label={"select date"}
-                  placeholder={"dd/mm/yyyy"}
-                  withAsterisk
-                  value={paymentPlanDateItem}
-                  onChange={setPaymentPlanDateItem}
-                />
-              </td>
-              <td>
-                <NumberInput
-                  label="payment value"
-                  value={paymentPlanValueItem}
-                  withAsterisk
-                  placeholder={"enter value to be collected"}
-                  onChange={(val) => setPaymentPlanValueItem(val)}
-                  parser={(sellPrice) => sellPrice?.replace(/\$\s?|(,*)/g, "")}
-                  error={
-                    paymentPlanValueItem
-                      ? paymentPlanValueItem < 0
-                        ? "enter values above 0"
-                        : false
-                      : false
-                  }
-                  formatter={(value) => {
-                    return value
-                      ? !Number.isNaN(parseFloat(value))
-                        ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        : ""
-                      : "";
-                  }}
-                />
-              </td>
-              <td>
-                {
-                  <Button variant="outline" onClick={onAddRow}>
-                    Add Values
-                  </Button>
-                }
-              </td>
-            </tr>
-          </tbody>
-        </Table>
+        <UpsertTableRows
+          tableHeader="Payment Plan"
+          tableRows={tableRows}
+          setTableRows={setTableRows}
+        />
       </Flex>
       <Group position="right">
         <Button onClick={onSubmitForm} variant="outline">
