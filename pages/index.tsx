@@ -1,20 +1,16 @@
-import * as ReactQuery from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
-import { Checkbox, Group, Table, Grid, Text } from "@mantine/core";
-import { Plot } from "@prisma/client";
-import { fetchAllPlots } from "@/r-query/functions";
-
+import { Table, Grid, Text, Flex, Button } from "@mantine/core";
 import { useRouter } from "next/router";
+import { Plot, Status } from "@prisma/client";
 
-// resuable function. can be used anywhere this value is cached
+import { fetchAllPlots } from "@/r-query/functions";
+import { PlotsSelectFields } from "./api/plot/add";
 
-const AllPlots = () => {
-  const [isNotSold, setIsNotSold] = React.useState(false);
-  const [isSold, setIsSold] = React.useState(false);
-  const [plots, setPlots] = React.useState<Plot[]>();
+const AllPlots: React.FC = () => {
   const router = useRouter();
 
-  const fetchPlots = ReactQuery.useQuery(["allPlots"], fetchAllPlots, {
+  const fetchPlots = useQuery(["allPlots"], fetchAllPlots, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
@@ -27,84 +23,88 @@ const AllPlots = () => {
   if (fetchPlots.isError) {
     return <span>Error: error occured</span>;
   }
-  // Set local state data if it does not exist
-  const data = fetchPlots.data!;
-  if (!plots) setPlots(data);
+
+  const plots = fetchPlots.data;
   // table data
   const notSoldPlots = plots?.filter((element) => {
     return element.status === "not_sold";
   });
-  const notSoldRowCount = (
-    <tr>
-      <th>Total</th>
-      <th>{notSoldPlots?.length}</th>
-      <th></th>
-    </tr>
-  );
-  const notSoldRows = notSoldPlots?.map((element) => (
-    <tr onClick={() => router.push(`/plot/${element.id}`)} key={element.id}>
-      <td>{element.id}</td>
-      <td>{element.square_feet}</td>
-      <td>{element.dimension}</td>
-    </tr>
-  ));
-  const soldPlots = plots?.filter((element) => {
-    return element.status !== "not_sold";
+  const partiallySold = plots?.filter((element) => {
+    return element.status === "partially_paid";
   });
-  const soldRowCount = (
-    <tr>
-      <th>Total</th>
-      <th>{soldPlots?.length}</th>
-      <th></th>
-    </tr>
-  );
-  const soldRows = soldPlots?.map((element) => (
-    <tr onClick={() => router.push(`/plot/${element.id}`)} key={element.id}>
-      <td>{element.id}</td>
-      <td>{element.square_feet}</td>
-      <td>{element.dimension}</td>
-    </tr>
-  ));
+
+  const fullySold = plots?.filter((element) => {
+    return element.status === "fully_paid";
+  });
+
+  const registryTransferred = plots?.filter((element) => {
+    return element.status === "registry_transferred";
+  });
 
   return (
-    <Grid>
-      <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
-        <Table highlightOnHover>
-          <thead>
-            <tr>
-              <th colSpan={3}>
-                <Text align="center">Sold</Text>
-              </th>
-            </tr>
-            <tr>
-              <th>Plot Number</th>
-              <th>Square ft</th>
-              <th>Dimension</th>
-            </tr>
-          </thead>
-          <tbody>{soldRows}</tbody>
-          <tfoot>{soldRowCount}</tfoot>
-        </Table>
-      </Grid.Col>
-      <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
-        <Table highlightOnHover>
-          <thead>
-            <tr>
-              <th colSpan={3}>
-                <Text align="center">Not Sold</Text>
-              </th>
-            </tr>
-            <tr>
-              <th>Plot Number</th>
-              <th>Square ft</th>
-              <th>Dimension</th>
-            </tr>
-          </thead>
-          <tbody>{notSoldRows}</tbody>
-          <tfoot>{notSoldRowCount}</tfoot>
-        </Table>
-      </Grid.Col>
-    </Grid>
+    <React.Fragment>
+      <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
+        <Text>Total Partially Sold {partiallySold?.length}</Text>
+        <Text>Total Not Sold {notSoldPlots?.length}</Text>
+        <Text>Total fully Sold {fullySold?.length}</Text>
+        <Text>Registry Transferred {registryTransferred?.length}</Text>
+        <Button onClick={() => router.push("/plot/payments")}>
+          Upcoming Payments
+        </Button>
+      </Flex>
+      <Grid>
+        <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
+          <PlotSaleSummaryTable
+            tableHead="partially paid"
+            tableRows={partiallySold}
+          />
+        </Grid.Col>
+        <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
+          <PlotSaleSummaryTable tableHead="not sold" tableRows={notSoldPlots} />
+        </Grid.Col>
+      </Grid>
+      <PlotSaleSummaryTable tableHead="fully sold" tableRows={fullySold} />
+      <PlotSaleSummaryTable
+        tableHead="registry trasnferred"
+        tableRows={registryTransferred}
+      />
+    </React.Fragment>
+  );
+};
+
+export interface PlotSaleSummaryTableProps {
+  tableHead: string;
+  tableRows: PlotsSelectFields[];
+}
+const PlotSaleSummaryTable: React.FC<PlotSaleSummaryTableProps> = (
+  PlotSaleSummaryTableProps
+) => {
+  const { tableHead, tableRows } = PlotSaleSummaryTableProps;
+  const router = useRouter();
+
+  const rows = tableRows?.map((element) => (
+    <tr onClick={() => router.push(`/plot/${element.id}`)} key={element.id}>
+      <td>{element.id}</td>
+      <td>{element.square_feet}</td>
+      <td>{element.dimension}</td>
+    </tr>
+  ));
+  return (
+    <Table highlightOnHover>
+      <thead>
+        <tr>
+          <th colSpan={3}>
+            <Text align="center">{tableHead}</Text>
+          </th>
+        </tr>
+        <tr>
+          <th>Plot Number</th>
+          <th>Square ft</th>
+          <th>Dimension</th>
+        </tr>
+      </thead>
+      <tbody>{rows}</tbody>
+    </Table>
   );
 };
 

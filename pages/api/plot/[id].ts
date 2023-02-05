@@ -1,22 +1,22 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Plot, Status, Customer, Payments } from "@prisma/client";
+import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
 
 import { prisma } from "../../../db/prisma";
 
-interface PlotDetail {
+export interface PlotDetail {
   plot: Plot;
   customer?: Customer | null;
-  payments?: Payments[];
+  payment_history?: Payments[];
+  payment_plan?: Payment_Plan[];
 }
 
 export default async function allPosts(
   req: NextApiRequest,
-  res: NextApiResponse<PlotDetail | { error: "error" } | Plot>
+  res: NextApiResponse<PlotDetail | { error: "error" }>
 ) {
   try {
     const plotId = req.query.id as string;
-    console.log(" I was hit");
 
     const plot = await prisma.plot.findUnique({
       where: {
@@ -36,15 +36,21 @@ export default async function allPosts(
           plot_id: parseInt(plotId),
         },
       });
+      const paymentPlan = await prisma.payment_Plan.findMany({
+        where: {
+          plot_id: parseInt(plotId),
+        },
+      });
 
       const plotDetail: PlotDetail = {
         plot: plot,
         customer: customer,
-        payments: payments,
+        payment_history: payments,
+        payment_plan: paymentPlan,
       };
       res.status(200).json(plotDetail);
     } else {
-      res.status(200).json(plot);
+      res.status(200).json({ plot: plot });
     }
   } catch (err) {
     //TODO: error handling
