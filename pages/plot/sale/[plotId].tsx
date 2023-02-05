@@ -112,7 +112,7 @@ const NewPlot = () => {
       paymentPlan: tableRows,
     };
     console.log("submit data", data);
-    //mutation.mutate(data);
+    mutation.mutate(data);
   };
 
   React.useEffect(() => {

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
-import { Table, Grid, Text, Flex } from "@mantine/core";
+import { Table, Grid, Text, Flex, Button } from "@mantine/core";
 import { useRouter } from "next/router";
 import { Plot, Status } from "@prisma/client";
 
@@ -48,6 +48,9 @@ const AllPlots: React.FC = () => {
         <Text>Total Not Sold {notSoldPlots?.length}</Text>
         <Text>Total fully Sold {fullySold?.length}</Text>
         <Text>Registry Transferred {registryTransferred?.length}</Text>
+        <Button onClick={() => router.push("/plot/payments")}>
+          Upcoming Payments
+        </Button>
       </Flex>
       <Grid>
         <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>

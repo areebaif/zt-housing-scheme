@@ -65,3 +65,14 @@ export const postPlotPayment = async (data: {
   const res: { created: true } = await response.json();
   return res;
 };
+
+export const upComingPayments = async () => {
+  const response = await fetch(`/api/payment/upcoming`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: any = await response.json();
+  return res;
+};

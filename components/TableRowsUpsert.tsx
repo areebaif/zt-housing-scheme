@@ -12,7 +12,6 @@ import { formatAddTime } from "../utilities";
 
 export interface TableRowItem {
   id: number;
-  date: string;
   dateISOString: string;
   value: number | undefined;
   description?: string;
@@ -67,16 +66,16 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
     }
     const key = fixedPaymentPlan?.length + 1;
     const date = new Date(`${paymentPlanDateItem}`);
+    const dateISO = formatAddTime(`${paymentPlanDateItem}`);
     const dateString = date.toDateString();
 
     const data = [
       ...tableRows,
       {
         id: key,
-        date: dateString,
         value: paymentPlanValueItem,
         description: description,
-        dateISOString: date.toISOString(),
+        dateISOString: dateISO,
       },
     ];
     setTableRows(data);
