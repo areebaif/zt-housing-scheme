@@ -5,7 +5,7 @@ import { PaymentPlanTable } from "./[id]";
 import { Group, Table, Text, Divider, Flex, Button } from "@mantine/core";
 import { compare } from "../../utilities/index";
 
-const paymentStatus: React.FC = () => {
+const PaymentStatus: React.FC = () => {
   const fetchUpcomingPayments = useQuery(
     ["upcomingPayments"],
     upComingPayments,
@@ -64,4 +64,4 @@ const paymentStatus: React.FC = () => {
   );
 };
 
-export default paymentStatus;
+export default PaymentStatus;
