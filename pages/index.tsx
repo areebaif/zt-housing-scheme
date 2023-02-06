@@ -49,17 +49,17 @@ const AllPlots: React.FC = () => {
       <Grid>
         <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
           <PlotSaleSummaryTable
-            tableHead="partially paid"
+            tableHead="Partially Paid"
             tableRows={partiallySold}
           />
         </Grid.Col>
         <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
-          <PlotSaleSummaryTable tableHead="not sold" tableRows={notSoldPlots} />
+          <PlotSaleSummaryTable tableHead="Not Sold" tableRows={notSoldPlots} />
         </Grid.Col>
       </Grid>
-      <PlotSaleSummaryTable tableHead="fully sold" tableRows={fullySold} />
+      <PlotSaleSummaryTable tableHead="Fully Sold" tableRows={fullySold} />
       <PlotSaleSummaryTable
-        tableHead="registry trasnferred"
+        tableHead="Registry Transferred"
         tableRows={registryTransferred}
       />
     </React.Fragment>

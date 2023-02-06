@@ -1,7 +1,7 @@
 import * as React from "react";
 import {PlotsSelectFields} from "@/pages/api/plot/add";
 import {useRouter} from "next/router";
-import {Table, Text} from "@mantine/core";
+import {Table, Title, Card, ScrollArea} from "@mantine/core";
 
 export interface PlotSaleSummaryTableProps {
     tableHead: string;
@@ -21,11 +21,13 @@ export const PlotSaleSummaryTable: React.FC<PlotSaleSummaryTableProps> = (
         </tr>
     ));
     return (
+        <Card shadow="sm" p="lg" radius="md" withBorder style={{ margin: "25px 0 0 0" }}>
+            <Card.Section>
         <Table highlightOnHover>
             <thead>
             <tr>
                 <th colSpan={3}>
-                    <Text align="center">{tableHead}</Text>
+                    <Title order={3} align="center">{tableHead}</Title>
                 </th>
             </tr>
             <tr>
@@ -36,5 +38,7 @@ export const PlotSaleSummaryTable: React.FC<PlotSaleSummaryTableProps> = (
             </thead>
             <tbody>{rows}</tbody>
         </Table>
+            </Card.Section>
+        </Card>
     );
 };

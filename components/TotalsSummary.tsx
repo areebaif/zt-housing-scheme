@@ -22,10 +22,10 @@ export const TotalsSummary: React.FC<TotalsSummaryProps> = (props) => {
             </Card.Section>
             <Card.Section inheritPadding py="xs">
             <Grid gutter={5} gutterXs="md" gutterMd="xl" gutterXl={50}>
-                <Grid.Col span={3}><Text weight={"bold"}>Total Partially Sold</Text> <Badge size="lg" color="green" variant="light">{partiallySold?.length}</Badge></Grid.Col>
-                <Grid.Col span={3}><Text weight={"bold"}>Total Not Sold</Text> <Badge size="lg" color="green" variant="light">{notSoldPlots?.length}</Badge></Grid.Col>
-                <Grid.Col span={3}><Text weight={"bold"}>Total fully Sold</Text> <Badge size="lg" color="green" variant="light">{fullySold?.length}</Badge></Grid.Col>
-                <Grid.Col span={3}><Text weight={"bold"}>Registry Transferred</Text> <Badge size="lg" color="green" variant="light">{registryTransferred?.length}</Badge></Grid.Col>
+                <Grid.Col span={3}><Text weight={"bold"}>Total Partially Sold</Text> <Badge size="xl" color="green" variant="light">{partiallySold?.length}</Badge></Grid.Col>
+                <Grid.Col span={3}><Text weight={"bold"}>Total Not Sold</Text> <Badge size="xl" color="green" variant="light">{notSoldPlots?.length}</Badge></Grid.Col>
+                <Grid.Col span={3}><Text weight={"bold"}>Total fully Sold</Text> <Badge size="xl" color="green" variant="light">{fullySold?.length}</Badge></Grid.Col>
+                <Grid.Col span={3}><Text weight={"bold"}>Registry Transferred</Text> <Badge size="xl" color="green" variant="light">{registryTransferred?.length}</Badge></Grid.Col>
             </Grid>
             </Card.Section>
         </Card>
