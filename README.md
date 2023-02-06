@@ -37,10 +37,11 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-Have planetscale cli installed brew install planetscale/tap/pscale
-To use prisma command with terninal prefix prisma command with npx since we installed prsima with package manager
-Open a terminal and connect to planetscale databased to this branch
-connect to your databse from your computer pscale connect [database_name] [branch_name] --port [port_number]
-In the .env file
-3309 is the port number env file string
-DATABASE_URL = 'mysql://root@127.0.0.1:3309/<DATABASE_NAME>'
+- Have the planetscale cli installed: ```brew install planetscale/tap/pscale```
+- To use the prisma command with your terminal prefix prisma command with npx since we installed prisma with package manager
+- prisma command: ```npx prisma generate client```
+- Open a terminal and connect to planetscale databased to this branch
+- connect to your databse from your computer:
+- ```pscale connect zt-housing-scheme main --port 3309```
+- (In the .env file 3309 is the port number env file string:)
+- ```DATABASE_URL = 'mysql://root@127.0.0.1:3309/<DATABASE_NAME>'``` 
