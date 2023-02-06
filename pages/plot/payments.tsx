@@ -1,9 +1,8 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { upComingPayments } from "@/r-query/functions";
-import { PaymentPlanTable } from "./[id]";
-import { Group, Table, Text, Divider, Flex, Button } from "@mantine/core";
-import { compare } from "../../utilities/index";
+import { Table, Card } from "@mantine/core";
+import { compare } from "@/utilities";
 
 const PaymentStatus: React.FC = () => {
   const fetchUpcomingPayments = useQuery(
@@ -48,6 +47,8 @@ const PaymentStatus: React.FC = () => {
   });
 
   return (
+      <Card shadow="sm" p="lg" radius="md" withBorder>
+          <Card.Section>
     <Table highlightOnHover>
       <thead>
         <tr>
@@ -61,6 +62,8 @@ const PaymentStatus: React.FC = () => {
       </thead>
       <tbody>{paymentPlanRows}</tbody>
     </Table>
+          </Card.Section>
+      </Card>
   );
 };
 
