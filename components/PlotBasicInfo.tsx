@@ -15,9 +15,9 @@ export const PlotBasicInfo: React.FC<PlotBasicInfoProps> = (props) => {
     //Hooks
     const router = useRouter();
     return (
-        <Card shadow="sm" p="lg" radius="md" withBorder style={{ margin: "25px 0 0 0" }}>
+        <Card shadow="sm" p="xl" radius="md" withBorder style={{ height: "100%" }}>
             <Card.Section withBorder inheritPadding py="xs">
-                <Group position="apart" mt="md" mb="xs">
+                <Group position="apart">
                     <Title order={3}>Basic Information</Title>
                     <Button
                         onClick={() =>

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import * as ReactQuery from "@tanstack/react-query";
-import { Group, Card, Text, Divider, Flex, Button } from "@mantine/core";
+import { Group, Card, Text, Divider, Flex, Button, Grid } from "@mantine/core";
 import { fetchPlotById } from "../../r-query/functions";
 import { PaymentPlanTable, PaymentHistoryTable, PlotBasicInfo, SellInfo } from "@/components";
 
@@ -37,8 +37,10 @@ const PlotPage = () => {
 
   return (
     <React.Fragment>
-      <PlotBasicInfo plotDetail={plotDetail} plotId={plotId} />
-      <SellInfo plotDetail={plotDetail} totalPayment={totalPayment} />
+      <Grid align={"stretch"} style={{ margin: "25px 0 0 0" }}>
+        <Grid.Col span={"auto"}><PlotBasicInfo plotDetail={plotDetail} plotId={plotId} /></Grid.Col>
+        <Grid.Col span={"auto"}><SellInfo plotDetail={plotDetail} totalPayment={totalPayment} /></Grid.Col>
+      </Grid>
       {plotDetail.plot.status !== "not_sold" ? (
         <React.Fragment>
           <PaymentPlanTable

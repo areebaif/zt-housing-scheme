@@ -11,31 +11,32 @@ export type SellInfoProps = {
 export const SellInfo: React.FC<SellInfoProps> = (props) => {
     const { plotDetail, totalPayment } = props;
     return (
-        <Card shadow="sm" p="lg" radius="md" withBorder style={{ margin: "25px 0 0 0" }}>
+        <Card shadow="sm" p="lg" radius="md" withBorder>
             <Card.Section withBorder inheritPadding py="xs">
                 <Title order={3}>Sell Information </Title>
             </Card.Section>
             <Card.Section inheritPadding py="xs">
                 <Flex direction="column" align="flex-start" gap="md" justify="flex-start">
                     <Text>
-                        Sell Price:{" "}
+                        <Text span weight={"bold"}>Sell Price:{" "}</Text>
                         {`${plotDetail?.plot?.sold_price}`.replace(
                             /\B(?=(\d{3})+(?!\d))/g,
                             ","
                         )}{" "}
                     </Text>
                     <Text>
-                        Sell Date: {new Date(`${plotDetail?.plot.sold_date}`).toDateString()}{" "}
+                        <Text span weight={"bold"}>Sell Date:</Text> {new Date(`${plotDetail?.plot.sold_date}`).toDateString()}{" "}
                     </Text>
                     <Text>
-                        Total Payment Recieved:{" "}
+                        <Text span weight={"bold"}>Total Payment Recieved:{" "}</Text>
                         {`${totalPayment}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
                     </Text>
                     <Text>
-                        Customer Name: {plotDetail?.customer?.name} Son/of:{" "}
-                        {plotDetail?.customer?.son_of}{" "}
+                        <Text span weight={"bold"}>Customer Name:</Text> {plotDetail?.customer?.name}
                     </Text>
-                    <Text>Customer cnic: {plotDetail?.customer?.cnic}</Text>
+                    <Text><Text span weight={"bold"}>Son/of:{" "}</Text>
+                        {plotDetail?.customer?.son_of}{" "}</Text>
+                    <Text><Text span weight={"bold"}>Customer CNIC:</Text> {plotDetail?.customer?.cnic}</Text>
                 </Flex>
             </Card.Section>
         </Card>
