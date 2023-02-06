@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import {
   Box,
-    Card,
+  Card,
   TextInput,
   Group,
   NumberInput,
@@ -11,7 +11,8 @@ import {
   Text,
   Autocomplete,
   Button,
-    Title,
+  Title,
+  Loader,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { fetchAllCustomers, postAddPlotSale } from "@/r-query/functions";
@@ -53,6 +54,9 @@ const NewPlot = () => {
     );
   const [existingCustomerUserSelect, setExisitngCustomerUserSelect] =
     React.useState("");
+
+  const [showNewCustomerFields, setShowNewCustomerFields] =
+    React.useState(false);
 
   // table props
   const [tableRows, setTableRows] = React.useState<TableRowItem[]>([]);
@@ -127,10 +131,10 @@ const NewPlot = () => {
     setSquareFeet(squareFeet);
     setExistingCustomerBackendData(fetchCustomers.data);
   }, [routerReady, fetchCustomers.data]);
-  
+
   if (fetchCustomers.isLoading) {
     // TODO: loading component
-    return <span>Loading...</span>;
+    return <Loader />;
   }
 
   if (fetchCustomers.isError) {
@@ -138,10 +142,37 @@ const NewPlot = () => {
   }
   // this has to remain outside useEffect otherwise throws error
 
-  const plotDetailsData = { plotId, setPlotId, dimension, setDimension, squareFeet, setSquareFeet }
-  const sellDetailsData = { sellDate, setSellDate, sellPrice, setSellPrice, downPayment, setDownPayment, developmentCharges, setDevelopmentCharges }
-  const customerDetailsData = { existingCustomerUserSelect, setExisitngCustomerUserSelect, existingCustomerBackendData, newCustomerName, setNewCustomerCNIC, setNewCustomerName, newCustomerCNIC, sonOf,
-    setSonOf}
+  const plotDetailsData = {
+    plotId,
+    setPlotId,
+    dimension,
+    setDimension,
+    squareFeet,
+    setSquareFeet,
+  };
+  const sellDetailsData = {
+    sellDate,
+    setSellDate,
+    sellPrice,
+    setSellPrice,
+    downPayment,
+    setDownPayment,
+    developmentCharges,
+    setDevelopmentCharges,
+  };
+  const customerDetailsData = {
+    existingCustomerUserSelect,
+    setExisitngCustomerUserSelect,
+    existingCustomerBackendData,
+    newCustomerName,
+    setNewCustomerCNIC,
+    setNewCustomerName,
+    newCustomerCNIC,
+    sonOf,
+    setSonOf,
+    showNewCustomerFields,
+    setShowNewCustomerFields,
+  };
 
   return router.query.plotId ? (
     <React.Fragment>
@@ -149,7 +180,7 @@ const NewPlot = () => {
       <SellDetailsInput {...sellDetailsData} />
       <CustomerDetailsInput {...customerDetailsData} />
       <PaymentPlanInput tableRows={tableRows} setTableRows={setTableRows} />
-      <Group position="center" style={{margin: "15px 0 0 0"}}>
+      <Group position="center" style={{ margin: "15px 0 0 0" }}>
         <Button size="xl" onClick={onSubmitForm}>
           Submit
         </Button>
@@ -167,46 +198,55 @@ type PlotDetailsInputProps = {
   setSquareFeet: (sqFeet: string) => void;
   dimension: string;
   setDimension: (value: string) => void;
-}
+};
 const PlotDetailsInput: React.FC<PlotDetailsInputProps> = (props) => {
-  const { plotId, setPlotId, squareFeet, setSquareFeet, dimension, setDimension } = props;
+  const {
+    plotId,
+    setPlotId,
+    squareFeet,
+    setSquareFeet,
+    dimension,
+    setDimension,
+  } = props;
   return (
-      <Card shadow="sm" p="lg" radius="md" withBorder>
-        <Card.Section withBorder inheritPadding py="xs">
+    <Card shadow="sm" p="lg" radius="md" withBorder>
+      <Card.Section withBorder inheritPadding py="xs">
         <Title order={3}>Plot Details</Title>
-        </Card.Section>
-        <Card.Section inheritPadding py="md">
+      </Card.Section>
+      <Card.Section inheritPadding py="md">
         <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
           <TextInput
-              value={plotId}
-              onChange={(event) => setPlotId(event.currentTarget.value)}
-              withAsterisk
-              error={
-                isNaN(parseInt(plotId)) ? "please enter a valid plot number" : ""
-              }
-              label="Plot Number"
-              placeholder="plot number"
+            value={plotId}
+            //onChange={(event) => setPlotId(event.currentTarget.value)}
+            withAsterisk
+            error={
+              isNaN(parseInt(plotId)) ? "please enter a valid plot number" : ""
+            }
+            label="Plot Number"
+            placeholder="plot number"
           />
           <TextInput
-              value={squareFeet}
-              onChange={(event) => setSquareFeet(event.currentTarget.value)}
-              error={
-                isNaN(parseInt(squareFeet)) ? "please enter a valid dimension" : ""
-              }
-              label="Square ft"
-              placeholder="square ft"
+            value={squareFeet}
+            //onChange={(event) => setSquareFeet(event.currentTarget.value)}
+            error={
+              isNaN(parseInt(squareFeet))
+                ? "please enter a valid dimension"
+                : ""
+            }
+            label="Square ft"
+            placeholder="square ft"
           />
           <TextInput
-              value={dimension}
-              label="Dimension"
-              onChange={(event) => setDimension(event.currentTarget.value)}
-              placeholder="dimension"
+            value={dimension}
+            label="Dimension"
+            //onChange={(event) => setDimension(event.currentTarget.value)}
+            placeholder="dimension"
           />
         </Flex>
-        </Card.Section>
-      </Card>
-  )
-}
+      </Card.Section>
+    </Card>
+  );
+};
 
 type SellDetailsInputProps = {
   sellDate: Date | null;
@@ -217,156 +257,214 @@ type SellDetailsInputProps = {
   setDownPayment: (payment: number | undefined) => void;
   developmentCharges: number | undefined;
   setDevelopmentCharges: (charges: number | undefined) => void;
-}
+};
 const SellDetailsInput: React.FC<SellDetailsInputProps> = (props) => {
-  const { sellDate, setSellDate, sellPrice, setSellPrice, downPayment, setDownPayment, developmentCharges, setDevelopmentCharges } = props;
+  const {
+    sellDate,
+    setSellDate,
+    sellPrice,
+    setSellPrice,
+    downPayment,
+    setDownPayment,
+    developmentCharges,
+    setDevelopmentCharges,
+  } = props;
   return (
-      <Card shadow="sm" p="lg" radius="md" withBorder style={{ overflow: "inherit", margin: "15px 0 0 0" }}>
-        <Card.Section withBorder inheritPadding py="xs">
-          <Title order={3}>Sell Detail</Title>
-        </Card.Section>
-        <Card.Section inheritPadding py="md">
-            <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
+    <Card
+      shadow="sm"
+      p="lg"
+      radius="md"
+      withBorder
+      style={{ overflow: "inherit", margin: "15px 0 0 0" }}
+    >
+      <Card.Section withBorder inheritPadding py="xs">
+        <Title order={3}>Sell Detail</Title>
+      </Card.Section>
+      <Card.Section inheritPadding py="md">
+        <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
           <DatePicker
-              inputFormat="ddd MMM D YYYY"
-              label={"select date"}
-              placeholder={"dd/mm/yyyy"}
-              withAsterisk
-              error={!sellDate}
-              value={sellDate}
-              onChange={setSellDate}
+            inputFormat="ddd MMM D YYYY"
+            label={"select date"}
+            placeholder={"dd/mm/yyyy"}
+            withAsterisk
+            error={!sellDate}
+            value={sellDate}
+            onChange={setSellDate}
           />
           <NumberInput
-              label="Sell Price"
-              value={sellPrice}
-              placeholder={"enter sold value"}
-              withAsterisk
-              onChange={(val) => setSellPrice(val)}
-              parser={(sellPrice) => sellPrice?.replace(/\$\s?|(,*)/g, "")}
-              error={
-                sellPrice ? (sellPrice < 1 ? "enter values above 0" : false) : true
-              }
-              formatter={(value) => {
-                return value
-                    ? !Number.isNaN(parseFloat(value))
-                        ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        : ""
-                    : "";
-              }}
+            label="Sell Price"
+            value={sellPrice}
+            placeholder={"enter sold value"}
+            withAsterisk
+            onChange={(val) => setSellPrice(val)}
+            parser={(sellPrice) => sellPrice?.replace(/\$\s?|(,*)/g, "")}
+            error={
+              sellPrice
+                ? sellPrice < 1
+                  ? "enter values above 0"
+                  : false
+                : true
+            }
+            formatter={(value) => {
+              return value
+                ? !Number.isNaN(parseFloat(value))
+                  ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""
+                : "";
+            }}
           />
           <NumberInput
-              label="Down Payment"
-              value={downPayment}
-              placeholder={"enter down payment"}
-              withAsterisk
-              onChange={(val) => setDownPayment(val)}
-              parser={(downPayment) => downPayment?.replace(/\$\s?|(,*)/g, "")}
-              error={
-                downPayment
-                    ? downPayment < 1
-                        ? "enter values above 0"
-                        : false
-                    : true
-              }
-              formatter={(value) => {
-                return value
-                    ? !Number.isNaN(parseFloat(value))
-                        ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        : ""
-                    : "";
-              }}
+            label="Down Payment"
+            value={downPayment}
+            placeholder={"enter down payment"}
+            withAsterisk
+            onChange={(val) => setDownPayment(val)}
+            parser={(downPayment) => downPayment?.replace(/\$\s?|(,*)/g, "")}
+            error={
+              downPayment
+                ? downPayment < 1
+                  ? "enter values above 0"
+                  : false
+                : true
+            }
+            formatter={(value) => {
+              return value
+                ? !Number.isNaN(parseFloat(value))
+                  ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""
+                : "";
+            }}
           />
           <NumberInput
-              label="development charges"
-              value={developmentCharges}
-              placeholder={"enter down payment"}
-              onChange={(val) => setDevelopmentCharges(val)}
-              parser={(developmentCharges) =>
-                  developmentCharges?.replace(/\$\s?|(,*)/g, "")
-              }
-              error={
-                developmentCharges
-                    ? developmentCharges < 0
-                        ? "enter values 0 or more than 0"
-                        : false
-                    : false
-              }
-              formatter={(value) => {
-                return value
-                    ? !Number.isNaN(parseFloat(value))
-                        ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        : ""
-                    : "";
-              }}
+            label="development charges"
+            value={developmentCharges}
+            placeholder={"enter down payment"}
+            onChange={(val) => setDevelopmentCharges(val)}
+            parser={(developmentCharges) =>
+              developmentCharges?.replace(/\$\s?|(,*)/g, "")
+            }
+            error={
+              developmentCharges
+                ? developmentCharges < 0
+                  ? "enter values 0 or more than 0"
+                  : false
+                : false
+            }
+            formatter={(value) => {
+              return value
+                ? !Number.isNaN(parseFloat(value))
+                  ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""
+                : "";
+            }}
           />
         </Flex>
-        </Card.Section>
-      </Card>
-  )
-}
+      </Card.Section>
+    </Card>
+  );
+};
 
 type CustomerDetailsInputProps = {
   existingCustomerUserSelect: string;
   setExisitngCustomerUserSelect: (val: string) => void;
-  existingCustomerBackendData: { id: number; cnic: string; value: string }[] | undefined;
+  existingCustomerBackendData:
+    | { id: number; cnic: string; value: string }[]
+    | undefined;
   newCustomerName: string;
   setNewCustomerName: (val: string) => void;
   sonOf: string;
   setSonOf: (val: string) => void;
   newCustomerCNIC: string;
   setNewCustomerCNIC: (val: string) => void;
-
-
-}
+  showNewCustomerFields: boolean;
+  setShowNewCustomerFields: (val: boolean) => void;
+};
 const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
-  const { existingCustomerUserSelect, setExisitngCustomerUserSelect, existingCustomerBackendData, newCustomerName, setNewCustomerCNIC, setNewCustomerName, newCustomerCNIC, sonOf,
-  setSonOf} = props;
+  const {
+    existingCustomerUserSelect,
+    setExisitngCustomerUserSelect,
+    existingCustomerBackendData,
+    newCustomerName,
+    setNewCustomerCNIC,
+    setNewCustomerName,
+    newCustomerCNIC,
+    sonOf,
+    setSonOf,
+    showNewCustomerFields,
+    setShowNewCustomerFields,
+  } = props;
   return (
-      <Card shadow="sm" p="lg" radius="md" withBorder style={{ overflow: "inherit", margin: "15px 0 0 0" }}>
-          <Card.Section withBorder inheritPadding py="xs">
-              <Title order={3}>Customer Details</Title>
-          </Card.Section>
-          <Card.Section inheritPadding py="md">
-              <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
+    <Card
+      shadow="sm"
+      p="lg"
+      radius="md"
+      withBorder
+      style={{ overflow: "inherit", margin: "15px 0 0 0" }}
+    >
+      <Card.Section withBorder inheritPadding py="xs">
+        <Title order={3}>Customer Details</Title>
+      </Card.Section>
+      <Card.Section inheritPadding py="md">
+        <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
           <Autocomplete
-              label="exisitng customer cnic no"
-              placeholder="Start typing to see exisitng customer cnic no"
-              value={existingCustomerUserSelect}
-              onChange={setExisitngCustomerUserSelect}
-              data={
-                existingCustomerUserSelect.length
-                    ? existingCustomerBackendData
-                        ? existingCustomerBackendData
-                        : []
-                    : []
-              }
+            label="exisitng customer cnic no"
+            placeholder="Start typing to see exisitng customer cnic no"
+            value={existingCustomerUserSelect}
+            onChange={setExisitngCustomerUserSelect}
+            data={
+              existingCustomerUserSelect.length
+                ? existingCustomerBackendData
+                  ? existingCustomerBackendData
+                  : []
+                : []
+            }
           />
-          <Box sx={(theme) => ({ padding: theme.spacing.lg })}>
-            <Text>or</Text>
+          <Box sx={(theme) => ({ padding: theme.spacing.xl })}>
+            <Title sx={(theme) => ({ marginTop: "5px" })} order={5}>
+              or
+            </Title>
           </Box>
-          <TextInput
-              value={newCustomerName}
-              onChange={(event) => setNewCustomerName(event.currentTarget.value)}
-              label="customer name"
-              placeholder="name"
-          />
-          <TextInput
-              value={sonOf}
-              onChange={(event) => setSonOf(event.currentTarget.value)}
-              label="son/of"
-              placeholder="son/of"
-          />
-          <TextInput
-              value={newCustomerCNIC}
-              onChange={(event) => setNewCustomerCNIC(event.currentTarget.value)}
-              label="cnic no"
-              placeholder="cnic no"
-          />
+          {!showNewCustomerFields ? (
+            <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
+              <Button
+                onClick={() => {
+                  setShowNewCustomerFields(true);
+                }}
+              >
+                Add New Customer
+              </Button>
+            </Box>
+          ) : (
+            <Box>
+              <TextInput
+                value={newCustomerName}
+                onChange={(event) =>
+                  setNewCustomerName(event.currentTarget.value)
+                }
+                label="customer name"
+                placeholder="name"
+              />
+              <TextInput
+                value={sonOf}
+                onChange={(event) => setSonOf(event.currentTarget.value)}
+                label="son/of"
+                placeholder="son/of"
+              />
+              <TextInput
+                value={newCustomerCNIC}
+                onChange={(event) =>
+                  setNewCustomerCNIC(event.currentTarget.value)
+                }
+                label="cnic no"
+                placeholder="cnic no"
+              />
+            </Box>
+          )}
         </Flex>
-          </Card.Section>
-      </Card>
-  )
-}
+      </Card.Section>
+    </Card>
+  );
+};
 
 type PaymentPlanInputProps = {
   tableRows: TableRowItem[];
@@ -376,17 +474,23 @@ type PaymentPlanInputProps = {
 const PaymentPlanInput: React.FC<PaymentPlanInputProps> = (props) => {
   const { tableRows, setTableRows } = props;
   return (
-      <Card shadow="sm" p="lg" radius="md" withBorder style={{ overflow: "inherit", margin: "15px 0 0 0" }}>
-          <Card.Section withBorder inheritPadding py="xs">
-            <Title order={3}>Payment Plan</Title>
-          </Card.Section>
-        <UpsertTableRows
-            tableHeader=""
-            tableRows={tableRows}
-            setTableRows={setTableRows}
-        />
-      </Card>
-  )
-}
+    <Card
+      shadow="sm"
+      p="lg"
+      radius="md"
+      withBorder
+      style={{ overflow: "inherit", margin: "15px 0 0 0" }}
+    >
+      <Card.Section withBorder inheritPadding py="xs">
+        <Title order={3}>Payment Plan</Title>
+      </Card.Section>
+      <UpsertTableRows
+        tableHeader=""
+        tableRows={tableRows}
+        setTableRows={setTableRows}
+      />
+    </Card>
+  );
+};
 
 export default NewPlot;
