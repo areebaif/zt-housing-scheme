@@ -1,9 +1,14 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import * as ReactQuery from "@tanstack/react-query";
-import { Group, Card, Text, Divider, Flex, Button, Grid } from "@mantine/core";
+import { Divider, Grid, Loader } from "@mantine/core";
 import { fetchPlotById } from "../../r-query/functions";
-import { PaymentPlanTable, PaymentHistoryTable, PlotBasicInfo, SellInfo } from "@/components";
+import {
+  PaymentPlanTable,
+  PaymentHistoryTable,
+  PlotBasicInfo,
+  SellInfo,
+} from "@/components";
 
 const PlotPage = () => {
   const router = useRouter();
@@ -20,7 +25,7 @@ const PlotPage = () => {
   if (fetchplot.isLoading) {
     // TODO: loading component
     console.log("loading");
-    return <span>Loading...</span>;
+    return <Loader />;
   }
 
   if (fetchplot.isError) {
@@ -38,8 +43,12 @@ const PlotPage = () => {
   return (
     <React.Fragment>
       <Grid align={"stretch"} style={{ margin: "25px 0 0 0" }}>
-        <Grid.Col span={"auto"}><PlotBasicInfo plotDetail={plotDetail} plotId={plotId} /></Grid.Col>
-        <Grid.Col span={"auto"}><SellInfo plotDetail={plotDetail} totalPayment={totalPayment} /></Grid.Col>
+        <Grid.Col span={"auto"}>
+          <PlotBasicInfo plotDetail={plotDetail} plotId={plotId} />
+        </Grid.Col>
+        <Grid.Col span={"auto"}>
+          <SellInfo plotDetail={plotDetail} totalPayment={totalPayment} />
+        </Grid.Col>
       </Grid>
       {plotDetail.plot.status !== "not_sold" ? (
         <React.Fragment>
@@ -49,7 +58,11 @@ const PlotPage = () => {
             sonOf={plotDetail?.customer?.son_of}
           />
           <Divider my="sm" variant="dashed" />
-          <PaymentHistoryTable plotDetail={plotDetail} plotId={plotId} tableRows={plotDetail.payment_history} />
+          <PaymentHistoryTable
+            plotDetail={plotDetail}
+            plotId={plotId}
+            tableRows={plotDetail.payment_history}
+          />
         </React.Fragment>
       ) : (
         <div></div>

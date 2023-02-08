@@ -7,8 +7,10 @@ import { createIncrementalCompilerHost } from "typescript";
 
 export interface CustomerSelectFields {
   id: number;
-  cnic: string;
+  //cnic: string;
   value: string;
+  name: string;
+  son_of: string | null;
 }
 
 export default async function allCustomers(
@@ -16,10 +18,16 @@ export default async function allCustomers(
   res: NextApiResponse<CustomerSelectFields[]>
 ) {
   const data = await prisma.customer.findMany({
-    select: { id: true, cnic: true },
+    select: { id: true, cnic: true, name: true, son_of: true },
   });
   const mappedData = data.map((element) => {
-    return { id: element.id, cnic: element.cnic, value: element.cnic };
+    return {
+      id: element.id,
+      //cnic: element.cnic,
+      value: element.cnic,
+      name: element.name,
+      son_of: element.son_of,
+    };
   });
   res.status(200).json(mappedData);
 }

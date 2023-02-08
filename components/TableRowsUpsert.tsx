@@ -6,9 +6,13 @@ import {
   NumberInput,
   Box,
   TextInput,
+  Flex,
+  Card,
+  Title,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { formatAddTime } from "../utilities";
+import { ThemeContext } from "@emotion/react";
 
 export interface TableRowItem {
   id: number;
@@ -98,59 +102,58 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
     setDescription("");
   };
   return (
-    <Table highlightOnHover>
-      <thead>
-        <tr>
-          <th colSpan={3}>
-            <Text align="center">{tableHeader}</Text>
-          </th>
-        </tr>
-        <tr>
-          <th>Date</th>
-          {descriptionField ? <th>Description</th> : undefined}
-          <th>Value</th>
-          <th>Add or Delete Values</th>
-        </tr>
-      </thead>
-      <tbody>
-        {fixedPaymentPlan}
-        <tr>
-          <td>
-            <Box>
-              <DatePicker
-                inputFormat="ddd MMM D YYYY"
-                label={"select date"}
-                placeholder={"dd/mm/yyyy"}
-                withAsterisk
-                value={paymentPlanDateItem}
-                onChange={setPaymentPlanDateItem}
-              />
-            </Box>
-          </td>
-          {descriptionField ? (
-            <td>
+    <React.Fragment>
+      <Card
+        shadow="sm"
+        p="lg"
+        radius="md"
+        withBorder
+        style={{
+          overflow: "inherit",
+          margin: "15px 0 0 0",
+        }}
+        sx={(theme) => ({ backgroundColor: theme.colors.gray[1] })}
+      >
+        {/* <Card.Section withBorder inheritPadding py="xs">
+          <Title order={3}>Sell Detail</Title>
+        </Card.Section> */}
+        <Card.Section inheritPadding py="md">
+          <Flex
+            direction="row"
+            align="flex-start"
+            gap="md"
+            justify="flex-start"
+          >
+            <DatePicker
+              inputFormat="ddd MMM D YYYY"
+              label={"select date"}
+              placeholder={"dd/mm/yyyy"}
+              withAsterisk
+              error={!paymentPlanDateItem}
+              value={paymentPlanDateItem}
+              onChange={setPaymentPlanDateItem}
+            />
+            {descriptionField ? (
               <TextInput
                 value={description}
                 label="description"
                 onChange={(event) => setDescription(event.currentTarget.value)}
                 placeholder="description"
               />
-            </td>
-          ) : undefined}
-          <td>
+            ) : undefined}
             <NumberInput
               label="payment value"
               value={paymentPlanValueItem}
+              placeholder={"enter Value to be Collected"}
               withAsterisk
-              placeholder={"enter value to be collected"}
               onChange={(val) => setPaymentPlanValueItem(val)}
-              parser={(sellPrice) => sellPrice?.replace(/\$\s?|(,*)/g, "")}
+              parser={(val) => val?.replace(/\$\s?|(,*)/g, "")}
               error={
                 paymentPlanValueItem
-                  ? paymentPlanValueItem < 0
+                  ? paymentPlanValueItem < 1
                     ? "enter values above 0"
                     : false
-                  : false
+                  : true
               }
               formatter={(value) => {
                 return value
@@ -160,16 +163,93 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
                   : "";
               }}
             />
-          </td>
-          <td>
-            {
+            <Box
+              sx={(theme) => ({
+                paddingTop: theme.spacing.xl,
+              })}
+            >
               <Button variant="outline" onClick={onAddRow}>
-                Add Values
+                Add Value
               </Button>
-            }
-          </td>
-        </tr>
-      </tbody>
-    </Table>
+            </Box>
+          </Flex>
+        </Card.Section>
+      </Card>
+      <Table highlightOnHover>
+        <thead>
+          <tr>
+            <th colSpan={3}>
+              <Text align="center">{tableHeader}</Text>
+            </th>
+          </tr>
+          <tr>
+            <th>Date</th>
+            {descriptionField ? <th>Description</th> : undefined}
+            <th>Value</th>
+            <th>Delete Values</th>
+          </tr>
+        </thead>
+        <tbody>
+          {fixedPaymentPlan}
+          {/* <tr>
+            <td>
+              <Box>
+                <DatePicker
+                  inputFormat="ddd MMM D YYYY"
+                  label={"select date"}
+                  placeholder={"dd/mm/yyyy"}
+                  withAsterisk
+                  value={paymentPlanDateItem}
+                  onChange={setPaymentPlanDateItem}
+                />
+              </Box>
+            </td>
+            {descriptionField ? (
+              <td>
+                <TextInput
+                  value={description}
+                  label="description"
+                  onChange={(event) =>
+                    setDescription(event.currentTarget.value)
+                  }
+                  placeholder="description"
+                />
+              </td>
+            ) : undefined}
+            <td>
+              <NumberInput
+                label="payment value"
+                value={paymentPlanValueItem}
+                withAsterisk
+                placeholder={"enter value to be collected"}
+                onChange={(val) => setPaymentPlanValueItem(val)}
+                parser={(sellPrice) => sellPrice?.replace(/\$\s?|(,*)/g, "")}
+                error={
+                  paymentPlanValueItem
+                    ? paymentPlanValueItem < 0
+                      ? "enter values above 0"
+                      : false
+                    : false
+                }
+                formatter={(value) => {
+                  return value
+                    ? !Number.isNaN(parseFloat(value))
+                      ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      : ""
+                    : "";
+                }}
+              />
+            </td>
+            <td>
+              {
+                <Button variant="outline" onClick={onAddRow}>
+                  Add Values
+                </Button>
+              }
+            </td>
+          </tr> */}
+        </tbody>
+      </Table>
+    </React.Fragment>
   );
 };

@@ -21,6 +21,22 @@ import {
   TableRowItem,
 } from "../../../components/TableRowsUpsert";
 import { formatAddTime } from "@/utilities";
+import { CustomerSelectFields } from "@/pages/api/customer/all";
+
+export interface FormPostProps {
+  plotId: string;
+  sellPrice: number;
+  soldDateString: string;
+  downPayment: number;
+  developmentCharges: number | undefined;
+  customer: {
+    customerCNIC: string;
+    customerName: string;
+    sonOf: string;
+    newCustomer: boolean;
+  };
+  paymentPlan: TableRowItem[];
+}
 
 const NewPlot = () => {
   const queryClient = useQueryClient();
@@ -42,21 +58,18 @@ const NewPlot = () => {
   const [developmentCharges, setDevelopmentCharges] = React.useState<
     number | undefined
   >(0);
+  const [developmentChargePercent, setDevelopmentChargePercent] =
+    React.useState<number | undefined>(undefined);
   const [sellDate, setSellDate] = React.useState<Date | null>(null);
   // new customer props
-  const [newCustomerName, setNewCustomerName] = React.useState("");
+  const [customerName, setCustomerName] = React.useState("");
   const [sonOf, setSonOf] = React.useState("");
-  const [newCustomerCNIC, setNewCustomerCNIC] = React.useState("");
-  // existing customer props
+  const [customerCNIC, setCustomerCNIC] = React.useState("");
+  //existing customer props
   const [existingCustomerBackendData, setExistingCustomerBackendData] =
-    React.useState<{ id: number; cnic: string; value: string }[] | undefined>(
-      []
-    );
-  const [existingCustomerUserSelect, setExisitngCustomerUserSelect] =
-    React.useState("");
+    React.useState<CustomerSelectFields[] | undefined>([]);
 
-  const [showNewCustomerFields, setShowNewCustomerFields] =
-    React.useState(false);
+  const [isNewCustomer, setIsNewCustomer] = React.useState(false);
 
   // table props
   const [tableRows, setTableRows] = React.useState<TableRowItem[]>([]);
@@ -82,21 +95,11 @@ const NewPlot = () => {
       throw new Error(
         "please provide plotNumber, Sell Date ad Sell Price to submit the form"
       );
-    // customer data fields validation
-    if (
-      !existingCustomerUserSelect &&
-      (!newCustomerName || !newCustomerCNIC || !sonOf)
-    )
-      throw new Error(
-        "Please enter customer data: Either select an existing customer or enter information for new customer"
-      );
-    if (
-      existingCustomerUserSelect &&
-      (newCustomerName || newCustomerCNIC || sonOf)
-    )
-      throw new Error(
-        "please select either from existing customer or add a new customer"
-      );
+
+    //customer data fields validation
+    if (!customerCNIC) throw new Error("Please enter cnic");
+    if (isNewCustomer && (!customerName || !customerCNIC || !sonOf))
+      throw new Error("please enter customer name son of and cnic");
     // payment plan fields validation
     if (!tableRows.length)
       throw new Error("please enter a payment plan for customer");
@@ -104,22 +107,22 @@ const NewPlot = () => {
 
     const soldDateString = formatAddTime(`${sellDate}`);
 
-    const data = {
+    const data: FormPostProps = {
       plotId,
       sellPrice,
       soldDateString,
       downPayment,
       developmentCharges,
       customer: {
-        newCustomerCNIC,
-        newCustomerName,
+        customerCNIC,
+        customerName,
         sonOf,
-        existingCustomer: existingCustomerUserSelect,
+        newCustomer: isNewCustomer,
       },
       paymentPlan: tableRows,
     };
-    console.log("submit data", data);
-    mutation.mutate(data);
+    console.log(data);
+    //mutation.mutate(data);
   };
 
   React.useEffect(() => {
@@ -138,7 +141,7 @@ const NewPlot = () => {
   }
 
   if (fetchCustomers.isError) {
-    return <span>Error: error occured</span>;
+    return <Loader />;
   }
   // this has to remain outside useEffect otherwise throws error
 
@@ -159,19 +162,19 @@ const NewPlot = () => {
     setDownPayment,
     developmentCharges,
     setDevelopmentCharges,
+    developmentChargePercent,
+    setDevelopmentChargePercent,
   };
   const customerDetailsData = {
-    existingCustomerUserSelect,
-    setExisitngCustomerUserSelect,
+    customerCNIC,
+    setCustomerCNIC,
     existingCustomerBackendData,
-    newCustomerName,
-    setNewCustomerCNIC,
-    setNewCustomerName,
-    newCustomerCNIC,
+    customerName,
+    setCustomerName,
     sonOf,
     setSonOf,
-    showNewCustomerFields,
-    setShowNewCustomerFields,
+    isNewCustomer,
+    setIsNewCustomer,
   };
 
   return router.query.plotId ? (
@@ -202,11 +205,11 @@ type PlotDetailsInputProps = {
 const PlotDetailsInput: React.FC<PlotDetailsInputProps> = (props) => {
   const {
     plotId,
-    setPlotId,
+    //setPlotId,
     squareFeet,
-    setSquareFeet,
+    //setSquareFeet,
     dimension,
-    setDimension,
+    //setDimension,
   } = props;
   return (
     <Card shadow="sm" p="lg" radius="md" withBorder>
@@ -222,8 +225,9 @@ const PlotDetailsInput: React.FC<PlotDetailsInputProps> = (props) => {
             error={
               isNaN(parseInt(plotId)) ? "please enter a valid plot number" : ""
             }
-            label="Plot Number"
+            label="plot number"
             placeholder="plot number"
+            disabled={true}
           />
           <TextInput
             value={squareFeet}
@@ -233,14 +237,16 @@ const PlotDetailsInput: React.FC<PlotDetailsInputProps> = (props) => {
                 ? "please enter a valid dimension"
                 : ""
             }
-            label="Square ft"
+            label="square ft"
             placeholder="square ft"
+            disabled={true}
           />
           <TextInput
             value={dimension}
-            label="Dimension"
+            label="dimension"
             //onChange={(event) => setDimension(event.currentTarget.value)}
             placeholder="dimension"
+            disabled={true}
           />
         </Flex>
       </Card.Section>
@@ -257,6 +263,8 @@ type SellDetailsInputProps = {
   setDownPayment: (payment: number | undefined) => void;
   developmentCharges: number | undefined;
   setDevelopmentCharges: (charges: number | undefined) => void;
+  developmentChargePercent: number | undefined;
+  setDevelopmentChargePercent: (charges: number | undefined) => void;
 };
 const SellDetailsInput: React.FC<SellDetailsInputProps> = (props) => {
   const {
@@ -268,6 +276,8 @@ const SellDetailsInput: React.FC<SellDetailsInputProps> = (props) => {
     setDownPayment,
     developmentCharges,
     setDevelopmentCharges,
+    developmentChargePercent,
+    setDevelopmentChargePercent,
   } = props;
   return (
     <Card
@@ -292,7 +302,7 @@ const SellDetailsInput: React.FC<SellDetailsInputProps> = (props) => {
             onChange={setSellDate}
           />
           <NumberInput
-            label="Sell Price"
+            label="sell price"
             value={sellPrice}
             placeholder={"enter sold value"}
             withAsterisk
@@ -314,7 +324,7 @@ const SellDetailsInput: React.FC<SellDetailsInputProps> = (props) => {
             }}
           />
           <NumberInput
-            label="Down Payment"
+            label="down payment"
             value={downPayment}
             placeholder={"enter down payment"}
             withAsterisk
@@ -336,19 +346,48 @@ const SellDetailsInput: React.FC<SellDetailsInputProps> = (props) => {
             }}
           />
           <NumberInput
-            label="development charges"
-            value={developmentCharges}
-            placeholder={"enter down payment"}
-            onChange={(val) => setDevelopmentCharges(val)}
+            label="development charges (% of sell price)"
+            value={developmentChargePercent}
+            placeholder={"enter value between 0 and 100"}
+            onChange={(val) => setDevelopmentChargePercent(val)}
             parser={(developmentCharges) =>
               developmentCharges?.replace(/\$\s?|(,*)/g, "")
             }
             error={
-              developmentCharges
-                ? developmentCharges < 0
-                  ? "enter values 0 or more than 0"
+              developmentChargePercent
+                ? developmentChargePercent < 0 || developmentChargePercent > 100
+                  ? "enter values between 0 and 100"
                   : false
                 : false
+            }
+            formatter={(value) => {
+              return value
+                ? !Number.isNaN(parseFloat(value))
+                  ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""
+                : "";
+            }}
+          />
+          <NumberInput
+            label="development charges (pkr)"
+            value={
+              developmentChargePercent && sellPrice
+                ? (developmentChargePercent / 100) * sellPrice
+                : 0
+            }
+            placeholder={
+              developmentCharges === 0 ? "enter sell price and % for value" : ""
+            }
+            // onChange={(val) => {
+            //   const value =
+            //     developmentChargePercent && sellPrice
+            //       ? developmentChargePercent * sellPrice
+            //       : 0;
+            //   setDevelopmentCharges(value);
+            // }}
+            disabled={true}
+            parser={(developmentCharges) =>
+              developmentCharges?.replace(/\$\s?|(,*)/g, "")
             }
             formatter={(value) => {
               return value
@@ -365,34 +404,52 @@ const SellDetailsInput: React.FC<SellDetailsInputProps> = (props) => {
 };
 
 type CustomerDetailsInputProps = {
-  existingCustomerUserSelect: string;
-  setExisitngCustomerUserSelect: (val: string) => void;
-  existingCustomerBackendData:
-    | { id: number; cnic: string; value: string }[]
-    | undefined;
-  newCustomerName: string;
-  setNewCustomerName: (val: string) => void;
+  customerCNIC: string;
+  setCustomerCNIC: (val: string) => void;
+  existingCustomerBackendData: CustomerSelectFields[] | undefined;
+  customerName: string;
+  setCustomerName: (val: string) => void;
   sonOf: string;
   setSonOf: (val: string) => void;
-  newCustomerCNIC: string;
-  setNewCustomerCNIC: (val: string) => void;
-  showNewCustomerFields: boolean;
-  setShowNewCustomerFields: (val: boolean) => void;
+  isNewCustomer: boolean;
+  setIsNewCustomer: (val: boolean) => void;
 };
 const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
   const {
-    existingCustomerUserSelect,
-    setExisitngCustomerUserSelect,
+    customerCNIC,
+    setCustomerCNIC,
     existingCustomerBackendData,
-    newCustomerName,
-    setNewCustomerCNIC,
-    setNewCustomerName,
-    newCustomerCNIC,
+    customerName,
+    setCustomerName,
     sonOf,
     setSonOf,
-    showNewCustomerFields,
-    setShowNewCustomerFields,
+    isNewCustomer,
+    setIsNewCustomer,
   } = props;
+
+  const [showCustomerFields, setShowCustomerFields] = React.useState(false);
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      FindExistingCustomerSetValues();
+    }
+  };
+
+  const FindExistingCustomerSetValues = () => {
+    const exisitngCustomer = existingCustomerBackendData?.filter(
+      (item) => item.value === customerCNIC
+    );
+
+    if (exisitngCustomer?.length) {
+      setCustomerName(exisitngCustomer[0].name);
+      setSonOf(exisitngCustomer[0].son_of ? exisitngCustomer[0].son_of : "");
+      setShowCustomerFields(true);
+    } else {
+      setIsNewCustomer(true);
+      setShowCustomerFields(true);
+    }
+  };
+
   return (
     <Card
       shadow="sm"
@@ -406,25 +463,77 @@ const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
       </Card.Section>
       <Card.Section inheritPadding py="md">
         <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
-          <Autocomplete
-            label="exisitng customer cnic no"
-            placeholder="Start typing to see exisitng customer cnic no"
-            value={existingCustomerUserSelect}
-            onChange={setExisitngCustomerUserSelect}
-            data={
-              existingCustomerUserSelect.length
-                ? existingCustomerBackendData
-                  ? existingCustomerBackendData
-                  : []
-                : []
-            }
-          />
-          <Box sx={(theme) => ({ padding: theme.spacing.xl })}>
-            <Title sx={(theme) => ({ marginTop: "5px" })} order={5}>
-              or
-            </Title>
-          </Box>
-          {!showNewCustomerFields ? (
+          {!showCustomerFields ? (
+            <Flex
+              direction="row"
+              align="flex-start"
+              gap="md"
+              justify="flex-start"
+            >
+              <TextInput
+                label="CNIC Number: Type to search existing customer cnic or add a new customer"
+                placeholder="CNIC"
+                value={customerCNIC}
+                onChange={(event) => setCustomerCNIC(event.currentTarget.value)}
+                onKeyDown={(e) => onKeyDown(e)}
+              />
+              <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    FindExistingCustomerSetValues();
+                  }}
+                >
+                  Search
+                </Button>
+              </Box>
+            </Flex>
+          ) : (
+            <Flex
+              direction="row"
+              align="flex-start"
+              gap="md"
+              justify="flex-start"
+            >
+              <TextInput
+                value={customerName}
+                label="customer name"
+                placeholder="name"
+                onChange={(event) => setCustomerName(event.currentTarget.value)}
+                disabled={!isNewCustomer}
+              />
+              <TextInput
+                value={sonOf ? sonOf : ""}
+                label="son/of"
+                placeholder="son of"
+                onChange={(event) => setSonOf(event.currentTarget.value)}
+                disabled={!isNewCustomer}
+              />{" "}
+              <TextInput
+                value={customerCNIC}
+                onChange={(event) => {
+                  setCustomerCNIC(event.currentTarget.value);
+                }}
+                label="cnic no"
+                placeholder="cnic no"
+                disabled={!isNewCustomer}
+              />
+              <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
+                <Button
+                  onClick={() => {
+                    setShowCustomerFields(false);
+                    setCustomerName("");
+                    setSonOf("");
+                    setIsNewCustomer(false);
+                  }}
+                >
+                  Back
+                </Button>
+              </Box>
+            </Flex>
+          )}
+
+          {/* {!showNewCustomerFields ? (
             <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
               <Button
                 onClick={() => {
@@ -435,7 +544,12 @@ const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
               </Button>
             </Box>
           ) : (
-            <Box>
+            <Flex
+              direction="row"
+              align="flex-start"
+              gap="md"
+              justify="flex-start"
+            >
               <TextInput
                 value={newCustomerName}
                 onChange={(event) =>
@@ -458,8 +572,8 @@ const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
                 label="cnic no"
                 placeholder="cnic no"
               />
-            </Box>
-          )}
+            </Flex>
+          )} */}
         </Flex>
       </Card.Section>
     </Card>

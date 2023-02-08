@@ -31,9 +31,9 @@ export default async function upsertPlots(
 
     // check existing customer or new customer
     let customerId: number | undefined;
-    if (customer.existingCustomer) {
+    if (!customer.newCustomer) {
       const customerVal = await prisma.customer.findUnique({
-        where: { cnic: customer.existingCustomer },
+        where: { cnic: customer.customerCNIC },
       });
       customerId = customerVal?.id;
       if (!customerId) throw new Error("cannot find customer with supplied Id");
@@ -93,15 +93,15 @@ export default async function upsertPlots(
       data: paymentPlanArray,
     });
 
-    if (customer.existingCustomer) {
+    if (!customer.newCustomer) {
       await prisma.$transaction([updatePlot, addPayment, payment_plan]);
     } else {
       const addCustomer = prisma.customer.create({
         data: {
           id: customerId,
-          name: customer.newCustomerName,
+          name: customer.customerName,
           son_of: customer.sonOf,
-          cnic: customer.newCustomerCNIC,
+          cnic: customer.customerCNIC,
         },
       });
       await prisma.$transaction([
