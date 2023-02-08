@@ -38,6 +38,8 @@ export interface FormPostProps {
   paymentPlan: TableRowItem[];
 }
 
+// TODO: show development Charges in Payment Plan when are they collected????
+
 const NewPlot = () => {
   const queryClient = useQueryClient();
   // router props
@@ -122,7 +124,7 @@ const NewPlot = () => {
       paymentPlan: tableRows,
     };
     console.log(data);
-    //mutation.mutate(data);
+    mutation.mutate(data);
   };
 
   React.useEffect(() => {
@@ -135,7 +137,7 @@ const NewPlot = () => {
     setExistingCustomerBackendData(fetchCustomers.data);
   }, [routerReady, fetchCustomers.data]);
 
-  if (fetchCustomers.isLoading) {
+  if (fetchCustomers.isLoading || mutation.isLoading) {
     // TODO: loading component
     return <Loader />;
   }

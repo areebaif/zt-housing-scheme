@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useRouter } from "next/router";
-import { Text, Group, Button } from "@mantine/core";
+import { Text, Group, Button, Loader } from "@mantine/core";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import {
   UpsertTableRows,
@@ -52,6 +52,10 @@ const AddPayment: React.FC = () => {
     setCustomerName(name);
     setSonOf(sonOf);
   }, [routerReady]);
+
+  if (mutation.isLoading) {
+    return <Loader />;
+  }
   return (
     <React.Fragment>
       <Text>

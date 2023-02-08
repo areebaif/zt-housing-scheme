@@ -175,7 +175,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
           </Flex>
         </Card.Section>
       </Card>
-      <Table highlightOnHover>
+      <Table highlightOnHover fontSize="lg">
         <thead>
           <tr>
             <th colSpan={3}>
