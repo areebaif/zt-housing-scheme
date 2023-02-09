@@ -34,7 +34,7 @@ export const SellInfo: React.FC<SellInfoProps> = (props) => {
           </Text>
           <Text>
             <Text span weight={"bold"}>
-              Sell Date:
+              Sell Date:{" "}
             </Text>
             {plotDetail?.plot.sold_date
               ? new Date(`${plotDetail?.plot.sold_date}`).toDateString()

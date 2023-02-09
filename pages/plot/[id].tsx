@@ -57,7 +57,7 @@ const PlotPage = () => {
             customerName={plotDetail?.customer?.name}
             sonOf={plotDetail?.customer?.son_of}
           />
-          <Divider my="sm" variant="dashed" />
+
           <PaymentHistoryTable
             plotDetail={plotDetail}
             plotId={plotId}
