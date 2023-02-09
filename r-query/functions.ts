@@ -2,7 +2,7 @@ import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
 import { PlotsSelectFields } from "../pages/api/plot/all";
 import { PlotDetail } from "../pages/api/plot/[id]";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
-import {PaymentSchedule} from "@/pages/api/payment/upcoming"
+import { PaymentStatus } from "@/pages/api/payment/paymentStatus";
 import { TableRowItem } from "../components/TableRowsUpsert";
 
 export const fetchAllPlots = async () => {
@@ -67,13 +67,13 @@ export const postPlotPayment = async (data: {
   return res;
 };
 
-export const upComingPayments = async () => {
-  const response = await fetch(`/api/payment/upcoming`, {
+export const paymentStatus = async () => {
+  const response = await fetch(`/api/payment/paymentStatus`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const res: {upcomingPayments: PaymentSchedule[]} = await response.json();
+  const res: PaymentStatus = await response.json();
   return res;
 };

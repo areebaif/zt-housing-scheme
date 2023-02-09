@@ -2,10 +2,7 @@ import * as React from "react";
 import { useRouter } from "next/router";
 import { Text, Group, Button, Loader, Card, Title, Grid } from "@mantine/core";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import {
-  UpsertTableRows,
-  TableRowItem,
-} from "../../../components/TableRowsUpsert";
+import { TableRowItem } from "../../../components/TableRowsUpsert";
 import { postPlotPayment } from "@/r-query/functions";
 import { PaymentInput } from "@/components/PaymentInput";
 
@@ -35,7 +32,6 @@ const AddPayment: React.FC = () => {
 
   const onSubmitForm = () => {
     // data validation
-    console.log(tableRows, " I am row");
     if (!tableRows.length) throw new Error(" Please provide data to submit");
 
     const data = { payment: tableRows, customerId, plotId };
@@ -58,7 +54,7 @@ const AddPayment: React.FC = () => {
   if (mutation.isLoading) {
     return <Loader />;
   }
-
+  // TODO: error handling
   if (mutation.isError) {
     return <div>Cannot add payment at this time, please try later</div>;
   }
