@@ -6,9 +6,13 @@ import { prisma } from "../../../db/prisma";
 import { TableRowItem } from "@/components/TableRowsUpsert";
 import { PlotDetail } from "../plot/[id]";
 
+export interface PostReturnType {
+  created: true;
+}
+
 export default async function addPayment(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<PostReturnType>
 ) {
   try {
     const payment = req.body.payment as TableRowItem[];

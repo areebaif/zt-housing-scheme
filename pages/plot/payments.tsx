@@ -1,24 +1,24 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { paymentStatus } from "@/r-query/functions";
+import { fetchPaymentStatus } from "@/r-query/functions";
 import { Table, Card, Loader } from "@mantine/core";
 import { compare } from "@/utilities";
 
 const PaymentStatus: React.FC = () => {
-  const fetchPaymentStatus = useQuery(["upcomingPayments"], paymentStatus, {
+  const fetchStatus = useQuery(["upcomingPayments"], fetchPaymentStatus, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-  if (fetchPaymentStatus.isLoading) {
+  if (fetchStatus.isLoading) {
     return <Loader />;
   }
   // TODO: date comapre sql
   // select * from Payment_Plan where Date(payment_date) < '2023-02-05T16:58:16.132Z';
-  if (fetchPaymentStatus.isError) {
+  if (fetchStatus.isError) {
     return <span>Error: error occured</span>;
   }
 
-  const payments = fetchPaymentStatus.data;
+  const payments = fetchStatus.data;
 
   const paymentPlanRows = payments.paymentStatus?.map((element) => {
     const date = new Date(`${element.payment_date}`);

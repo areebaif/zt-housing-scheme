@@ -4,6 +4,7 @@ import { PlotDetail } from "../pages/api/plot/[id]";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
 import { PaymentStatus } from "@/pages/api/payment/paymentStatus";
 import { TableRowItem } from "../components/TableRowsUpsert";
+import { PostReturnType } from "@/pages/api/payment/add";
 
 export const fetchAllPlots = async () => {
   const response = await fetch("/api/plot/all", {
@@ -47,7 +48,7 @@ export const postAddPlotSale = async (data: any) => {
     },
     body: JSON.stringify(data),
   });
-  const res: { created: true } = await response.json();
+  const res: PostReturnType = await response.json();
   return res;
 };
 
@@ -63,11 +64,11 @@ export const postPlotPayment = async (data: {
     },
     body: JSON.stringify(data),
   });
-  const res: { created: true } = await response.json();
+  const res: PostReturnType = await response.json();
   return res;
 };
 
-export const paymentStatus = async () => {
+export const fetchPaymentStatus = async () => {
   const response = await fetch(`/api/payment/paymentStatus`, {
     method: "GET",
     headers: {
