@@ -21,7 +21,7 @@ export interface TableRowItem {
   description?: string;
 }
 export interface UpsertTableRowsProps {
-  tableHeader: string;
+  //tableHeader: string;
   tableRows: TableRowItem[];
   setTableRows: (data: TableRowItem[]) => void;
   descriptionField?: boolean;
@@ -31,8 +31,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
   UpsertTableRowsProps
 ) => {
   // props
-  const { tableRows, setTableRows, tableHeader, descriptionField } =
-    UpsertTableRowsProps;
+  const { tableRows, setTableRows, descriptionField } = UpsertTableRowsProps;
   // state
   const [fixedPaymentPlan, setFixedPaymentPlan] = React.useState<JSX.Element[]>(
     []
@@ -114,9 +113,6 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
         }}
         sx={(theme) => ({ backgroundColor: theme.colors.gray[1] })}
       >
-        {/* <Card.Section withBorder inheritPadding py="xs">
-          <Title order={3}>Sell Detail</Title>
-        </Card.Section> */}
         <Card.Section inheritPadding py="md">
           <Flex
             direction="row"
@@ -144,7 +140,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
             <NumberInput
               label="payment value"
               value={paymentPlanValueItem}
-              placeholder={"enter Value to be Collected"}
+              placeholder={"value to be collected"}
               withAsterisk
               onChange={(val) => setPaymentPlanValueItem(val)}
               parser={(val) => val?.replace(/\$\s?|(,*)/g, "")}
@@ -175,81 +171,21 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
           </Flex>
         </Card.Section>
       </Card>
-      <Table highlightOnHover fontSize="lg">
-        <thead>
-          <tr>
-            <th colSpan={3}>
-              <Text align="center">{tableHeader}</Text>
-            </th>
-          </tr>
-          <tr>
-            <th>Date</th>
-            {descriptionField ? <th>Description</th> : undefined}
-            <th>Value</th>
-            <th>Delete Values</th>
-          </tr>
-        </thead>
-        <tbody>
-          {fixedPaymentPlan}
-          {/* <tr>
-            <td>
-              <Box>
-                <DatePicker
-                  inputFormat="ddd MMM D YYYY"
-                  label={"select date"}
-                  placeholder={"dd/mm/yyyy"}
-                  withAsterisk
-                  value={paymentPlanDateItem}
-                  onChange={setPaymentPlanDateItem}
-                />
-              </Box>
-            </td>
-            {descriptionField ? (
-              <td>
-                <TextInput
-                  value={description}
-                  label="description"
-                  onChange={(event) =>
-                    setDescription(event.currentTarget.value)
-                  }
-                  placeholder="description"
-                />
-              </td>
-            ) : undefined}
-            <td>
-              <NumberInput
-                label="payment value"
-                value={paymentPlanValueItem}
-                withAsterisk
-                placeholder={"enter value to be collected"}
-                onChange={(val) => setPaymentPlanValueItem(val)}
-                parser={(sellPrice) => sellPrice?.replace(/\$\s?|(,*)/g, "")}
-                error={
-                  paymentPlanValueItem
-                    ? paymentPlanValueItem < 0
-                      ? "enter values above 0"
-                      : false
-                    : false
-                }
-                formatter={(value) => {
-                  return value
-                    ? !Number.isNaN(parseFloat(value))
-                      ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                      : ""
-                    : "";
-                }}
-              />
-            </td>
-            <td>
-              {
-                <Button variant="outline" onClick={onAddRow}>
-                  Add Values
-                </Button>
-              }
-            </td>
-          </tr> */}
-        </tbody>
-      </Table>
+      <Card>
+        <Card.Section inheritPadding py="md">
+          <Table highlightOnHover fontSize="lg">
+            <thead>
+              <tr>
+                <th>Date</th>
+                {descriptionField ? <th>Description</th> : undefined}
+                <th>Value</th>
+                <th>Delete Values</th>
+              </tr>
+            </thead>
+            <tbody>{fixedPaymentPlan}</tbody>
+          </Table>
+        </Card.Section>
+      </Card>
     </React.Fragment>
   );
 };

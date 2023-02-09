@@ -20,6 +20,7 @@ import {
   UpsertTableRows,
   TableRowItem,
 } from "../../../components/TableRowsUpsert";
+import { PaymentInput } from "@/components/PaymentInput";
 import { formatAddTime } from "@/utilities";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
 
@@ -184,7 +185,11 @@ const NewPlot = () => {
       <PlotDetailsInput {...plotDetailsData} />
       <SellDetailsInput {...sellDetailsData} />
       <CustomerDetailsInput {...customerDetailsData} />
-      <PaymentPlanInput tableRows={tableRows} setTableRows={setTableRows} />
+      <PaymentInput
+        tableRows={tableRows}
+        setTableRows={setTableRows}
+        descriptionField={"Payment Plan"}
+      />
       <Group position="center" style={{ margin: "15px 0 0 0" }}>
         <Button size="xl" onClick={onSubmitForm}>
           Submit
@@ -534,77 +539,8 @@ const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
               </Box>
             </Flex>
           )}
-
-          {/* {!showNewCustomerFields ? (
-            <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
-              <Button
-                onClick={() => {
-                  setShowNewCustomerFields(true);
-                }}
-              >
-                Add New Customer
-              </Button>
-            </Box>
-          ) : (
-            <Flex
-              direction="row"
-              align="flex-start"
-              gap="md"
-              justify="flex-start"
-            >
-              <TextInput
-                value={newCustomerName}
-                onChange={(event) =>
-                  setNewCustomerName(event.currentTarget.value)
-                }
-                label="customer name"
-                placeholder="name"
-              />
-              <TextInput
-                value={sonOf}
-                onChange={(event) => setSonOf(event.currentTarget.value)}
-                label="son/of"
-                placeholder="son/of"
-              />
-              <TextInput
-                value={newCustomerCNIC}
-                onChange={(event) =>
-                  setNewCustomerCNIC(event.currentTarget.value)
-                }
-                label="cnic no"
-                placeholder="cnic no"
-              />
-            </Flex>
-          )} */}
         </Flex>
       </Card.Section>
-    </Card>
-  );
-};
-
-type PaymentPlanInputProps = {
-  tableRows: TableRowItem[];
-  setTableRows: (rows: TableRowItem[]) => void;
-};
-
-const PaymentPlanInput: React.FC<PaymentPlanInputProps> = (props) => {
-  const { tableRows, setTableRows } = props;
-  return (
-    <Card
-      shadow="sm"
-      p="lg"
-      radius="md"
-      withBorder
-      style={{ overflow: "inherit", margin: "15px 0 0 0" }}
-    >
-      <Card.Section withBorder inheritPadding py="xs">
-        <Title order={3}>Payment Plan</Title>
-      </Card.Section>
-      <UpsertTableRows
-        tableHeader=""
-        tableRows={tableRows}
-        setTableRows={setTableRows}
-      />
     </Card>
   );
 };
