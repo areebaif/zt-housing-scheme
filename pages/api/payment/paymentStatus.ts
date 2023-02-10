@@ -5,7 +5,20 @@ import { prisma } from "../../../db/prisma";
 export interface PaymentStatus {
   paymentStatus: PaymentSchedule[];
 }
+export enum PaymentValueStatus {
+  partiallyPaid = "partial payment",
+  notPaid = "not paid",
+}
 
+export interface SQLQueryPlannedPayments {
+  id: number;
+  plot_id: number;
+  customer_id: number;
+  payment_date: string;
+  payment_value: number | null;
+  description: string | null;
+  payment_plan_recurring_payment_days: number | null;
+}
 export interface PaymentSchedule {
   id: number;
   description: string | null;
@@ -13,13 +26,13 @@ export interface PaymentSchedule {
   customer_id: number;
   payment_date: string;
   payment_value: number | null;
-  paymentStatus: string;
-  latePayment: string;
   payment_plan_recurring_payment_days: number | null;
   name: string;
   son_of: string;
   cnic: string;
-  lastPaymentDate: string;
+  lastPaymentDate?: string;
+  paymentValueStatus: PaymentValueStatus;
+  paymentCollectionValue: number | null;
 }
 
 interface SQLQueryPayments {
@@ -56,11 +69,9 @@ export default async function allCustomers(
     SQLQueryPayments[]
   >`select sum(payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate ,Payments.plot_id, Payments.customer_id, Customer.name, Customer.son_of, Customer.cnic from Payments join Customer on Customer.id = Payments.customer_id  group by plot_id,customer_id, Customer.name, Customer.son_of, Customer.cnic`;
 
-  const paymentPlanByPlot = await prisma.payment_Plan.findMany({
-    orderBy: {
-      payment_date: "asc",
-    },
-  });
+  const paymentPlanByPlot = await prisma.$queryRaw<
+    SQLQueryPlannedPayments[]
+  >`select * from Payment_Plan order by payment_date, plot_id;`;
 
   const calculatedTotalPayments = paymentPlanTotalValueByPlot.map(
     (planPayments) => {
@@ -84,36 +95,54 @@ export default async function allCustomers(
   );
   const totalPayment = calculatedTotalPayments.flat();
 
-  const upcoming: PaymentSchedule[] = totalPayment.map((item) => {
+  const status: PaymentSchedule[][] = totalPayment.map((item) => {
     const plot_id = item?.plot_id;
     const totalPaid = item?.totalPaid;
     let sum = 0;
-    const returnObject: any = [];
+    const returnObject: PaymentSchedule[] = [];
     paymentPlanByPlot.forEach((element, index) => {
       if (plot_id === element.plot_id) {
         sum = sum + (element.payment_value ? element.payment_value : 0);
-        if (sum >= totalPaid! && sum - totalPaid! > 0) {
-          const obj: any = {
+        const difference = sum - totalPaid!;
+        if (sum >= totalPaid! && difference > 0) {
+          const test = { ...element };
+          const obj: PaymentSchedule = {
             ...element,
-            name: item?.name,
-            son_of: item?.son_of,
-            cnic: item?.cnic,
+            name: item?.name!,
+            son_of: item?.son_of!,
+            cnic: item?.cnic!,
+            lastPaymentDate: item?.lastPaymentDate,
+            paymentCollectionValue: null,
+            paymentValueStatus:
+              test.payment_value! - difference === 0 &&
+              returnObject.length === 0
+                ? PaymentValueStatus.notPaid
+                : test.payment_value! - difference > 0 &&
+                  returnObject.length === 0
+                ? PaymentValueStatus.partiallyPaid
+                : PaymentValueStatus.notPaid,
           };
-          if (returnObject.length === 0) {
-            obj.paymentStatus = "partially paid";
+
+          (obj.paymentCollectionValue =
+            obj.paymentValueStatus === PaymentValueStatus.partiallyPaid
+              ? difference
+              : obj.payment_value),
             returnObject.push(obj);
-          } else {
-            obj.paymentStatus = "not paid";
-            returnObject.push(obj);
-          }
         }
       }
     });
+
     return returnObject;
   });
 
-  const upcomingFlatArray = upcoming.flat();
+  const paymentStatus = status.flat();
+  const paymentStatusSortedByDate = [...paymentStatus];
+  paymentStatusSortedByDate.sort((a: PaymentSchedule, b: PaymentSchedule) => {
+    const date1: any = new Date(a.payment_date);
+    const date2: any = new Date(b.payment_date);
 
-  //console.log(data);
-  res.status(200).json({ paymentStatus: upcomingFlatArray });
+    return date1 - date2;
+  });
+
+  res.status(200).json({ paymentStatus: paymentStatusSortedByDate });
 }

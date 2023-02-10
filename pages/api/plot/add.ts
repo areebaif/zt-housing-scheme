@@ -1,8 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Plot } from "@prisma/client";
-
 import { prisma } from "../../../db/prisma";
+import { PostReturnType } from "../payment/add";
 
 export interface PlotsSelectFields {
   id: number;
@@ -13,7 +13,7 @@ export interface PlotsSelectFields {
 
 export default async function upsertPlots(
   req: NextApiRequest,
-  res: NextApiResponse<any>
+  res: NextApiResponse<PostReturnType>
 ) {
   try {
     const {

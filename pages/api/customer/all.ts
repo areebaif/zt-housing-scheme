@@ -7,7 +7,6 @@ import { createIncrementalCompilerHost } from "typescript";
 
 export interface CustomerSelectFields {
   id: number;
-  //cnic: string;
   value: string;
   name: string;
   son_of: string | null;
