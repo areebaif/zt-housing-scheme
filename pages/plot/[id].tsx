@@ -9,10 +9,10 @@ import {
   PlotBasicInfo,
   SellInfo,
 } from "@/components";
-import NewPlot from "../../components/PlotIdPage/PlotUpsertForm";
+import PlotUpsertForm from "../../components/PlotIdPage/PlotUpsertForm";
 import { PlotDetail } from "../api/plot/[id]";
 
-const PlotUpsertForm: React.FC = () => {
+const PlotId: React.FC = () => {
   const [showForm, setShowForm] = React.useState(false);
   const [isEditForm, setIsEditForm] = React.useState(false);
   const router = useRouter();
@@ -27,8 +27,6 @@ const PlotUpsertForm: React.FC = () => {
     cacheTime: Infinity,
   });
   if (fetchplot.isLoading) {
-    // TODO: loading component
-    console.log("loading");
     return <Loader />;
   }
 
@@ -84,7 +82,7 @@ const PlotUpsertForm: React.FC = () => {
       setIsEditForm={setIsEditForm}
     />
   ) : (
-    <NewPlot {...FormData} />
+    <PlotUpsertForm {...FormData} />
   );
 };
 
@@ -135,4 +133,4 @@ const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
   );
 };
 
-export default PlotUpsertForm;
+export default PlotId;

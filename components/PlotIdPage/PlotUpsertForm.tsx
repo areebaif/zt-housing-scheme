@@ -49,10 +49,12 @@ interface AddSaleFormProps {
   soldDate: Date | null;
   futurePaymentPlan: TableRowItem[] | [];
   isEditForm: boolean;
-  setIsEditForm: (val: boolean) => void;
+  //setIsEditForm: (val: boolean) => void;
 }
 
-const NewPlot: React.FC<AddSaleFormProps> = (props: AddSaleFormProps) => {
+const PlotUpsertForm: React.FC<AddSaleFormProps> = (
+  props: AddSaleFormProps
+) => {
   const {
     plotNumber,
     dimensionString,
@@ -64,7 +66,7 @@ const NewPlot: React.FC<AddSaleFormProps> = (props: AddSaleFormProps) => {
     soldDate,
     futurePaymentPlan,
     isEditForm,
-    setIsEditForm,
+    //setIsEditForm,
   } = props;
   const queryClient = useQueryClient();
   // // router props
@@ -96,6 +98,7 @@ const NewPlot: React.FC<AddSaleFormProps> = (props: AddSaleFormProps) => {
   const [existingCustomerBackendData, setExistingCustomerBackendData] =
     React.useState<CustomerSelectFields[] | undefined>([]);
   const [isNewCustomer, setIsNewCustomer] = React.useState(false);
+  const [showEditFieldFlag, setShowEditFieldFlag] = React.useState(isEditForm);
 
   // table props
   const [tableRows, setTableRows] =
@@ -203,14 +206,13 @@ const NewPlot: React.FC<AddSaleFormProps> = (props: AddSaleFormProps) => {
     setIsNewCustomer,
     isEditForm,
   };
-
   return (
     <React.Fragment>
       <PlotDetailsInput {...plotDetailsData} />
       <SellDetailsInput {...sellDetailsData} />
       <CustomerDetailsInput {...customerDetailsData} />
 
-      {!isEditForm ? (
+      {!showEditFieldFlag ? (
         <PaymentInput
           tableRows={tableRows}
           setTableRows={setTableRows}
@@ -221,7 +223,7 @@ const NewPlot: React.FC<AddSaleFormProps> = (props: AddSaleFormProps) => {
           paymentPlan={tableRows}
           descriptionField={true}
           setTableRows={setTableRows}
-          setIsEditForm={setIsEditForm}
+          setShowEditFieldFlag={setShowEditFieldFlag}
         />
       )}
 
@@ -670,11 +672,14 @@ type PaymentPlanView = {
   paymentPlan: TableRowItem[];
   descriptionField?: boolean;
   setTableRows: (val: TableRowItem[]) => void;
-  setIsEditForm: (val: boolean) => void;
+  //isEditForm: boolean;
+  setShowEditFieldFlag: (val: boolean) => void;
 };
 
 const PaymentPlanView: React.FC<PaymentPlanView> = (props: PaymentPlanView) => {
-  const { paymentPlan, descriptionField, setIsEditForm, setTableRows } = props;
+  const { paymentPlan, descriptionField, setTableRows, setShowEditFieldFlag } =
+    props;
+
   const jsxRows: JSX.Element[] = [];
 
   paymentPlan.forEach((item, index) => {
@@ -708,7 +713,7 @@ const PaymentPlanView: React.FC<PaymentPlanView> = (props: PaymentPlanView) => {
             variant="outline"
             onClick={() => {
               setTableRows([]);
-              setIsEditForm(false);
+              setShowEditFieldFlag(false);
             }}
           >
             Delete Plan
@@ -734,4 +739,4 @@ const PaymentPlanView: React.FC<PaymentPlanView> = (props: PaymentPlanView) => {
   );
 };
 
-export default NewPlot;
+export default PlotUpsertForm;
