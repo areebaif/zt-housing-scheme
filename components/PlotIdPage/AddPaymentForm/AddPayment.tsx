@@ -2,23 +2,32 @@ import * as React from "react";
 import { useRouter } from "next/router";
 import { Text, Group, Button, Loader, Card, Title, Grid } from "@mantine/core";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { TableRowItem } from "../../../components/TableRowsUpsert";
+import { TableRowItem } from "../../TableRowsUpsert";
 import { postPlotPayment } from "@/r-query/functions";
-import { PaymentInput } from "@/components/PaymentInput";
+import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInput";
 
-const AddPayment: React.FC = () => {
+interface AddPayment {
+  plotNumber: string;
+  customerNumber: string;
+  name: string;
+  customerSonOf: string;
+  cnic: string;
+}
+
+export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
+  const { plotNumber, customerNumber, customerSonOf, name, cnic } = props;
   const queryClient = useQueryClient();
   // router
   const router = useRouter();
-  const routerReady = router.isReady;
-  const query = router.query;
+  //   const routerReady = router.isReady;
+  //   const query = router.query;
   // plot details
-  const [plotId, setPlotId] = React.useState("");
+  const [plotId, setPlotId] = React.useState(plotNumber);
   // customer details
-  const [customerId, setCustomerId] = React.useState("");
-  const [customerName, setCustomerName] = React.useState("");
-  const [sonOf, setSonOf] = React.useState("");
-  const [customerCNIC, setCustomerCNIC] = React.useState("");
+  const [customerId, setCustomerId] = React.useState(customerNumber);
+  const [customerName, setCustomerName] = React.useState(customerSonOf);
+  const [sonOf, setSonOf] = React.useState(name);
+  const [customerCNIC, setCustomerCNIC] = React.useState(cnic);
   // table props
   const [tableRows, setTableRows] = React.useState<TableRowItem[]>([]);
 
@@ -38,18 +47,18 @@ const AddPayment: React.FC = () => {
     mutation.mutate(data);
   };
 
-  React.useEffect(() => {
-    const plot = query.plotId as string;
-    const customerId = query.customerId as string;
-    const name = query.customerName as string;
-    const sonOf = query.sonOf as string;
-    const cnic = query.cnic as string;
-    setPlotId(plot);
-    setCustomerId(customerId);
-    setCustomerCNIC(cnic);
-    setCustomerName(name);
-    setSonOf(sonOf);
-  }, [routerReady]);
+  //   React.useEffect(() => {
+  //     const plot = query.plotId as string;
+  //     const customerId = query.customerId as string;
+  //     const name = query.customerName as string;
+  //     const sonOf = query.sonOf as string;
+  //     const cnic = query.cnic as string;
+  //     setPlotId(plot);
+  //     setCustomerId(customerId);
+  //     setCustomerCNIC(cnic);
+  //     setCustomerName(name);
+  //     setSonOf(sonOf);
+  //   }, []);
 
   if (mutation.isLoading) {
     return <Loader />;
@@ -115,5 +124,3 @@ const PaymentPlotInfo: React.FC<PaymentPlotInfo> = (props: PaymentPlotInfo) => {
     </Card>
   );
 };
-
-export default AddPayment;

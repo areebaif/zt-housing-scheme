@@ -1,7 +1,7 @@
 import * as react from "react";
-import { TableRowItem } from "./TableRowsUpsert";
+import { TableRowItem } from "../../TableRowsUpsert";
 import { Card, Title } from "@mantine/core";
-import { UpsertTableRows } from "./TableRowsUpsert";
+import { UpsertTableRows } from "../../TableRowsUpsert";
 
 type PaymentInputProps = {
   tableRows: TableRowItem[];

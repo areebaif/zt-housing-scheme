@@ -10,12 +10,12 @@ import {
 } from ".";
 import { fetchAllCustomers, postAddPlotSale } from "@/r-query/functions";
 import { TableRowItem } from "../../TableRowsUpsert";
-import { PaymentInput } from "@/components/PaymentInput";
+import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInput";
 import { formatAddTime } from "@/utilities";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
 
 // TODO: show development Charges in Payment Plan when are they collected????
-export interface FormPostProps {
+interface FormPostProps {
   plotId: string;
   sellPrice: number;
   soldDateString: string;
@@ -29,7 +29,7 @@ export interface FormPostProps {
   };
   paymentPlan: TableRowItem[];
 }
-export interface AddSaleFormProps {
+interface AddSaleFormProps {
   plotNumber: string;
   dimensionString: string;
   squareFt: string;
@@ -43,7 +43,7 @@ export interface AddSaleFormProps {
   //setIsEditForm: (val: boolean) => void;
 }
 
-const PlotUpsertForm: React.FC<AddSaleFormProps> = (
+export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   props: AddSaleFormProps
 ) => {
   const {
@@ -226,5 +226,3 @@ const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     </React.Fragment>
   );
 };
-
-export default PlotUpsertForm;

@@ -8,13 +8,15 @@ export interface PaymentHistoryTableProps {
   tableRows?: Payments[];
   plotDetail: PlotDetail;
   plotId: string;
+  setShowAddPaymentForm: (val: boolean) => void;
 }
 
 export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
   PaymentHistoryTable
 ) => {
   //Props
-  const { tableRows, plotDetail, plotId } = PaymentHistoryTable;
+  const { tableRows, plotDetail, plotId, setShowAddPaymentForm } =
+    PaymentHistoryTable;
   // Hooks
   const router = useRouter();
   // Display Funcs
@@ -44,11 +46,12 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
         <Group position="apart">
           <Title order={3}>History</Title>
           <Button
-            onClick={() =>
-              router.push(
-                `/payment/add/${plotId}?customerId=${plotDetail?.customer?.id}&customerName=${plotDetail?.customer?.name}&sonOf=${plotDetail?.customer?.son_of}&cnic=${plotDetail?.customer?.cnic}`
-              )
-            }
+            onClick={() => {
+              setShowAddPaymentForm(true);
+              // router.push(
+              //   `/payment/add/${plotId}?customerId=${plotDetail?.customer?.id}&customerName=${plotDetail?.customer?.name}&sonOf=${plotDetail?.customer?.son_of}&cnic=${plotDetail?.customer?.cnic}`
+              // )
+            }}
           >
             Add Payment
           </Button>

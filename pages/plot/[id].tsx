@@ -9,14 +9,17 @@ import {
   PlotBasicInfo,
   SellInfo,
 } from "@/components";
-import PlotUpsertForm from "../../components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
+import { AddPayment } from "@/components/PlotIdPage/AddPaymentForm/AddPayment";
+import { PlotUpsertForm } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
+
 import { PlotDetail } from "../api/plot/[id]";
 
 const PlotId: React.FC = () => {
-  const [showForm, setShowForm] = React.useState(false);
-  const [isEditForm, setIsEditForm] = React.useState(false);
   const router = useRouter();
   const plotId = router.query?.id as string;
+  const [showForm, setShowForm] = React.useState(false);
+  const [isEditForm, setIsEditForm] = React.useState(false);
+  const [showAddPaymentForm, setShowAddPaymentForm] = React.useState(false);
 
   // backend data fetch
   const fetchplot = ReactQuery.useQuery({
@@ -72,17 +75,31 @@ const PlotId: React.FC = () => {
     isEditForm,
     setIsEditForm,
   };
+  const addPaymentProps = {
+    plotNumber: plotId,
+    customerNumber: plotDetail.customer?.id
+      ? plotDetail.customer?.id.toString()
+      : "",
+    name: plotDetail.customer?.name ? plotDetail.customer?.name : "",
+    customerSonOf: plotDetail.customer?.son_of
+      ? plotDetail.customer?.son_of
+      : "",
+    cnic: plotDetail.customer?.cnic ? plotDetail.customer?.cnic : "",
+  };
 
-  return !showForm ? (
+  return !showForm && !showAddPaymentForm ? (
     <PlotSummary
       plotDetail={plotDetail}
       plotId={plotId}
       totalPayment={totalPayment}
       setShowForm={setShowForm}
       setIsEditForm={setIsEditForm}
+      setShowAddPaymentForm={setShowAddPaymentForm}
     />
-  ) : (
+  ) : !showAddPaymentForm ? (
     <PlotUpsertForm {...FormData} />
+  ) : (
+    <AddPayment {...addPaymentProps} />
   );
 };
 
@@ -92,11 +109,18 @@ type PlotSummaryProps = {
   totalPayment: number;
   setShowForm: (val: boolean) => void;
   setIsEditForm: (val: boolean) => void;
+  setShowAddPaymentForm: (val: boolean) => void;
 };
 
 const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
-  const { plotId, plotDetail, totalPayment, setShowForm, setIsEditForm } =
-    props;
+  const {
+    plotId,
+    plotDetail,
+    totalPayment,
+    setShowForm,
+    setIsEditForm,
+    setShowAddPaymentForm,
+  } = props;
   return (
     <React.Fragment>
       <Grid align={"stretch"} style={{ margin: "25px 0 0 0" }}>
@@ -124,6 +148,7 @@ const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
             plotDetail={plotDetail}
             plotId={plotId}
             tableRows={plotDetail.payment_history}
+            setShowAddPaymentForm={setShowAddPaymentForm}
           />
         </React.Fragment>
       ) : (
