@@ -23,24 +23,8 @@ export const PlotSaleSummaryTable: React.FC<PlotSaleSummaryTableProps> = (
   const { tableHead, tableRows } = PlotSaleSummaryTableProps;
   const router = useRouter();
 
-  const rows = tableRows?.map((element) => (
-    // <Card
-    //   shadow="sm"
-    //   p="lg"
-    //   radius="md"
-    //   withBorder
-    //   style={{
-    //     overflow: "inherit",
-    //     margin: "15px 0 0 0",
-    //   }}
-    // >
-    //   <Card.Section
-    //     onClick={() => router.push(`/plot/${element.id}`)}
-    //     key={element.id}
-    //     inheritPadding
-    //     py="md"
-    //   >
-    <React.Fragment>
+  const rows = tableRows?.map((element, index) => (
+    <React.Fragment key={index}>
       <Divider my="sm" />
       <Grid
         onClick={() => router.push(`/plot/${element.id}`)}
@@ -56,14 +40,13 @@ export const PlotSaleSummaryTable: React.FC<PlotSaleSummaryTableProps> = (
         grow
         gutter="xl"
       >
-        <Grid.Col p="lg" span={4}>
+        <Grid.Col span={4}>
           <Text fz="xl">{element.id}</Text>
         </Grid.Col>
-
         <Grid.Col p="lg" span={4}>
           <Text fz="xl">{element.square_feet}</Text>
         </Grid.Col>
-        <Grid.Col p="lg" span={4}>
+        <Grid.Col span={4}>
           <Text fz="xl">{element.dimension}</Text>
         </Grid.Col>
       </Grid>
@@ -77,11 +60,15 @@ export const PlotSaleSummaryTable: React.FC<PlotSaleSummaryTableProps> = (
       withBorder
       style={{ margin: "25px 0 0 0" }}
     >
-      <Card.Section p="lg">
-        <Grid grow gutter="xl">
+      <Card.Section withBorder inheritPadding py="xs">
+        <Grid>
           <Grid.Col sx={(theme) => ({ textAlign: "center" })} span={12}>
-            <Title order={4}>{tableHead}</Title>
+            <Title order={3}>{tableHead}</Title>
           </Grid.Col>
+        </Grid>
+      </Card.Section>
+      <Card.Section sx={(theme) => ({ padding: "10px 20px 0 20px " })}>
+        <Grid grow gutter="xl">
           <Grid.Col span={4}>
             <Title order={4}>Plot Number</Title>
           </Grid.Col>

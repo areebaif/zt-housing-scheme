@@ -12,7 +12,6 @@ import {
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { formatAddTime } from "../utilities";
-import { ThemeContext } from "@emotion/react";
 
 export interface TableRowItem {
   id: number;
@@ -44,18 +43,11 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
   >(undefined);
 
   const onRowDelete = (key: number) => {
-    let paymentPlanDelete: JSX.Element[] = [];
-    if (fixedPaymentPlan.length) {
-      paymentPlanDelete = fixedPaymentPlan.filter(
-        (item, index) => index !== key - 1
-      );
-    }
-    setFixedPaymentPlan(paymentPlanDelete);
-    let filteredRow: TableRowItem[] = [];
-    if (tableRows.length) {
-      filteredRow = tableRows.filter((item, index) => index !== key - 1);
-    }
-    setTableRows(filteredRow);
+    setFixedPaymentPlan(
+      fixedPaymentPlan.filter((item, index) => index !== key - 1)
+    );
+
+    setTableRows(tableRows.filter((item, index) => index !== key - 1));
   };
 
   const onAddRow = () => {
@@ -63,16 +55,13 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
     if (!paymentPlanDateItem || !paymentPlanValueItem) {
       throw new Error("please enter date and value to add row");
     }
-    const paymentPlanAdd = [];
-    if (fixedPaymentPlan.length) {
-      fixedPaymentPlan.forEach((item) => paymentPlanAdd.push(item));
-    }
+
     const key = fixedPaymentPlan?.length + 1;
     const date = new Date(`${paymentPlanDateItem}`);
     const dateISO = formatAddTime(`${paymentPlanDateItem}`);
     const dateString = date.toDateString();
 
-    const data = [
+    setTableRows([
       ...tableRows,
       {
         id: key,
@@ -80,8 +69,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
         description: description,
         dateISOString: dateISO,
       },
-    ];
-    setTableRows(data);
+    ]);
 
     setFixedPaymentPlan((el) => [
       ...fixedPaymentPlan,

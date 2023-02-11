@@ -9,17 +9,14 @@ import {
   NumberInput,
   Flex,
   Text,
-  Autocomplete,
   Button,
   Title,
   Loader,
+  Table,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { fetchAllCustomers, postAddPlotSale } from "@/r-query/functions";
-import {
-  UpsertTableRows,
-  TableRowItem,
-} from "../../../components/TableRowsUpsert";
+import { TableRowItem } from "../../../components/TableRowsUpsert";
 import { PaymentInput } from "@/components/PaymentInput";
 import { formatAddTime } from "@/utilities";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
@@ -41,19 +38,46 @@ export interface FormPostProps {
 
 // TODO: show development Charges in Payment Plan when are they collected????
 
-const NewPlot = () => {
+interface AddSaleFormProps {
+  plotNumber: string;
+  dimensionString: string;
+  squareFt: string;
+  soldPrice: number | undefined;
+  name: string;
+  son_of: string;
+  cnic: string;
+  soldDate: Date | null;
+  futurePaymentPlan: TableRowItem[] | [];
+  isEditForm: boolean;
+  setIsEditForm: (val: boolean) => void;
+}
+
+const NewPlot: React.FC<AddSaleFormProps> = (props: AddSaleFormProps) => {
+  const {
+    plotNumber,
+    dimensionString,
+    squareFt,
+    soldPrice,
+    name,
+    son_of,
+    cnic,
+    soldDate,
+    futurePaymentPlan,
+    isEditForm,
+    setIsEditForm,
+  } = props;
   const queryClient = useQueryClient();
-  // router props
+  // // router props
   const router = useRouter();
-  const query = router.query;
-  const routerReady = router.isReady;
+  // const query = router.query;
+  // const routerReady = router.isReady;
   // plot metadata props
-  const [plotId, setPlotId] = React.useState("");
-  const [dimension, setDimension] = React.useState("");
-  const [squareFeet, setSquareFeet] = React.useState("");
+  const [plotId, setPlotId] = React.useState(plotNumber);
+  const [dimension, setDimension] = React.useState(dimensionString);
+  const [squareFeet, setSquareFeet] = React.useState(squareFt);
   // sell info props
   const [sellPrice, setSellPrice] = React.useState<number | undefined>(
-    undefined
+    soldPrice
   );
   const [downPayment, setDownPayment] = React.useState<number | undefined>(
     undefined
@@ -63,19 +87,19 @@ const NewPlot = () => {
   >(0);
   const [developmentChargePercent, setDevelopmentChargePercent] =
     React.useState<number | undefined>(undefined);
-  const [sellDate, setSellDate] = React.useState<Date | null>(null);
+  const [sellDate, setSellDate] = React.useState<Date | null>(soldDate);
   // new customer props
-  const [customerName, setCustomerName] = React.useState("");
-  const [sonOf, setSonOf] = React.useState("");
-  const [customerCNIC, setCustomerCNIC] = React.useState("");
+  const [customerName, setCustomerName] = React.useState(name);
+  const [sonOf, setSonOf] = React.useState(son_of);
+  const [customerCNIC, setCustomerCNIC] = React.useState(cnic);
   //existing customer props
   const [existingCustomerBackendData, setExistingCustomerBackendData] =
     React.useState<CustomerSelectFields[] | undefined>([]);
-
   const [isNewCustomer, setIsNewCustomer] = React.useState(false);
 
   // table props
-  const [tableRows, setTableRows] = React.useState<TableRowItem[]>([]);
+  const [tableRows, setTableRows] =
+    React.useState<TableRowItem[]>(futurePaymentPlan);
 
   // fetch exisitng customer data from backend
   const fetchCustomers = useQuery({
@@ -109,7 +133,6 @@ const NewPlot = () => {
     // format date
 
     const soldDateString = formatAddTime(`${sellDate}`);
-
     const data: FormPostProps = {
       plotId,
       sellPrice,
@@ -129,14 +152,14 @@ const NewPlot = () => {
   };
 
   React.useEffect(() => {
-    const plot = query.plotId as string;
-    const dimension = query.dimension as string;
-    const squareFeet = query.squareFeet as string;
-    setPlotId(plot);
-    setDimension(dimension);
-    setSquareFeet(squareFeet);
+    //const plot = query.plotId as string;
+    //const dimension = query.dimension as string;
+    //const squareFeet = query.squareFeet as string;
+    //setPlotId(plot);
+    //setDimension(dimension);
+    //setSquareFeet(squareFeet);
     setExistingCustomerBackendData(fetchCustomers.data);
-  }, [routerReady, fetchCustomers.data]);
+  }, [fetchCustomers.data]);
 
   if (fetchCustomers.isLoading || mutation.isLoading) {
     // TODO: loading component
@@ -178,26 +201,36 @@ const NewPlot = () => {
     setSonOf,
     isNewCustomer,
     setIsNewCustomer,
+    isEditForm,
   };
 
-  return router.query.plotId ? (
+  return (
     <React.Fragment>
       <PlotDetailsInput {...plotDetailsData} />
       <SellDetailsInput {...sellDetailsData} />
       <CustomerDetailsInput {...customerDetailsData} />
-      <PaymentInput
-        tableRows={tableRows}
-        setTableRows={setTableRows}
-        descriptionField={"Payment Plan"}
-      />
+
+      {!isEditForm ? (
+        <PaymentInput
+          tableRows={tableRows}
+          setTableRows={setTableRows}
+          descriptionField={"Payment Plan"}
+        />
+      ) : (
+        <PaymentPlanView
+          paymentPlan={tableRows}
+          descriptionField={true}
+          setTableRows={setTableRows}
+          setIsEditForm={setIsEditForm}
+        />
+      )}
+
       <Group position="center" style={{ margin: "15px 0 0 0" }}>
         <Button size="xl" onClick={onSubmitForm}>
           Submit
         </Button>
       </Group>
     </React.Fragment>
-  ) : (
-    <div>loading</div>
   );
 };
 
@@ -237,10 +270,10 @@ const PlotDetailsInput: React.FC<PlotDetailsInputProps> = (props) => {
             disabled={true}
           />
           <TextInput
-            value={squareFeet}
+            value={squareFeet ? squareFeet : ""}
             //onChange={(event) => setSquareFeet(event.currentTarget.value)}
             error={
-              isNaN(parseInt(squareFeet))
+              isNaN(parseInt(squareFeet ? squareFeet : ""))
                 ? "please enter a valid dimension"
                 : ""
             }
@@ -249,7 +282,7 @@ const PlotDetailsInput: React.FC<PlotDetailsInputProps> = (props) => {
             disabled={true}
           />
           <TextInput
-            value={dimension}
+            value={dimension ? dimension : ""}
             label="dimension"
             //onChange={(event) => setDimension(event.currentTarget.value)}
             placeholder="dimension"
@@ -385,13 +418,6 @@ const SellDetailsInput: React.FC<SellDetailsInputProps> = (props) => {
             placeholder={
               developmentCharges === 0 ? "enter sell price and % for value" : ""
             }
-            // onChange={(val) => {
-            //   const value =
-            //     developmentChargePercent && sellPrice
-            //       ? developmentChargePercent * sellPrice
-            //       : 0;
-            //   setDevelopmentCharges(value);
-            // }}
             disabled={true}
             parser={(developmentCharges) =>
               developmentCharges?.replace(/\$\s?|(,*)/g, "")
@@ -420,6 +446,7 @@ type CustomerDetailsInputProps = {
   setSonOf: (val: string) => void;
   isNewCustomer: boolean;
   setIsNewCustomer: (val: boolean) => void;
+  isEditForm: boolean;
 };
 const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
   const {
@@ -432,10 +459,11 @@ const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
     setSonOf,
     isNewCustomer,
     setIsNewCustomer,
+    isEditForm,
   } = props;
-
+  const [isEditFlag, setIsEditFlag] = React.useState(isEditForm);
   const [showCustomerFields, setShowCustomerFields] = React.useState(false);
-
+  const [showCustomerCard, setShowCustomerCard] = React.useState(false);
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       FindExistingCustomerSetValues();
@@ -469,8 +497,8 @@ const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
         <Title order={3}>Customer Details</Title>
       </Card.Section>
       <Card.Section inheritPadding py="md">
-        <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
-          {!showCustomerFields ? (
+        {!isEditFlag ? (
+          !showCustomerFields ? (
             <Flex
               direction="row"
               align="flex-start"
@@ -495,7 +523,7 @@ const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
                 </Button>
               </Box>
             </Flex>
-          ) : (
+          ) : !showCustomerCard ? (
             <Flex
               direction="row"
               align="flex-start"
@@ -507,14 +535,12 @@ const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
                 label="customer name"
                 placeholder="name"
                 onChange={(event) => setCustomerName(event.currentTarget.value)}
-                disabled={!isNewCustomer}
               />
               <TextInput
                 value={sonOf ? sonOf : ""}
                 label="son/of"
                 placeholder="son of"
                 onChange={(event) => setSonOf(event.currentTarget.value)}
-                disabled={!isNewCustomer}
               />{" "}
               <TextInput
                 value={customerCNIC}
@@ -523,24 +549,187 @@ const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (props) => {
                 }}
                 label="cnic no"
                 placeholder="cnic no"
-                disabled={!isNewCustomer}
               />
               <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
-                <Button
-                  onClick={() => {
-                    setShowCustomerFields(false);
-                    setCustomerName("");
-                    setSonOf("");
-                    setIsNewCustomer(false);
-                  }}
-                >
-                  Back
-                </Button>
+                <Flex direction="row" gap="md">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowCustomerCard(true);
+                    }}
+                  >
+                    Add
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowCustomerFields(false);
+                      setCustomerName("");
+                      setSonOf("");
+                      setIsNewCustomer(false);
+                    }}
+                  >
+                    Back
+                  </Button>
+                </Flex>
               </Box>
             </Flex>
-          )}
-        </Flex>
+          ) : (
+            <CustomerDetailCard
+              customerCNIC={customerCNIC ? customerCNIC : ""}
+              customerName={customerName}
+              sonOf={sonOf ? sonOf : null}
+              setShowCustomerCard={setShowCustomerCard}
+              setShowCustomerFields={setShowCustomerFields}
+              setIsEditFlag={setIsEditFlag}
+            />
+          )
+        ) : (
+          <CustomerDetailCard
+            customerCNIC={customerCNIC ? customerCNIC : ""}
+            customerName={customerName}
+            sonOf={sonOf ? sonOf : null}
+            setShowCustomerCard={setShowCustomerCard}
+            setShowCustomerFields={setShowCustomerFields}
+            setIsEditFlag={setIsEditFlag}
+          />
+        )}
       </Card.Section>
+    </Card>
+  );
+};
+
+type CustomerDetailProps = {
+  customerCNIC: string;
+  customerName: string | undefined;
+  sonOf: string | null;
+  setShowCustomerCard: (val: boolean) => void;
+  setShowCustomerFields: (val: boolean) => void;
+  setIsEditFlag: (val: boolean) => void;
+};
+
+const CustomerDetailCard: React.FC<CustomerDetailProps> = (
+  props: CustomerDetailProps
+) => {
+  const {
+    customerCNIC,
+    customerName,
+    sonOf,
+    setShowCustomerFields,
+    setShowCustomerCard,
+    setIsEditFlag,
+  } = props;
+
+  return (
+    <Group position="apart">
+      <Flex
+        direction={"row"}
+        sx={(theme) => ({ columnGap: theme.spacing.xl * 2.5 })}
+      >
+        {" "}
+        <Flex
+          direction={"row"}
+          columnGap={"xs"}
+          sx={(theme) => ({ paddingTop: theme.spacing.xs * 0.5 })}
+        >
+          <Title order={5}>Name:</Title>
+          <Text>{customerName} </Text>
+        </Flex>
+        <Flex
+          direction={"row"}
+          columnGap={"xs"}
+          sx={(theme) => ({ paddingTop: theme.spacing.xs * 0.5 })}
+        >
+          <Title order={5}>Son of:</Title>
+          <Text> {sonOf} </Text>
+        </Flex>
+        <Flex
+          direction={"row"}
+          columnGap={"xs"}
+          sx={(theme) => ({ paddingTop: theme.spacing.xs * 0.5 })}
+        >
+          <Title order={5}>CNIC no:</Title>
+          <Text> {customerCNIC} </Text>
+        </Flex>
+      </Flex>
+      <Button
+        variant="outline"
+        onClick={() => {
+          setIsEditFlag(false);
+          setShowCustomerFields(true);
+          setShowCustomerCard(false);
+        }}
+      >
+        Edit
+      </Button>
+    </Group>
+  );
+};
+
+type PaymentPlanView = {
+  paymentPlan: TableRowItem[];
+  descriptionField?: boolean;
+  setTableRows: (val: TableRowItem[]) => void;
+  setIsEditForm: (val: boolean) => void;
+};
+
+const PaymentPlanView: React.FC<PaymentPlanView> = (props: PaymentPlanView) => {
+  const { paymentPlan, descriptionField, setIsEditForm, setTableRows } = props;
+  const jsxRows: JSX.Element[] = [];
+
+  paymentPlan.forEach((item, index) => {
+    const key = index;
+    const date = new Date(`${item.dateISOString}`);
+    const description = item.description;
+    const dateString = date.toDateString();
+    const value = item.value;
+
+    jsxRows.push(
+      <tr key={key}>
+        <td>{dateString}</td>
+        <td>{description}</td>
+        <td>{value}</td>
+      </tr>
+    );
+  });
+
+  return (
+    <Card
+      shadow="sm"
+      p="lg"
+      radius="md"
+      withBorder
+      style={{ overflow: "inherit", margin: "15px 0 0 0" }}
+    >
+      <Card.Section withBorder inheritPadding py="xs">
+        <Group position="apart" mt="3px" mb="0px">
+          <Title order={3}>Payment Plan</Title>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setTableRows([]);
+              setIsEditForm(false);
+            }}
+          >
+            Delete Plan
+          </Button>
+        </Group>
+      </Card.Section>
+
+      <Card>
+        <Card.Section inheritPadding py="md">
+          <Table highlightOnHover fontSize="lg">
+            <thead>
+              <tr>
+                <th>Date</th>
+                {descriptionField ? <th>Description</th> : undefined}
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>{jsxRows}</tbody>
+          </Table>
+        </Card.Section>
+      </Card>
     </Card>
   );
 };
