@@ -9,7 +9,7 @@ import {
   PlotBasicInfo,
   SellInfo,
 } from "@/components";
-import PlotUpsertForm from "../../components/PlotIdPage/PlotUpsertForm";
+import PlotUpsertForm from "../../components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
 import { PlotDetail } from "../api/plot/[id]";
 
 const PlotId: React.FC = () => {
