@@ -9,12 +9,11 @@ import {
   PlotBasicInfo,
   SellInfo,
 } from "@/components";
-import NewPlot from "./sale/[plotId]";
+import NewPlot from "../../components/PlotIdPage/PlotUpsertForm";
 import { PlotDetail } from "../api/plot/[id]";
-import { TableRowItem } from "@/components/TableRowsUpsert";
 
-const PlotPage = () => {
-  const [showAddForm, setShowAddForm] = React.useState(false);
+const PlotUpsertForm: React.FC = () => {
+  const [showForm, setShowForm] = React.useState(false);
   const [isEditForm, setIsEditForm] = React.useState(false);
   const router = useRouter();
   const plotId = router.query?.id as string;
@@ -76,12 +75,12 @@ const PlotPage = () => {
     setIsEditForm,
   };
 
-  return !showAddForm ? (
+  return !showForm ? (
     <PlotSummary
       plotDetail={plotDetail}
       plotId={plotId}
       totalPayment={totalPayment}
-      setShowAddForm={setShowAddForm}
+      setShowForm={setShowForm}
       setIsEditForm={setIsEditForm}
     />
   ) : (
@@ -93,12 +92,12 @@ type PlotSummaryProps = {
   plotDetail: PlotDetail;
   plotId: string;
   totalPayment: number;
-  setShowAddForm: (val: boolean) => void;
+  setShowForm: (val: boolean) => void;
   setIsEditForm: (val: boolean) => void;
 };
 
 const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
-  const { plotId, plotDetail, totalPayment, setShowAddForm, setIsEditForm } =
+  const { plotId, plotDetail, totalPayment, setShowForm, setIsEditForm } =
     props;
   return (
     <React.Fragment>
@@ -107,7 +106,7 @@ const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
           <PlotBasicInfo
             plotDetail={plotDetail}
             plotId={plotId}
-            setShowAddForm={setShowAddForm}
+            setShowForm={setShowForm}
             setIsEditForm={setIsEditForm}
           />
         </Grid.Col>
@@ -136,4 +135,4 @@ const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
   );
 };
 
-export default PlotPage;
+export default PlotUpsertForm;

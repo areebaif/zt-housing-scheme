@@ -7,13 +7,13 @@ import { PlotDetail } from "@/pages/api/plot/[id]";
 export interface PlotBasicInfoProps {
   plotDetail: PlotDetail;
   plotId: string;
-  setShowAddForm: (val: boolean) => void;
+  setShowForm: (val: boolean) => void;
   setIsEditForm: (val: boolean) => void;
 }
 
 export const PlotBasicInfo: React.FC<PlotBasicInfoProps> = (props) => {
   //Props
-  const { plotDetail, plotId, setShowAddForm, setIsEditForm } = props;
+  const { plotDetail, plotId, setShowForm, setIsEditForm } = props;
   //Hooks
   const router = useRouter();
   return (
@@ -23,7 +23,7 @@ export const PlotBasicInfo: React.FC<PlotBasicInfoProps> = (props) => {
           <Title order={3}>Basic Information</Title>
           <Button
             onClick={() => {
-              setShowAddForm(true);
+              setShowForm(true);
               {
                 plotDetail?.plot.status === "not_sold"
                   ? setIsEditForm(false)

@@ -16,7 +16,7 @@ import {
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { fetchAllCustomers, postAddPlotSale } from "@/r-query/functions";
-import { TableRowItem } from "../../../components/TableRowsUpsert";
+import { TableRowItem } from "../TableRowsUpsert";
 import { PaymentInput } from "@/components/PaymentInput";
 import { formatAddTime } from "@/utilities";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
