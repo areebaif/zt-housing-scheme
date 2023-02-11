@@ -23,7 +23,11 @@ export const PaymentInput: React.FC<PaymentInputProps> = (props) => {
         <Title order={3}>{descriptionField}</Title>
       </Card.Section>
 
-      <UpsertTableRows tableRows={tableRows} setTableRows={setTableRows} />
+      <UpsertTableRows
+        tableRows={tableRows}
+        setTableRows={setTableRows}
+        descriptionField={true}
+      />
     </Card>
   );
 };

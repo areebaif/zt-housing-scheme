@@ -44,7 +44,11 @@ const PlotId: React.FC = () => {
   plotDetail?.payment_history?.forEach((item) => {
     totalPayment = totalPayment + item.payment_value;
   });
+  let plotDownPayment: number | undefined;
   const paymentPlanMap = plotDetail.payment_plan?.map((item) => {
+    if (item.description === "down payment") {
+      plotDownPayment = item.payment_value ? item.payment_value : undefined;
+    }
     const res = {
       id: item.id,
       dateISOString: item.payment_date
@@ -74,7 +78,9 @@ const PlotId: React.FC = () => {
     futurePaymentPlan: paymentPlanMap?.length ? paymentPlanMap : [],
     isEditForm,
     setIsEditForm,
+    plotDownPayment,
   };
+
   const addPaymentProps = {
     plotNumber: plotId,
     customerNumber: plotDetail.customer?.id
@@ -85,6 +91,7 @@ const PlotId: React.FC = () => {
       ? plotDetail.customer?.son_of
       : "",
     cnic: plotDetail.customer?.cnic ? plotDetail.customer?.cnic : "",
+    setShowAddPaymentForm,
   };
 
   return !showForm && !showAddPaymentForm ? (

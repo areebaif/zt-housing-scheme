@@ -58,18 +58,18 @@ export default async function upsertPlots(
         status: "partially_paid",
         sold_date: soldDateString,
         sold_price: sellPrice,
-        development_charges: parseInt(developmentCharges),
+        //development_charges: parseInt(developmentCharges),
       },
     });
-    const addPayment = prisma.payments.create({
-      data: {
-        description: "down payment",
-        payment_value: downPayment,
-        customer_id: customerId,
-        plot_id: parsedPlotId,
-        payment_date: soldDateString,
-      },
-    });
+    // const addPayment = prisma.payments.create({
+    //   data: {
+    //     description: "down payment",
+    //     payment_value: downPayment,
+    //     customer_id: customerId,
+    //     plot_id: parsedPlotId,
+    //     payment_date: soldDateString,
+    //   },
+    // });
     let paymentPlanArray = [];
     const paymentPlanParse = paymentPlan.map((item: any) => {
       return {
@@ -88,13 +88,21 @@ export default async function upsertPlots(
         payment_date: soldDateString,
       },
       ...paymentPlanParse,
+      {
+        description: "development charges",
+        payment_value: parseInt(developmentCharges),
+        customer_id: customerId,
+        plot_id: parsedPlotId,
+        payment_date:
+          paymentPlanParse[paymentPlanParse.length - 1].payment_date,
+      },
     ];
     const payment_plan = prisma.payment_Plan.createMany({
       data: paymentPlanArray,
     });
 
     if (!customer.newCustomer) {
-      await prisma.$transaction([updatePlot, addPayment, payment_plan]);
+      await prisma.$transaction([updatePlot, payment_plan]);
     } else {
       const addCustomer = prisma.customer.create({
         data: {
@@ -104,12 +112,7 @@ export default async function upsertPlots(
           cnic: customer.customerCNIC,
         },
       });
-      await prisma.$transaction([
-        addCustomer,
-        updatePlot,
-        addPayment,
-        payment_plan,
-      ]);
+      await prisma.$transaction([addCustomer, updatePlot, payment_plan]);
     }
     res.status(201).json({ created: true });
   } catch (err) {

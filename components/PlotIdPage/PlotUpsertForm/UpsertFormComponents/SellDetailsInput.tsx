@@ -30,6 +30,14 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
     developmentChargePercent,
     setDevelopmentChargePercent,
   } = props;
+  const onChangeDevelopmentCharge = (val: number | undefined) => {
+    setDevelopmentChargePercent(val);
+    setDevelopmentCharges(
+      developmentChargePercent && sellPrice
+        ? (developmentChargePercent / 100) * sellPrice
+        : undefined
+    );
+  };
   return (
     <Card
       shadow="sm"
@@ -100,7 +108,7 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
             label="development charges (% of sell price)"
             value={developmentChargePercent}
             placeholder={"enter value between 0 and 100"}
-            onChange={(val) => setDevelopmentChargePercent(val)}
+            onChange={(val) => onChangeDevelopmentCharge(val)}
             parser={(developmentCharges) =>
               developmentCharges?.replace(/\$\s?|(,*)/g, "")
             }
@@ -121,11 +129,7 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
           />
           <NumberInput
             label="development charges (pkr)"
-            value={
-              developmentChargePercent && sellPrice
-                ? (developmentChargePercent / 100) * sellPrice
-                : 0
-            }
+            value={developmentCharges}
             placeholder={
               developmentCharges === 0 ? "enter sell price and % for value" : ""
             }

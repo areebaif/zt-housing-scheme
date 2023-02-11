@@ -34,6 +34,7 @@ interface AddSaleFormProps {
   dimensionString: string;
   squareFt: string;
   soldPrice: number | undefined;
+  plotDownPayment: number | undefined;
   name: string;
   son_of: string;
   cnic: string;
@@ -57,6 +58,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     soldDate,
     futurePaymentPlan,
     isEditForm,
+    plotDownPayment,
     //setIsEditForm,
   } = props;
   const queryClient = useQueryClient();
@@ -73,7 +75,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     soldPrice
   );
   const [downPayment, setDownPayment] = React.useState<number | undefined>(
-    undefined
+    plotDownPayment
   );
   const [developmentCharges, setDevelopmentCharges] = React.useState<
     number | undefined
@@ -146,12 +148,6 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   };
 
   React.useEffect(() => {
-    //const plot = query.plotId as string;
-    //const dimension = query.dimension as string;
-    //const squareFeet = query.squareFeet as string;
-    //setPlotId(plot);
-    //setDimension(dimension);
-    //setSquareFeet(squareFeet);
     setExistingCustomerBackendData(fetchCustomers.data);
   }, [fetchCustomers.data]);
 
@@ -163,7 +159,6 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   if (fetchCustomers.isError) {
     return <Loader />;
   }
-  // this has to remain outside useEffect otherwise throws error
 
   const plotDetailsData = {
     plotId,

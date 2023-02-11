@@ -12,10 +12,18 @@ interface AddPayment {
   name: string;
   customerSonOf: string;
   cnic: string;
+  setShowAddPaymentForm: (val: boolean) => void;
 }
 
 export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
-  const { plotNumber, customerNumber, customerSonOf, name, cnic } = props;
+  const {
+    plotNumber,
+    customerNumber,
+    customerSonOf,
+    name,
+    cnic,
+    setShowAddPaymentForm,
+  } = props;
   const queryClient = useQueryClient();
   // router
   const router = useRouter();
@@ -35,6 +43,8 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
     mutationFn: postPlotPayment,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["plotById"] });
+      // setPayment form false
+      setShowAddPaymentForm(false);
       router.push(`/plot/${plotId}`);
     },
   });
@@ -46,19 +56,6 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
     const data = { payment: tableRows, customerId, plotId };
     mutation.mutate(data);
   };
-
-  //   React.useEffect(() => {
-  //     const plot = query.plotId as string;
-  //     const customerId = query.customerId as string;
-  //     const name = query.customerName as string;
-  //     const sonOf = query.sonOf as string;
-  //     const cnic = query.cnic as string;
-  //     setPlotId(plot);
-  //     setCustomerId(customerId);
-  //     setCustomerCNIC(cnic);
-  //     setCustomerName(name);
-  //     setSonOf(sonOf);
-  //   }, []);
 
   if (mutation.isLoading) {
     return <Loader />;
