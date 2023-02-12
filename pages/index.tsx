@@ -3,7 +3,7 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 // Mantine Imports
-import { Grid, Text, Flex } from "@mantine/core";
+import { Grid, Text, Flex, Loader } from "@mantine/core";
 // Component Imports
 import { PlotSaleSummaryTable, TotalsSummary } from "@/components";
 // Utilities
@@ -19,7 +19,7 @@ const AllPlots: React.FC = () => {
   if (fetchPlots.isLoading) {
     // TODO: loading component
     console.log("loading");
-    return <span>Loading...</span>;
+    return <Loader />;
   }
 
   if (fetchPlots.isError) {
@@ -47,21 +47,29 @@ const AllPlots: React.FC = () => {
     <React.Fragment>
       <TotalsSummary plots={plots} />
       <Grid>
-        <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
+        <Grid.Col span={6}>
+          <PlotSaleSummaryTable tableHead="Not Sold" tableRows={notSoldPlots} />
+        </Grid.Col>
+        <Grid.Col span={6}>
           <PlotSaleSummaryTable
-            tableHead="Partially Paid"
+            tableHead="Sold - Partial Payment"
             tableRows={partiallySold}
           />
         </Grid.Col>
-        <Grid.Col xs={12} sm={12} md={6} lg={6} xl={6}>
-          <PlotSaleSummaryTable tableHead="Not Sold" tableRows={notSoldPlots} />
+
+        <Grid.Col span={6}>
+          <PlotSaleSummaryTable
+            tableHead="Sold - Full Payment"
+            tableRows={fullySold}
+          />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <PlotSaleSummaryTable
+            tableHead="Registry Transferred"
+            tableRows={registryTransferred}
+          />
         </Grid.Col>
       </Grid>
-      <PlotSaleSummaryTable tableHead="Fully Sold" tableRows={fullySold} />
-      <PlotSaleSummaryTable
-        tableHead="Registry Transferred"
-        tableRows={registryTransferred}
-      />
     </React.Fragment>
   );
 };
