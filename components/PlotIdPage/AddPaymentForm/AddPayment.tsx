@@ -42,7 +42,7 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
   const mutation = useMutation({
     mutationFn: postPlotPayment,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["plotById"] });
+      queryClient.invalidateQueries();
       // setPayment form false
       setShowAddPaymentForm(false);
       router.push(`/plot/${plotId}`);

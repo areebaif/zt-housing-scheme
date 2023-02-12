@@ -35,10 +35,16 @@ export default async function allPosts(
         where: {
           plot_id: parseInt(plotId),
         },
+        orderBy: {
+          payment_date: "asc",
+        },
       });
       const paymentPlan = await prisma.payment_Plan.findMany({
         where: {
           plot_id: parseInt(plotId),
+        },
+        orderBy: {
+          payment_date: "asc",
         },
       });
 

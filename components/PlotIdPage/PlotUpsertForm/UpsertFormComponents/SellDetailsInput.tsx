@@ -32,10 +32,14 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
   } = props;
   const onChangeDevelopmentCharge = (val: number | undefined) => {
     setDevelopmentChargePercent(val);
+    setDevelopmentCharges(val && sellPrice ? (val / 100) * sellPrice : 0);
+  };
+  const onChangeSellPrice = (val: number | undefined) => {
+    setSellPrice(val);
     setDevelopmentCharges(
-      developmentChargePercent && sellPrice
-        ? (developmentChargePercent / 100) * sellPrice
-        : undefined
+      val && developmentChargePercent
+        ? (developmentChargePercent / 100) * val
+        : 0
     );
   };
   return (
@@ -65,7 +69,7 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
             value={sellPrice}
             placeholder={"enter sold value"}
             withAsterisk
-            onChange={(val) => setSellPrice(val)}
+            onChange={(val) => onChangeSellPrice(val)}
             parser={(sellPrice) => sellPrice?.replace(/\$\s?|(,*)/g, "")}
             error={
               sellPrice

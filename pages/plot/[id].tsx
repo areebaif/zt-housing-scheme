@@ -79,6 +79,7 @@ const PlotId: React.FC = () => {
     isEditForm,
     setIsEditForm,
     plotDownPayment,
+    setShowForm
   };
 
   const addPaymentProps = {

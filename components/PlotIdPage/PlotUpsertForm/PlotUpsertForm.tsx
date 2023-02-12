@@ -41,6 +41,7 @@ interface AddSaleFormProps {
   soldDate: Date | null;
   futurePaymentPlan: TableRowItem[] | [];
   isEditForm: boolean;
+  setShowForm: (val: boolean) => void;
   //setIsEditForm: (val: boolean) => void;
 }
 
@@ -59,6 +60,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     futurePaymentPlan,
     isEditForm,
     plotDownPayment,
+    setShowForm,
     //setIsEditForm,
   } = props;
   const queryClient = useQueryClient();
@@ -109,7 +111,8 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     mutationFn: postAddPlotSale,
     onSuccess: () => {
       queryClient.invalidateQueries();
-      router.push("/");
+      setShowForm(false);
+      router.push(`/plot/${plotId}`);
     },
   });
   const onSubmitForm = () => {
@@ -143,7 +146,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
       },
       paymentPlan: tableRows,
     };
-    console.log(data);
+
     mutation.mutate(data);
   };
 

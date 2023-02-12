@@ -1,8 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Plot } from "@prisma/client";
+import { Payment_Plan, Plot } from "@prisma/client";
 import { prisma } from "../../../db/prisma";
 import { PostReturnType } from "../payment/add";
+
+enum PaymentType {
+  development_charges = "development charges",
+  down_payment = "down payment",
+  other = "other",
+}
 
 export interface PlotsSelectFields {
   id: number;
@@ -61,15 +67,15 @@ export default async function upsertPlots(
         //development_charges: parseInt(developmentCharges),
       },
     });
-    // const addPayment = prisma.payments.create({
-    //   data: {
-    //     description: "down payment",
-    //     payment_value: downPayment,
-    //     customer_id: customerId,
-    //     plot_id: parsedPlotId,
-    //     payment_date: soldDateString,
-    //   },
-    // });
+    const addPayment = prisma.payments.create({
+      data: {
+        description: "down payment",
+        payment_value: downPayment,
+        customer_id: customerId,
+        plot_id: parsedPlotId,
+        payment_date: soldDateString,
+      },
+    });
     let paymentPlanArray = [];
     const paymentPlanParse = paymentPlan.map((item: any) => {
       return {
@@ -79,30 +85,46 @@ export default async function upsertPlots(
         customer_id: customerId,
       };
     });
-    paymentPlanArray = [
-      {
-        description: "down payment",
-        payment_value: downPayment,
-        customer_id: customerId,
-        plot_id: parsedPlotId,
-        payment_date: soldDateString,
-      },
-      ...paymentPlanParse,
-      {
-        description: "development charges",
-        payment_value: parseInt(developmentCharges),
-        customer_id: customerId,
-        plot_id: parsedPlotId,
-        payment_date:
-          paymentPlanParse[paymentPlanParse.length - 1].payment_date,
-      },
-    ];
+    let paymentPlanArr: Payment_Plan[];
+    if (developmentCharges) {
+      paymentPlanArray = [
+        {
+          description: "down payment",
+          payment_value: downPayment,
+          customer_id: customerId,
+          plot_id: parsedPlotId,
+          payment_date: soldDateString,
+        },
+        ...paymentPlanParse,
+        {
+          description: "development charges",
+          payment_value: parseInt(developmentCharges),
+          customer_id: customerId,
+          plot_id: parsedPlotId,
+          payment_date:
+            paymentPlanParse[paymentPlanParse.length - 1].payment_date,
+        },
+      ];
+      paymentPlanArr = [...paymentPlanArray];
+    } else {
+      paymentPlanArray = [
+        {
+          description: "down payment",
+          payment_value: downPayment,
+          customer_id: customerId,
+          plot_id: parsedPlotId,
+          payment_date: soldDateString,
+        },
+        ...paymentPlanParse,
+      ];
+      paymentPlanArr = [...paymentPlanArray];
+    }
     const payment_plan = prisma.payment_Plan.createMany({
       data: paymentPlanArray,
     });
 
     if (!customer.newCustomer) {
-      await prisma.$transaction([updatePlot, payment_plan]);
+      await prisma.$transaction([updatePlot, addPayment, payment_plan]);
     } else {
       const addCustomer = prisma.customer.create({
         data: {
@@ -112,7 +134,12 @@ export default async function upsertPlots(
           cnic: customer.customerCNIC,
         },
       });
-      await prisma.$transaction([addCustomer, updatePlot, payment_plan]);
+      await prisma.$transaction([
+        addCustomer,
+        updatePlot,
+        addPayment,
+        payment_plan,
+      ]);
     }
     res.status(201).json({ created: true });
   } catch (err) {
