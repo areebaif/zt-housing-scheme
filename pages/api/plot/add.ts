@@ -3,12 +3,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Payment_Plan, Plot } from "@prisma/client";
 import { prisma } from "../../../db/prisma";
 import { PostReturnType } from "../payment/add";
-
-enum PaymentType {
-  development_charges = "development charges",
-  down_payment = "down payment",
-  other = "other",
-}
+import { PaymentType } from "@prisma/client";
+import { TableRowItem } from "@/components/TableRowsUpsert";
 
 export interface PlotsSelectFields {
   id: number;
@@ -31,12 +27,15 @@ export default async function upsertPlots(
       paymentPlan,
       developmentCharges,
     } = req.body;
-    // add sale
+    // things to check for
+    // 1 new customer existing customer
+    // 2 development charges?
+    // 3 if plot paid in full when sold
 
     const parsedPlotId = parseInt(plotId);
-
     // check existing customer or new customer
     let customerId: number | undefined;
+
     if (!customer.newCustomer) {
       const customerVal = await prisma.customer.findUnique({
         where: { cnic: customer.customerCNIC },
@@ -59,68 +58,105 @@ export default async function upsertPlots(
       where: {
         id: parsedPlotId,
       },
-      data: {
-        customer_id: customerId,
-        status: "partially_paid",
-        sold_date: soldDateString,
-        sold_price: sellPrice,
-        //development_charges: parseInt(developmentCharges),
-      },
+      data:
+        developmentCharges + downPayment !== sellPrice
+          ? {
+              customer_id: customerId,
+              status: "partially_paid",
+              sold_date: soldDateString,
+              sold_price: sellPrice,
+              //development_charges: parseInt(developmentCharges),
+            }
+          : {
+              customer_id: customerId,
+              status: "fully_paid",
+              sold_date: soldDateString,
+              fully_sold_date: soldDateString,
+              sold_price: sellPrice,
+            },
     });
-    const addPayment = prisma.payments.create({
-      data: {
-        description: "down payment",
-        payment_value: downPayment,
-        customer_id: customerId,
-        plot_id: parsedPlotId,
-        payment_date: soldDateString,
-      },
+    const addPayment = prisma.payments.createMany({
+      data:
+        developmentCharges + downPayment !== sellPrice
+          ? {
+              payment_type: PaymentType.down_payment,
+              payment_value: downPayment,
+              customer_id: customerId,
+              plot_id: parsedPlotId,
+              payment_date: soldDateString,
+            }
+          : developmentCharges && downPayment
+          ? [
+              {
+                payment_type: PaymentType.down_payment,
+                payment_value: downPayment,
+                customer_id: customerId,
+                plot_id: parsedPlotId,
+                payment_date: soldDateString,
+              },
+              {
+                payment_type: PaymentType.development_charge,
+                payment_value: developmentCharges,
+                customer_id: customerId,
+                plot_id: parsedPlotId,
+                payment_date: soldDateString,
+              },
+            ]
+          : {
+              payment_type: PaymentType.down_payment,
+              payment_value: downPayment,
+              customer_id: customerId,
+              plot_id: parsedPlotId,
+              payment_date: soldDateString,
+            },
     });
     let paymentPlanArray = [];
-    const paymentPlanParse = paymentPlan.map((item: any) => {
+    const paymentPlanParse = paymentPlan.map((item: TableRowItem) => {
       return {
         payment_date: item.dateISOString,
+        payment_type: item.paymentType,
         payment_value: item.value,
         plot_id: parsedPlotId,
         customer_id: customerId,
       };
     });
     let paymentPlanArr: Payment_Plan[];
-    if (developmentCharges) {
-      paymentPlanArray = [
-        {
-          description: "down payment",
-          payment_value: downPayment,
-          customer_id: customerId,
-          plot_id: parsedPlotId,
-          payment_date: soldDateString,
-        },
-        ...paymentPlanParse,
-        {
-          description: "development charges",
-          payment_value: parseInt(developmentCharges),
-          customer_id: customerId,
-          plot_id: parsedPlotId,
-          payment_date:
-            paymentPlanParse[paymentPlanParse.length - 1].payment_date,
-        },
-      ];
-      paymentPlanArr = [...paymentPlanArray];
-    } else {
-      paymentPlanArray = [
-        {
-          description: "down payment",
-          payment_value: downPayment,
-          customer_id: customerId,
-          plot_id: parsedPlotId,
-          payment_date: soldDateString,
-        },
-        ...paymentPlanParse,
-      ];
-      paymentPlanArr = [...paymentPlanArray];
-    }
+    // if (developmentCharges) {
+    paymentPlanArray = [
+      {
+        payment_type: PaymentType.down_payment,
+        payment_value: downPayment,
+        customer_id: customerId,
+        plot_id: parsedPlotId,
+        payment_date: soldDateString,
+      },
+      ...paymentPlanParse,
+      {
+        payment_type: PaymentType.development_charge,
+        payment_value: parseInt(developmentCharges),
+        customer_id: customerId,
+        plot_id: parsedPlotId,
+        payment_date: paymentPlanParse.length
+          ? paymentPlanParse[paymentPlanParse.length - 1].payment_date
+          : soldDateString,
+      },
+    ];
+    paymentPlanArr = [...paymentPlanArray];
+    // } else {
+    //   paymentPlanArray = [
+    //     {
+    //       payment_type: PaymentType.down_payment,
+    //       payment_value: downPayment,
+    //       customer_id: customerId,
+    //       plot_id: parsedPlotId,
+    //       payment_date: soldDateString,
+    //     },
+    //     ...paymentPlanParse,
+    //   ];
+    // paymentPlanArr = [...paymentPlanArray];
+    //}
     const payment_plan = prisma.payment_Plan.createMany({
-      data: paymentPlanArray,
+      data: paymentPlanArr,
     });
 
     if (!customer.newCustomer) {

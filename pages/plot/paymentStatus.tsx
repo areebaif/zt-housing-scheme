@@ -36,6 +36,7 @@ const PaymentStatus: React.FC = () => {
         <td>
           {`${element.payment_value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
         </td>
+        <td>{element.payment_type}</td>
         <td>{element.paymentValueStatus === "not paid" ? "no" : "yes"}</td>
         <td>
           {`${element.paymentCollectionValue}`.replace(
@@ -62,6 +63,7 @@ const PaymentStatus: React.FC = () => {
         <td>
           {`${element.payment_value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
         </td>
+        <td>{element.payment_type}</td>
         <td>{element.paymentValueStatus === "not paid" ? "no" : "yes"}</td>
         <td>
           {`${element.paymentCollectionValue}`.replace(
@@ -132,8 +134,9 @@ export const PaymentStatusTable: React.FC<PaymentStatusTableProps> = (
               <th>plot no</th>
               <th>name</th>
               <th>son of</th>
-              <th>payment date (payment plan)</th>
-              <th>payment value (payment plan)</th>
+              <th>date (payment plan)</th>
+              <th>value (payment plan)</th>
+              <th>payment type</th>
               <th>is payment partially paid</th>
               <th>value to be collected</th>
             </tr>
@@ -173,6 +176,7 @@ const MarkedSlider: React.FC<MarkedSliderProps> = (
       >{`payment collection for next ${sliderValue} days`}</Title>
       <Slider
         max={90}
+        min={1}
         marks={marks}
         value={sliderValue}
         onChange={setSliderValue}

@@ -18,6 +18,13 @@ enum Status {
   registry_transferred
 }
 
+enum PaymentType {
+  down_payment
+  development_charge
+  installment
+  other
+}
+
 model Plot {
   id Int @id
   dimension String?  @db.VarChar(255)
@@ -43,6 +50,7 @@ model Customer {
 model Payment_Plan {
   id Int @id @default(autoincrement())
   description String?
+  payment_type PaymentType
   plot_id Int
   customer_id Int
   payment_date DateTime?
@@ -52,6 +60,7 @@ model Payment_Plan {
 model Payments {
   id Int @id @default(autoincrement())
   description String?  @db.VarChar(255)
+  payment_type PaymentType
   plot_id Int
   customer_id Int
   payment_date DateTime

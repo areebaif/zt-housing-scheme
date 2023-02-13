@@ -8,28 +8,42 @@ import {
   TextInput,
   Flex,
   Card,
+  Select,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { formatAddTime } from "../utilities";
+import { PaymentType } from "@prisma/client";
+
+// export enum TypePayment {
+//   down_payment = "down_payment",
+//   development_charge = "development_charge",
+//   installment = "installment",
+//   other = "other",
+// }
 
 export interface TableRowItem {
   id: number;
+  dateParsed: string;
   dateISOString: string;
   value: number | undefined;
   description?: string;
+  paymentType: PaymentType;
 }
 export interface UpsertTableRowsProps {
   //tableHeader: string;
   tableRows: TableRowItem[];
   setTableRows: (data: TableRowItem[]) => void;
   descriptionField?: boolean;
+  showDevelopmentCharge?: boolean;
 }
 
 export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
   UpsertTableRowsProps
 ) => {
   // props
-  const { tableRows, setTableRows, descriptionField } = UpsertTableRowsProps;
+  const { tableRows, setTableRows, descriptionField, showDevelopmentCharge } =
+    UpsertTableRowsProps;
+
   // state
   const [fixedPaymentPlan, setFixedPaymentPlan] = React.useState<JSX.Element[]>(
     []
@@ -40,6 +54,33 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
   const [paymentPlanValueItem, setPaymentPlanValueItem] = React.useState<
     number | undefined
   >(undefined);
+  const [paymentPlanPaymentType, setPaymentPlanPaymentType] =
+    React.useState<PaymentType | null>();
+
+  let data: {
+    value: PaymentType;
+    label: string;
+  }[];
+
+  if (showDevelopmentCharge) {
+    data = [
+      {
+        value: PaymentType.development_charge,
+        label: "development charge",
+      },
+      { value: PaymentType.installment, label: "installment" },
+      { value: PaymentType.other, label: "other" },
+    ];
+  } else {
+    data = [
+      { value: PaymentType.installment, label: "installment" },
+      { value: PaymentType.other, label: "other" },
+    ];
+  }
+
+  const onPaymentTypeChange = (val: PaymentType | null) => {
+    setPaymentPlanPaymentType(val);
+  };
 
   const onRowDelete = (key: number) => {
     setFixedPaymentPlan(
@@ -51,14 +92,19 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
 
   const onAddRow = () => {
     // do some validation here aswell
-    if (!paymentPlanDateItem || !paymentPlanValueItem) {
-      throw new Error("please enter date and value to add row");
+    if (
+      !paymentPlanDateItem ||
+      !paymentPlanValueItem ||
+      !paymentPlanPaymentType
+    ) {
+      throw new Error("please enter date,value and payment type to add a row");
     }
 
     const key = fixedPaymentPlan?.length + 1;
     const date = new Date(`${paymentPlanDateItem}`);
     const dateISO = formatAddTime(`${paymentPlanDateItem}`);
     const dateString = date.toDateString();
+    const paymnetType = paymentPlanPaymentType;
 
     setTableRows([
       ...tableRows,
@@ -66,7 +112,11 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
         id: key,
         value: paymentPlanValueItem,
         description: description,
+        dateParsed: dateISO,
         dateISOString: dateISO,
+        paymentType: paymentPlanPaymentType
+          ? paymentPlanPaymentType
+          : PaymentType.other,
       },
     ]);
 
@@ -74,7 +124,8 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
       ...fixedPaymentPlan,
       <tr key={key}>
         <td>{dateString}</td>
-        {description ? <td>{description}</td> : undefined}
+        <td>{paymnetType}</td>
+        <td>{description}</td>
         <td>{paymentPlanValueItem}</td>
         <td>
           <Button variant="outline" onClick={() => onRowDelete(key)}>
@@ -84,6 +135,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
       </tr>,
     ]);
     setPaymentPlanValueItem(undefined);
+    setPaymentPlanPaymentType(null);
     setPaymentPlanDateItem(null);
     setDescription("");
   };
@@ -111,10 +163,16 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
               inputFormat="ddd MMM D YYYY"
               label={"select date"}
               placeholder={"dd/mm/yyyy"}
-              withAsterisk
-              error={!paymentPlanDateItem}
+              //error={!paymentPlanDateItem}
               value={paymentPlanDateItem}
               onChange={setPaymentPlanDateItem}
+            />
+            <Select
+              value={paymentPlanPaymentType}
+              onChange={onPaymentTypeChange}
+              label={"choose type of payment"}
+              placeholder={"pick one"}
+              data={data}
             />
             {descriptionField ? (
               <TextInput
@@ -128,7 +186,6 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
               label="payment value"
               value={paymentPlanValueItem}
               placeholder={"value to be collected"}
-              withAsterisk
               onChange={(val) => setPaymentPlanValueItem(val)}
               parser={(val) => val?.replace(/\$\s?|(,*)/g, "")}
               error={
@@ -136,7 +193,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
                   ? paymentPlanValueItem < 1
                     ? "enter values above 0"
                     : false
-                  : true
+                  : false
               }
               formatter={(value) => {
                 return value
@@ -164,6 +221,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
             <thead>
               <tr>
                 <th>Date</th>
+                <th>Payment Type</th>
                 {descriptionField ? <th>Description</th> : undefined}
                 <th>Value</th>
                 <th>Delete Values</th>

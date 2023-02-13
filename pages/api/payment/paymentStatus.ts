@@ -1,3 +1,4 @@
+import { PaymentType } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../../db/prisma";
@@ -10,30 +11,43 @@ export enum PaymentValueStatus {
   notPaid = "not paid",
 }
 
-export interface SQLQueryPlannedPayments {
+export type SQLQueryPlannedPayments = {
   id: number;
   plot_id: number;
   customer_id: number;
+  payment_type: PaymentType;
   payment_date: string;
   payment_value: number | null;
   description: string | null;
   payment_plan_recurring_payment_days: number | null;
-}
-export interface PaymentSchedule {
-  id: number;
-  description: string | null;
-  plot_id: number;
-  customer_id: number;
-  payment_date: string;
-  payment_value: number | null;
-  payment_plan_recurring_payment_days: number | null;
+};
+
+type CustomerPayments = {
   name: string;
   son_of: string;
   cnic: string;
   lastPaymentDate?: string;
   paymentValueStatus: PaymentValueStatus;
   paymentCollectionValue: number | null;
-}
+};
+
+export type PaymentSchedule = SQLQueryPlannedPayments & CustomerPayments;
+// export type PaymentSchedule =  {
+//   id: number;
+//   plot_id: number;
+//   customer_id: number;
+//   payment_type: PaymentType;
+//   payment_date: string;
+//   payment_value: number | null;
+//   description: string | null;
+//   payment_plan_recurring_payment_days: number | null;
+//   name: string;
+//   son_of: string;
+//   cnic: string;
+//   lastPaymentDate?: string;
+//   paymentValueStatus: PaymentValueStatus;
+//   paymentCollectionValue: number | null;
+// }
 
 interface SQLQueryPayments {
   totalPaid: number;

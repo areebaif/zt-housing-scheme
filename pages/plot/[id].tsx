@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import * as ReactQuery from "@tanstack/react-query";
 import { Grid, Loader } from "@mantine/core";
 import { fetchPlotById } from "../../r-query/functions";
+import { PaymentType } from "@prisma/client";
 import {
   PaymentPlanTable,
   PaymentHistoryTable,
@@ -11,8 +12,8 @@ import {
 } from "@/components";
 import { AddPayment } from "@/components/PlotIdPage/AddPaymentForm/AddPayment";
 import { PlotUpsertForm } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
-
 import { PlotDetail } from "../api/plot/[id]";
+import { TableRowItem } from "@/components/TableRowsUpsert";
 
 const PlotId: React.FC = () => {
   const router = useRouter();
@@ -45,17 +46,27 @@ const PlotId: React.FC = () => {
     totalPayment = totalPayment + item.payment_value;
   });
   let plotDownPayment: number | undefined;
+  let plotDevelopmentCharge: number | undefined;
   const paymentPlanMap = plotDetail.payment_plan?.map((item) => {
-    if (item.description === "down payment") {
+    if (item.payment_type === PaymentType.down_payment) {
       plotDownPayment = item.payment_value ? item.payment_value : undefined;
     }
-    const res = {
+    if (item.payment_type === PaymentType.development_charge) {
+      plotDevelopmentCharge = item.payment_value
+        ? item.payment_value
+        : undefined;
+    }
+    const res: TableRowItem = {
       id: item.id,
-      dateISOString: item.payment_date
+      dateParsed: item.payment_date
         ? new Date(item.payment_date).toDateString()
+        : "",
+      dateISOString: item.payment_date
+        ? new Date(item.payment_date).toISOString()
         : "",
       value: item.payment_value ? item.payment_value : undefined,
       description: item.description ? item.description : undefined,
+      paymentType: item.payment_type,
     };
     return res;
   });
@@ -79,7 +90,8 @@ const PlotId: React.FC = () => {
     isEditForm,
     setIsEditForm,
     plotDownPayment,
-    setShowForm
+    setShowForm,
+    plotDevelopmentCharge,
   };
 
   const addPaymentProps = {
