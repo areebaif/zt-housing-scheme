@@ -35,8 +35,6 @@ model Plot {
   sold_price Int?
   created_at DateTime @default(now())
   customer_id Int?
-  registry_transfer_date DateTime?
-  registry_given_to String?
 }
 
 model Customer {
@@ -71,5 +69,9 @@ model Sale_Registry {
   id Int @id @default(autoincrement())
   plot_id Int @unique
   created_at DateTime @default(now())
+  registry_transfer_date DateTime?
+  registry_given_to_name String?
+  registry_given_to_son_of String?
+  registry_given_to_cnic String?
 }
 

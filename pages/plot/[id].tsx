@@ -4,6 +4,7 @@ import * as ReactQuery from "@tanstack/react-query";
 import { Grid, Loader } from "@mantine/core";
 import { fetchPlotById } from "../../r-query/functions";
 import { PaymentType } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import {
   PaymentPlanTable,
   PaymentHistoryTable,
@@ -16,6 +17,9 @@ import { PlotDetail } from "../api/plot/[id]";
 import { TableRowItem } from "@/components/TableRowsUpsert";
 
 const PlotId: React.FC = () => {
+  const { status } = useSession({
+    required: true,
+  });
   const router = useRouter();
   const plotId = router.query?.id as string;
   const [showForm, setShowForm] = React.useState(false);
@@ -30,7 +34,7 @@ const PlotId: React.FC = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-  if (fetchplot.isLoading) {
+  if (fetchplot.isLoading || status === "loading") {
     return <Loader />;
   }
 

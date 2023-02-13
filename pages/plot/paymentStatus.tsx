@@ -1,17 +1,21 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import { fetchPaymentStatus } from "@/r-query/functions";
 import { Table, Card, Loader, Title, Slider, Flex, Group } from "@mantine/core";
 import { compare, beforeDateInput } from "@/utilities";
 import { PaymentSchedule } from "../api/payment/paymentStatus";
 
 const PaymentStatus: React.FC = () => {
+  const { status } = useSession({
+    required: true,
+  });
   const [sliderValue, setSliderValue] = React.useState(40);
   const fetchStatus = useQuery(["upcomingPayments"], fetchPaymentStatus, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-  if (fetchStatus.isLoading) {
+  if (fetchStatus.isLoading || status === "loading") {
     return <Loader />;
   }
 
