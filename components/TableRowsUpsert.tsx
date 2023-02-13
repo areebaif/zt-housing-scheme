@@ -24,7 +24,7 @@ import { PaymentType } from "@prisma/client";
 export interface TableRowItem {
   id: number;
   dateParsed: string;
-  dateISOString?: string;
+  dateISOString: string;
   value: number | undefined;
   description?: string;
   paymentType: PaymentType;
