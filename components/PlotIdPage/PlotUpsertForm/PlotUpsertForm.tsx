@@ -8,13 +8,16 @@ import {
   CustomerDetailsInput,
   PaymentPlanView,
 } from ".";
-import { fetchAllCustomers, postAddPlotSale } from "@/r-query/functions";
+import {
+  fetchAllCustomers,
+  postAddPlotSale,
+  postEditPlotSale,
+} from "@/r-query/functions";
 import { TableRowItem } from "../../TableRowsUpsert";
 import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInput";
 import { formatAddTime } from "@/utilities";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
 
-// TODO: show development Charges in Payment Plan when are they collected????
 interface FormPostProps {
   plotId: string;
   sellPrice: number;
@@ -28,6 +31,7 @@ interface FormPostProps {
     newCustomer: boolean;
   };
   paymentPlan: TableRowItem[];
+  isEditPaymentPlan: boolean;
 }
 interface AddSaleFormProps {
   plotNumber: string;
@@ -98,6 +102,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   // table props
   const [tableRows, setTableRows] =
     React.useState<TableRowItem[]>(futurePaymentPlan);
+  const [isEditPaymentPlan, setIsEditPaymentPlan] = React.useState(false);
 
   // fetch exisitng customer data from backend
   const fetchCustomers = useQuery({
@@ -108,7 +113,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   });
 
   const mutation = useMutation({
-    mutationFn: postAddPlotSale,
+    mutationFn: !isEditForm ? postAddPlotSale : postEditPlotSale,
     onSuccess: () => {
       queryClient.invalidateQueries();
       setShowForm(false);
@@ -127,9 +132,9 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     if (isNewCustomer && (!customerName || !customerCNIC || !sonOf))
       throw new Error("please enter customer name son of and cnic");
     // payment plan fields validation
-    if (!tableRows.length)
-      throw new Error("please enter a payment plan for customer");
-    // format date
+    // if (!tableRows.length)
+    //   throw new Error("please enter a payment plan for customer");
+    // // format date
 
     const soldDateString = formatAddTime(`${sellDate}`);
     const data: FormPostProps = {
@@ -145,8 +150,9 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
         newCustomer: isNewCustomer,
       },
       paymentPlan: tableRows,
+      isEditPaymentPlan,
     };
-
+    console.log(data);
     mutation.mutate(data);
   };
 
@@ -213,6 +219,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
           descriptionField={true}
           setTableRows={setTableRows}
           setShowEditFieldFlag={setShowEditFieldFlag}
+          setIsEditPaymentPlan={setIsEditPaymentPlan}
         />
       )}
 

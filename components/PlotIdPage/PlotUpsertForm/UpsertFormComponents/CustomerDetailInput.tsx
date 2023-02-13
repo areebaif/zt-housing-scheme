@@ -159,6 +159,8 @@ export const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (
               setShowCustomerCard={setShowCustomerCard}
               setShowCustomerFields={setShowCustomerFields}
               setIsEditFlag={setIsEditFlag}
+              setCustomerName={setCustomerName}
+              setSonOf={setSonOf}
             />
           )
         ) : (
@@ -169,6 +171,8 @@ export const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (
             setShowCustomerCard={setShowCustomerCard}
             setShowCustomerFields={setShowCustomerFields}
             setIsEditFlag={setIsEditFlag}
+            setCustomerName={setCustomerName}
+            setSonOf={setSonOf}
           />
         )}
       </Card.Section>
@@ -183,6 +187,8 @@ type CustomerDetailCardProps = {
   setShowCustomerCard: (val: boolean) => void;
   setShowCustomerFields: (val: boolean) => void;
   setIsEditFlag: (val: boolean) => void;
+  setCustomerName: (va: string) => void;
+  setSonOf: (va: string) => void;
 };
 
 const CustomerDetailCard: React.FC<CustomerDetailCardProps> = (
@@ -195,6 +201,8 @@ const CustomerDetailCard: React.FC<CustomerDetailCardProps> = (
     setShowCustomerFields,
     setShowCustomerCard,
     setIsEditFlag,
+    setCustomerName,
+    setSonOf,
   } = props;
 
   return (
@@ -233,8 +241,10 @@ const CustomerDetailCard: React.FC<CustomerDetailCardProps> = (
         variant="outline"
         onClick={() => {
           setIsEditFlag(false);
-          setShowCustomerFields(true);
+          setShowCustomerFields(false);
           setShowCustomerCard(false);
+          setCustomerName("");
+          setSonOf("");
         }}
       >
         Edit

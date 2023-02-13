@@ -19,6 +19,7 @@ export const PaymentPlanTable: React.FC<PaymentPlanTable> = (
         <td>{element.plot_id}</td>
         <td>{customerName}</td>
         <td>{sonOf}</td>
+        <td>{element.payment_type}</td>
         <td>{element.description}</td>
         <td>{date.toDateString()}</td>
         <td>
@@ -46,6 +47,7 @@ export const PaymentPlanTable: React.FC<PaymentPlanTable> = (
               <th>Plot Number</th>
               <th>Customer Name</th>
               <th>Son/ of</th>
+              <th>Payment Type</th>
               <th>Description</th>
               <th>Estimated Payment Date</th>
               <th>Estimated Payment Value</th>

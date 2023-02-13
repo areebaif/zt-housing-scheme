@@ -25,6 +25,7 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
     return (
       <tr key={element.id}>
         <td>{element.id}</td>
+        <td>{element.payment_type}</td>
         <td>{element.description}</td>
         <td>{date.toDateString()}</td>
         <td>
@@ -48,9 +49,6 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
           <Button
             onClick={() => {
               setShowAddPaymentForm(true);
-              // router.push(
-              //   `/payment/add/${plotId}?customerId=${plotDetail?.customer?.id}&customerName=${plotDetail?.customer?.name}&sonOf=${plotDetail?.customer?.son_of}&cnic=${plotDetail?.customer?.cnic}`
-              // )
             }}
           >
             Add Payment
@@ -62,6 +60,7 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
           <thead>
             <tr>
               <th>Payment Number</th>
+              <th>PaymentType</th>
               <th>Description</th>
               <th>Date</th>
               <th>Value</th>

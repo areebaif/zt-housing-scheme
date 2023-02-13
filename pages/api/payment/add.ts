@@ -4,7 +4,6 @@ import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
 
 import { prisma } from "../../../db/prisma";
 import { TableRowItem } from "@/components/TableRowsUpsert";
-import { PlotDetail } from "../plot/[id]";
 
 export interface PostReturnType {
   created: true;
@@ -15,7 +14,6 @@ export default async function addPayment(
   res: NextApiResponse<any>
 ) {
   try {
-    console.log(" I just hit");
     const payment = req.body.payment as TableRowItem[];
     const customerId = req.body.customerId as string;
     const plotId = req.body.plotId as string;
@@ -26,6 +24,7 @@ export default async function addPayment(
       return {
         payment_date: item.dateISOString,
         payment_value: item.value!,
+        payment_type: item.paymentType,
         plot_id: parsedPlotId,
         customer_id: parsedCustomerId,
         description: item.description,

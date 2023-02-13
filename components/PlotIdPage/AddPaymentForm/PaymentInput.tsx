@@ -7,10 +7,12 @@ type PaymentInputProps = {
   tableRows: TableRowItem[];
   setTableRows: (rows: TableRowItem[]) => void;
   descriptionField: string;
+  showDevelopmentCharge?: boolean;
 };
 
 export const PaymentInput: React.FC<PaymentInputProps> = (props) => {
-  const { tableRows, setTableRows, descriptionField } = props;
+  const { tableRows, setTableRows, descriptionField, showDevelopmentCharge } =
+    props;
   return (
     <Card
       shadow="sm"
@@ -27,6 +29,7 @@ export const PaymentInput: React.FC<PaymentInputProps> = (props) => {
         tableRows={tableRows}
         setTableRows={setTableRows}
         descriptionField={true}
+        showDevelopmentCharge={showDevelopmentCharge}
       />
     </Card>
   );

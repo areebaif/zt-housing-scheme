@@ -52,6 +52,18 @@ export const postAddPlotSale = async (data: any) => {
   return res;
 };
 
+export const postEditPlotSale = async (data: any) => {
+  const response = await fetch(`/api/plot/edit`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const res: PostReturnType = await response.json();
+  return res;
+};
+
 export const postPlotPayment = async (data: {
   payment: TableRowItem[];
   customerId: string;
