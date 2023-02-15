@@ -18,11 +18,10 @@ import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInpu
 import { formatAddTime } from "@/utilities";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
 
-interface FormPostProps {
+export interface FormPostProps {
   plotId: string;
   sellPrice: number;
   soldDateString: string;
-
   customer: {
     customerCNIC: string;
     customerName: string;
@@ -62,15 +61,12 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     soldDate,
     futurePaymentPlan,
     isEditForm,
-    plotDownPayment,
     setShowForm,
-    //setIsEditForm,
   } = props;
   const queryClient = useQueryClient();
   // // router props
   const router = useRouter();
-  // const query = router.query;
-  // const routerReady = router.isReady;
+ 
   // plot metadata props
   const [plotId, setPlotId] = React.useState(plotNumber);
   const [dimension, setDimension] = React.useState(dimensionString);
@@ -79,14 +75,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   const [sellPrice, setSellPrice] = React.useState<number | undefined>(
     soldPrice
   );
-  // const [downPayment, setDownPayment] = React.useState<number | undefined>(
-  //   plotDownPayment
-  // );
-  // const [developmentCharges, setDevelopmentCharges] = React.useState<
-  //   number | undefined
-  // >(0);
-  // const [developmentChargePercent, setDevelopmentChargePercent] =
-  //   React.useState<number | undefined>(undefined);
+
   const [sellDate, setSellDate] = React.useState<Date | null>(soldDate);
   // new customer props
   const [customerName, setCustomerName] = React.useState(name);
@@ -117,6 +106,9 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
       queryClient.invalidateQueries();
       setShowForm(false);
       router.push(`/plot/${plotId}`);
+    },
+    onError: () => {
+      return <div>error occured: Please try again later</div>;
     },
   });
   const onSubmitForm = () => {

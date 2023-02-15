@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Payment_Plan, Plot } from "@prisma/client";
 import { prisma } from "../../../db/prisma";
 import { PostReturnType } from "../payment/add";
-import { PaymentType } from "@prisma/client";
 import { TableRowItem } from "@/components/TableRowsUpsert";
 
 export interface PlotsSelectFields {
@@ -18,14 +17,8 @@ export default async function upsertPlots(
   res: NextApiResponse<PostReturnType>
 ) {
   try {
-    const {
-      plotId,
-      sellPrice,
-      soldDateString,
-
-      customer,
-      paymentPlan,
-    } = req.body;
+    const { plotId, sellPrice, soldDateString, customer, paymentPlan } =
+      req.body;
     // things to check for
     // 1 new customer existing customer
 
@@ -131,7 +124,8 @@ export default async function upsertPlots(
     }
     res.status(201).json({ created: true });
   } catch (err) {
-    //TODO: error handling
-    console.log(err);
+    return res
+      .status(404)
+      .json({ error: "something went wrong please trey again" });
   }
 }

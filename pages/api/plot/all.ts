@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Plot } from "@prisma/client";
 
 import { prisma } from "../../../db/prisma";
+import { ReturnError } from "../customer/all";
 
 export interface PlotsSelectFields {
   id: number;
@@ -13,10 +14,16 @@ export interface PlotsSelectFields {
 
 export default async function allPosts(
   req: NextApiRequest,
-  res: NextApiResponse<PlotsSelectFields[]>
+  res: NextApiResponse<PlotsSelectFields[] | ReturnError>
 ) {
-  const data = await prisma.plot.findMany({
-    select: { id: true, dimension: true, square_feet: true, status: true },
-  });
-  res.status(200).json(data);
+  try {
+    const data = await prisma.plot.findMany({
+      select: { id: true, dimension: true, square_feet: true, status: true },
+    });
+    res.status(200).json(data);
+  } catch (err) {
+    return res
+      .status(404)
+      .json({ error: "something went wrong please try again" });
+  }
 }

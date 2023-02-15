@@ -60,7 +60,7 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
   if (mutation.isLoading) {
     return <Loader />;
   }
-  // TODO: error handling
+
   if (mutation.isError) {
     return <div>Cannot add payment at this time, please try later</div>;
   }

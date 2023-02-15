@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
-
+import { ReturnError } from "../customer/all";
 import { prisma } from "../../../db/prisma";
 
 export interface PlotDetail {
@@ -13,7 +13,7 @@ export interface PlotDetail {
 
 export default async function allPosts(
   req: NextApiRequest,
-  res: NextApiResponse<PlotDetail | { error: "error" }>
+  res: NextApiResponse<PlotDetail | ReturnError>
 ) {
   try {
     const plotId = req.query.id as string;
@@ -58,7 +58,9 @@ export default async function allPosts(
     } else {
       res.status(200).json({ plot: plot });
     }
-  } catch (err) {
-    //TODO: error handling
+  } catch (error) {
+    return res
+      .status(404)
+      .json({ error: "something went wrong please trey again" });
   }
 }
