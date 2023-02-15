@@ -33,15 +33,14 @@ export interface UpsertTableRowsProps {
   //tableHeader: string;
   tableRows: TableRowItem[];
   setTableRows: (data: TableRowItem[]) => void;
-  descriptionField?: boolean;
-  showDevelopmentCharge?: boolean;
+  showDescriptionField?: boolean;
 }
 
 export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
   UpsertTableRowsProps
 ) => {
   // props
-  const { tableRows, setTableRows, descriptionField, showDevelopmentCharge } =
+  const { tableRows, setTableRows, showDescriptionField } =
     UpsertTableRowsProps;
 
   // state
@@ -62,21 +61,18 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
     label: string;
   }[];
 
-  if (showDevelopmentCharge) {
-    data = [
-      {
-        value: PaymentType.development_charge,
-        label: "development charge",
-      },
-      { value: PaymentType.installment, label: "installment" },
-      { value: PaymentType.other, label: "other" },
-    ];
-  } else {
-    data = [
-      { value: PaymentType.installment, label: "installment" },
-      { value: PaymentType.other, label: "other" },
-    ];
-  }
+  data = [
+    {
+      value: PaymentType.down_payment,
+      label: "down payment",
+    },
+    {
+      value: PaymentType.development_charge,
+      label: "development charge",
+    },
+    { value: PaymentType.installment, label: "installment" },
+    { value: PaymentType.other, label: "other" },
+  ];
 
   const onPaymentTypeChange = (val: PaymentType | null) => {
     setPaymentPlanPaymentType(val);
@@ -111,7 +107,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
       {
         id: key,
         value: paymentPlanValueItem,
-        description: description,
+        description: showDescriptionField ? description : undefined,
         dateParsed: dateISO,
         dateISOString: dateISO,
         paymentType: paymentPlanPaymentType
@@ -125,7 +121,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
       <tr key={key}>
         <td>{dateString}</td>
         <td>{paymnetType}</td>
-        <td>{description}</td>
+        {showDescriptionField ? <td>{description}</td> : undefined}
         <td>{paymentPlanValueItem}</td>
         <td>
           <Button variant="outline" onClick={() => onRowDelete(key)}>
@@ -174,7 +170,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
               placeholder={"pick one"}
               data={data}
             />
-            {descriptionField ? (
+            {showDescriptionField ? (
               <TextInput
                 value={description}
                 label="description"
@@ -222,7 +218,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
               <tr>
                 <th>Date</th>
                 <th>Payment Type</th>
-                {descriptionField ? <th>Description</th> : undefined}
+                {showDescriptionField ? <th>Description</th> : undefined}
                 <th>Value</th>
                 <th>Delete Values</th>
               </tr>

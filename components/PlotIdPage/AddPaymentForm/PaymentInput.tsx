@@ -6,13 +6,12 @@ import { UpsertTableRows } from "../../TableRowsUpsert";
 type PaymentInputProps = {
   tableRows: TableRowItem[];
   setTableRows: (rows: TableRowItem[]) => void;
-  descriptionField: string;
-  showDevelopmentCharge?: boolean;
+  title: string;
+  showDescriptionField?: boolean;
 };
 
 export const PaymentInput: React.FC<PaymentInputProps> = (props) => {
-  const { tableRows, setTableRows, descriptionField, showDevelopmentCharge } =
-    props;
+  const { tableRows, setTableRows, title, showDescriptionField } = props;
   return (
     <Card
       shadow="sm"
@@ -22,14 +21,13 @@ export const PaymentInput: React.FC<PaymentInputProps> = (props) => {
       style={{ overflow: "inherit", margin: "15px 0 0 0" }}
     >
       <Card.Section withBorder inheritPadding py="xs">
-        <Title order={3}>{descriptionField}</Title>
+        <Title order={3}>{title}</Title>
       </Card.Section>
 
       <UpsertTableRows
         tableRows={tableRows}
         setTableRows={setTableRows}
-        descriptionField={true}
-        showDevelopmentCharge={showDevelopmentCharge}
+        showDescriptionField={showDescriptionField}
       />
     </Card>
   );

@@ -1,17 +1,17 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
 
 import { prisma } from "../../../db/prisma";
 import { TableRowItem } from "@/components/TableRowsUpsert";
 
 export interface PostReturnType {
-  created: true;
+  created?: true;
+  error?: string;
 }
 
 export default async function addPayment(
   req: NextApiRequest,
-  res: NextApiResponse<any>
+  res: NextApiResponse<PostReturnType>
 ) {
   try {
     const payment = req.body.payment as TableRowItem[];
@@ -70,6 +70,8 @@ export default async function addPayment(
     }
     res.status(201).json({ created: true });
   } catch (err) {
-    //TODO: error handling
+    return res
+      .status(404)
+      .json({ error: "something went wrong please trey again" });
   }
 }

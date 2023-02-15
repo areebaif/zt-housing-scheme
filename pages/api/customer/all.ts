@@ -12,21 +12,31 @@ export interface CustomerSelectFields {
   son_of: string | null;
 }
 
+export type ReturnError = {
+  error: String;
+};
+
 export default async function allCustomers(
   req: NextApiRequest,
-  res: NextApiResponse<CustomerSelectFields[]>
+  res: NextApiResponse<CustomerSelectFields[] | ReturnError>
 ) {
-  const data = await prisma.customer.findMany({
-    select: { id: true, cnic: true, name: true, son_of: true },
-  });
-  const mappedData = data.map((element) => {
-    return {
-      id: element.id,
-      //cnic: element.cnic,
-      value: element.cnic,
-      name: element.name,
-      son_of: element.son_of,
-    };
-  });
-  res.status(200).json(mappedData);
+  try {
+    const data = await prisma.customer.findMany({
+      select: { id: true, cnic: true, name: true, son_of: true },
+    });
+    const mappedData = data.map((element) => {
+      return {
+        id: element.id,
+        //cnic: element.cnic,
+        value: element.cnic,
+        name: element.name,
+        son_of: element.son_of,
+      };
+    });
+    res.status(200).json(mappedData);
+  } catch (err) {
+    return res
+      .status(404)
+      .json({ error: "something went wrong please trey again" });
+  }
 }

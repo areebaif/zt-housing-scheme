@@ -18,12 +18,10 @@ import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInpu
 import { formatAddTime } from "@/utilities";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
 
-interface FormPostProps {
+export interface FormPostProps {
   plotId: string;
   sellPrice: number;
   soldDateString: string;
-  downPayment: number;
-  developmentCharges: number | undefined;
   customer: {
     customerCNIC: string;
     customerName: string;
@@ -63,15 +61,12 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     soldDate,
     futurePaymentPlan,
     isEditForm,
-    plotDownPayment,
     setShowForm,
-    //setIsEditForm,
   } = props;
   const queryClient = useQueryClient();
   // // router props
   const router = useRouter();
-  // const query = router.query;
-  // const routerReady = router.isReady;
+ 
   // plot metadata props
   const [plotId, setPlotId] = React.useState(plotNumber);
   const [dimension, setDimension] = React.useState(dimensionString);
@@ -80,14 +75,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   const [sellPrice, setSellPrice] = React.useState<number | undefined>(
     soldPrice
   );
-  const [downPayment, setDownPayment] = React.useState<number | undefined>(
-    plotDownPayment
-  );
-  const [developmentCharges, setDevelopmentCharges] = React.useState<
-    number | undefined
-  >(0);
-  const [developmentChargePercent, setDevelopmentChargePercent] =
-    React.useState<number | undefined>(undefined);
+
   const [sellDate, setSellDate] = React.useState<Date | null>(soldDate);
   // new customer props
   const [customerName, setCustomerName] = React.useState(name);
@@ -119,30 +107,32 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
       setShowForm(false);
       router.push(`/plot/${plotId}`);
     },
+    onError: () => {
+      return <div>error occured: Please try again later</div>;
+    },
   });
   const onSubmitForm = () => {
     // plot and sell information validation
-    if (!plotId || !sellDate || !sellPrice || !downPayment)
+    if (!plotId || !sellDate || !sellPrice)
       throw new Error(
         "please provide plotNumber, Sell Date ad Sell Price to submit the form"
       );
-
     //customer data fields validation
     if (!customerCNIC) throw new Error("Please enter cnic");
     if (isNewCustomer && (!customerName || !customerCNIC || !sonOf))
       throw new Error("please enter customer name son of and cnic");
-    // payment plan fields validation
-    // if (!tableRows.length)
-    //   throw new Error("please enter a payment plan for customer");
-    // // format date
-
+    // payment plan field validation
+    const hasDownPayment = tableRows.filter((item) => {
+      return item.paymentType === "down_payment";
+    });
+    if (!hasDownPayment.length) {
+      throw new Error("please provide down payment in payment plan");
+    }
     const soldDateString = formatAddTime(`${sellDate}`);
     const data: FormPostProps = {
       plotId,
       sellPrice,
       soldDateString,
-      downPayment,
-      developmentCharges,
       customer: {
         customerCNIC,
         customerName,
@@ -182,12 +172,9 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     setSellDate,
     sellPrice,
     setSellPrice,
-    downPayment,
-    setDownPayment,
-    developmentCharges,
-    setDevelopmentCharges,
-    developmentChargePercent,
-    setDevelopmentChargePercent,
+
+    // developmentChargePercent,
+    // setDevelopmentChargePercent,
   };
   const customerDetailsData = {
     customerCNIC,
@@ -204,14 +191,14 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   return (
     <React.Fragment>
       <PlotDetailsInput {...plotDetailsData} />
-      <SellDetailsInput {...sellDetailsData} />
       <CustomerDetailsInput {...customerDetailsData} />
+      <SellDetailsInput {...sellDetailsData} />
 
       {!showEditFieldFlag ? (
         <PaymentInput
           tableRows={tableRows}
           setTableRows={setTableRows}
-          descriptionField={"Payment Plan"}
+          title={"Payment Plan"}
         />
       ) : (
         <PaymentPlanView

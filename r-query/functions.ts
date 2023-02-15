@@ -1,7 +1,7 @@
 import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
 import { PlotsSelectFields } from "../pages/api/plot/all";
 import { PlotDetail } from "../pages/api/plot/[id]";
-import { CustomerSelectFields } from "@/pages/api/customer/all";
+import { CustomerSelectFields, ReturnError } from "@/pages/api/customer/all";
 import { PaymentStatus } from "@/pages/api/payment/paymentStatus";
 import { TableRowItem } from "../components/TableRowsUpsert";
 import { PostReturnType } from "@/pages/api/payment/add";
@@ -13,6 +13,10 @@ export const fetchAllPlots = async () => {
       "Content-Type": "application/json",
     },
   });
+  console.log(response);
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
   const res: PlotsSelectFields[] = await response.json();
   return res;
 };
@@ -25,7 +29,11 @@ export const fetchPlotById = async (id: string) => {
       "Content-Type": "application/json",
     },
   });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
   const res: PlotDetail = await response.json();
+
   return res;
 };
 
@@ -36,7 +44,12 @@ export const fetchAllCustomers = async () => {
       "Content-Type": "application/json",
     },
   });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
   const res: CustomerSelectFields[] = await response.json();
+
   return res;
 };
 
@@ -48,6 +61,9 @@ export const postAddPlotSale = async (data: any) => {
     },
     body: JSON.stringify(data),
   });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
   const res: PostReturnType = await response.json();
   return res;
 };
@@ -60,6 +76,10 @@ export const postEditPlotSale = async (data: any) => {
     },
     body: JSON.stringify(data),
   });
+  console.log(response);
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
   const res: PostReturnType = await response.json();
   return res;
 };
@@ -76,6 +96,9 @@ export const postPlotPayment = async (data: {
     },
     body: JSON.stringify(data),
   });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
   const res: PostReturnType = await response.json();
   return res;
 };
@@ -87,6 +110,9 @@ export const fetchPaymentStatus = async () => {
       "Content-Type": "application/json",
     },
   });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
   const res: PaymentStatus = await response.json();
   return res;
 };
