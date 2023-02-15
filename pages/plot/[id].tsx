@@ -4,7 +4,7 @@ import * as ReactQuery from "@tanstack/react-query";
 import { Grid, Loader } from "@mantine/core";
 import { fetchPlotById } from "../../r-query/functions";
 import { PaymentType } from "@prisma/client";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import {
   PaymentPlanTable,
   PaymentHistoryTable,
@@ -17,10 +17,13 @@ import { PlotDetail } from "../api/plot/[id]";
 import { TableRowItem } from "@/components/TableRowsUpsert";
 
 const PlotId: React.FC = () => {
+  const router = useRouter();
   const { status } = useSession({
     required: true,
+    onUnauthenticated() {
+      signIn("google");
+    },
   });
-  const router = useRouter();
   const plotId = router.query?.id as string;
   const [showForm, setShowForm] = React.useState(false);
   const [isEditForm, setIsEditForm] = React.useState(false);
@@ -30,7 +33,7 @@ const PlotId: React.FC = () => {
   const fetchplot = ReactQuery.useQuery({
     queryKey: ["plotById", plotId],
     queryFn: () => fetchPlotById(plotId),
-    enabled: Boolean(plotId),
+    enabled: Boolean(plotId) && status === "authenticated",
     staleTime: Infinity,
     cacheTime: Infinity,
   });
