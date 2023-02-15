@@ -12,7 +12,11 @@ import {
   Container,
   Title,
 } from "@mantine/core";
-import { IconMessages, IconDatabase } from "@tabler/icons-react";
+
+import { useSession, signIn, signOut } from "next-auth/react";
+import { User } from "./User";
+import { IconMessages, IconDatabase, IconLogin } from "@tabler/icons-react";
+import process from "process";
 
 export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
   return (
@@ -38,13 +42,23 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
   );
 };
 
-const Navigation: React.FC = () => (
-  <Navbar p="xs" width={{ base: 300 }}>
-    <Navbar.Section grow mt="md">
-      <MainLinks />
-    </Navbar.Section>
-  </Navbar>
-);
+const Navigation: React.FC = () => {
+  const { data: session } = useSession();
+  return (
+    <Navbar p="xs" width={{ base: 275 }}>
+      <Navbar.Section grow mt="md">
+        <MainLinks />
+      </Navbar.Section>
+      {session ? (
+        <Navbar.Section>
+          <User />
+        </Navbar.Section>
+      ) : (
+        <div> </div>
+      )}
+    </Navbar>
+  );
+};
 
 interface MainLinkProps {
   icon: React.ReactNode;
@@ -72,7 +86,13 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
               : theme.colors.gray[0],
         },
       })}
-      onClick={() => router.push(link)}
+      onClick={() => {
+        link === "/login"
+          ? signIn("google")
+          : // : link === "/logout"
+            //? signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_DOMAIN_URL}` })
+            router.push(link);
+      }}
     >
       <Group>
         <ThemeIcon color={color} variant="light">
@@ -85,7 +105,7 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
   );
 }
 
-const data = [
+const logoutData = [
   {
     icon: <IconDatabase size={16} />,
     color: "blue",
@@ -98,9 +118,39 @@ const data = [
     label: "Payment Status",
     link: "/plot/paymentStatus",
   },
+  {
+    icon: <IconLogin size={16} />,
+    color: "violet",
+    label: "Logout",
+    link: "/auth/signout",
+  },
+];
+
+const loginData = [
+  {
+    icon: <IconDatabase size={16} />,
+    color: "blue",
+    label: "Sale Summary",
+    link: "/",
+  },
+  {
+    icon: <IconMessages size={16} />,
+    color: "teal",
+    label: "Payment Status",
+    link: "/plot/paymentStatus",
+  },
+  {
+    icon: <IconLogin size={16} />,
+    color: "violet",
+    label: "Login",
+    link: "/login",
+  },
 ];
 
 export function MainLinks() {
-  const links = data.map((link) => <MainLink {...link} key={link.label} />);
+  const { data: session } = useSession();
+  const links = session
+    ? logoutData.map((link) => <MainLink {...link} key={link.label} />)
+    : loginData.map((link) => <MainLink {...link} key={link.label} />);
   return <div>{links}</div>;
 }

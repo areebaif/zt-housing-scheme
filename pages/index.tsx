@@ -1,8 +1,8 @@
 import * as React from "react";
+
 // Hook Imports
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/router";
-// Mantine Imports
+
 import { Grid, Text, Flex, Loader } from "@mantine/core";
 // Component Imports
 import { PlotSaleSummaryTable, TotalsSummary } from "@/components";
@@ -10,15 +10,11 @@ import { PlotSaleSummaryTable, TotalsSummary } from "@/components";
 import { fetchAllPlots } from "@/r-query/functions";
 
 const AllPlots: React.FC = () => {
-  const router = useRouter();
-
   const fetchPlots = useQuery(["allPlots"], fetchAllPlots, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
   if (fetchPlots.isLoading) {
-    // TODO: loading component
-    console.log("loading");
     return <Loader />;
   }
 
