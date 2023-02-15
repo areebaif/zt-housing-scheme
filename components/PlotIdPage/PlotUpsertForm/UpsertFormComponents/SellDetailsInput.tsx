@@ -7,12 +7,9 @@ type SellDetailsInputProps = {
   setSellDate: (val: Date | null) => void;
   sellPrice: number | undefined;
   setSellPrice: (price: number | undefined) => void;
-  downPayment: number | undefined;
-  setDownPayment: (payment: number | undefined) => void;
-  developmentCharges: number | undefined;
-  setDevelopmentCharges: (charges: number | undefined) => void;
-  developmentChargePercent: number | undefined;
-  setDevelopmentChargePercent: (charges: number | undefined) => void;
+
+  // developmentChargePercent: number | undefined;
+  // setDevelopmentChargePercent: (charges: number | undefined) => void;
 };
 
 export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
@@ -23,24 +20,21 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
     setSellDate,
     sellPrice,
     setSellPrice,
-    downPayment,
-    setDownPayment,
-    developmentCharges,
-    setDevelopmentCharges,
-    developmentChargePercent,
-    setDevelopmentChargePercent,
+
+    // developmentChargePercent,
+    // setDevelopmentChargePercent,
   } = props;
-  const onChangeDevelopmentCharge = (val: number | undefined) => {
-    setDevelopmentChargePercent(val);
-    setDevelopmentCharges(val && sellPrice ? (val / 100) * sellPrice : 0);
-  };
+  // const onChangeDevelopmentCharge = (val: number | undefined) => {
+  //   setDevelopmentChargePercent(val);
+  //   // setDevelopmentCharges(val && sellPrice ? (val / 100) * sellPrice : 0);
+  // };
   const onChangeSellPrice = (val: number | undefined) => {
     setSellPrice(val);
-    setDevelopmentCharges(
-      val && developmentChargePercent
-        ? (developmentChargePercent / 100) * val
-        : 0
-    );
+    // setDevelopmentCharges(
+    //   val && developmentChargePercent
+    //     ? (developmentChargePercent / 100) * val
+    //     : 0
+    // );
   };
   return (
     <Card
@@ -86,7 +80,7 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
                 : "";
             }}
           />
-          <NumberInput
+          {/* <NumberInput
             label="down payment"
             value={downPayment}
             placeholder={"enter down payment"}
@@ -107,8 +101,8 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
                   : ""
                 : "";
             }}
-          />
-          <NumberInput
+          /> */}
+          {/* <NumberInput
             label="development charges (% of sell price)"
             value={developmentChargePercent}
             placeholder={"enter value between 0 and 100"}
@@ -130,8 +124,8 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
                   : ""
                 : "";
             }}
-          />
-          <NumberInput
+          /> */}
+          {/* <NumberInput
             label="development charges (pkr)"
             value={developmentCharges}
             placeholder={
@@ -148,7 +142,7 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
                   : ""
                 : "";
             }}
-          />
+          /> */}
         </Flex>
       </Card.Section>
     </Card>

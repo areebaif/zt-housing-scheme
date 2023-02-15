@@ -21,16 +21,10 @@ export default async function editPlots(
       plotId,
       sellPrice,
       soldDateString,
-      downPayment,
       customer,
       paymentPlan,
-      developmentCharges,
       isEditPaymentPlan,
     } = req.body;
-
-    // delete old payment plan
-    // update plot info with customerId
-    // update payments with customerId
 
     const parsedPlotId = parseInt(plotId);
     // check existing customer or new customer
@@ -59,22 +53,12 @@ export default async function editPlots(
       where: {
         id: parsedPlotId,
       },
-      data:
-        developmentCharges + downPayment !== sellPrice
-          ? {
-              customer_id: customerId,
-              status: "partially_paid",
-              sold_date: soldDateString,
-              sold_price: sellPrice,
-              //development_charges: parseInt(developmentCharges),
-            }
-          : {
-              customer_id: customerId,
-              status: "fully_paid",
-              sold_date: soldDateString,
-              fully_sold_date: soldDateString,
-              sold_price: sellPrice,
-            },
+      data: {
+        customer_id: customerId,
+        status: "partially_paid",
+        sold_date: soldDateString,
+        sold_price: sellPrice,
+      },
     });
 
     const updatePaymentCustomerId = prisma.payments.updateMany({
@@ -87,51 +71,17 @@ export default async function editPlots(
       },
     });
 
-    let paymentPlanArray = [];
-    const paymentPlanParse = paymentPlan.map((item: TableRowItem) => {
-      return {
-        payment_date: item.dateISOString,
-        payment_type: item.paymentType,
-        payment_value: item.value,
-        plot_id: parsedPlotId,
-        customer_id: customerId,
-      };
-    });
-    let paymentPlanArr: Payment_Plan[];
-    if (developmentCharges) {
-      paymentPlanArray = [
-        {
-          payment_type: PaymentType.down_payment,
-          payment_value: downPayment,
-          customer_id: customerId,
+    const paymentPlanArr: Payment_Plan[] = paymentPlan.map(
+      (item: TableRowItem) => {
+        return {
+          payment_date: item.dateISOString,
+          payment_type: item.paymentType,
+          payment_value: item.value,
           plot_id: parsedPlotId,
-          payment_date: soldDateString,
-        },
-        ...paymentPlanParse,
-        {
-          payment_type: PaymentType.development_charge,
-          payment_value: parseInt(developmentCharges),
           customer_id: customerId,
-          plot_id: parsedPlotId,
-          payment_date: paymentPlanParse.length
-            ? paymentPlanParse[paymentPlanParse.length - 1].payment_date
-            : soldDateString,
-        },
-      ];
-      paymentPlanArr = [...paymentPlanArray];
-    } else {
-      paymentPlanArray = [
-        {
-          payment_type: PaymentType.down_payment,
-          payment_value: downPayment,
-          customer_id: customerId,
-          plot_id: parsedPlotId,
-          payment_date: soldDateString,
-        },
-        ...paymentPlanParse,
-      ];
-      paymentPlanArr = [...paymentPlanArray];
-    }
+        };
+      }
+    );
 
     const bool = true;
     switch (bool) {
@@ -152,78 +102,9 @@ export default async function editPlots(
         ]);
         break;
       case !customer.newCustomer && !isEditPaymentPlan:
-        // check for edge case which is that development charges are being added changed or down payment is changed
-        // set data to insert
-        const payment = {
-          payment_type: PaymentType.development_charge,
-          payment_value: parseInt(developmentCharges),
-          customer_id: customerId,
-          plot_id: parsedPlotId,
-          payment_date: paymentPlanParse.length
-            ? paymentPlanParse[paymentPlanParse.length - 1].payment_date
-            : soldDateString,
-        };
-
-        // find values in database
-        const downPaymentId = await prisma.payment_Plan.findMany({
-          where: {
-            plot_id: parsedPlotId,
-            customer_id: customerId,
-            payment_type: PaymentType.down_payment,
-          },
-          select: {
-            id: true,
-          },
-        });
-        const developmentChargeExists = await prisma.payment_Plan.findMany({
-          where: {
-            plot_id: parsedPlotId,
-            customer_id: customerId,
-            payment_type: PaymentType.development_charge,
-          },
-          select: {
-            id: true,
-          },
-        });
-
-        // update values
-        const downPaymentUpdate = prisma.payment_Plan.update({
-          where: {
-            id: downPaymentId[0].id,
-          },
-          data: {
-            payment_value: downPayment,
-          },
-        });
-
-        if (developmentChargeExists.length) {
-          const payment_plan = prisma.payment_Plan.upsert({
-            where: {
-              id: developmentChargeExists[0].id,
-            },
-            update: {
-              payment_value: developmentCharges,
-            },
-            create: payment,
-          });
-          await prisma.$transaction([
-            updatePlot,
-            updatePaymentCustomerId,
-            payment_plan,
-            downPaymentUpdate,
-          ]);
-        } else {
-          const payment_plan = prisma.payment_Plan.create({
-            data: payment,
-          });
-          await prisma.$transaction([
-            updatePlot,
-            updatePaymentCustomerId,
-            payment_plan,
-            downPaymentUpdate,
-          ]);
-        }
+        await prisma.$transaction([updatePlot, updatePaymentCustomerId]);
         break;
+
       case customer.newCustomer && isEditPaymentPlan:
         const deletePlan = prisma.payment_Plan.deleteMany({
           where: {
@@ -249,31 +130,8 @@ export default async function editPlots(
           new_plan,
         ]);
         break;
+
       case customer.newCustomer && !isEditPaymentPlan:
-        // set data to insert
-        const newPayment = {
-          payment_type: PaymentType.development_charge,
-          payment_value: parseInt(developmentCharges),
-          customer_id: customerId,
-          plot_id: parsedPlotId,
-          payment_date: paymentPlanParse.length
-            ? paymentPlanParse[paymentPlanParse.length - 1].payment_date
-            : soldDateString,
-        };
-
-        // find values in database to edit
-        const chargeExists = await prisma.payment_Plan.findMany({
-          where: {
-            plot_id: parsedPlotId,
-            customer_id: customerId,
-            payment_type: PaymentType.development_charge,
-          },
-          select: {
-            id: true,
-          },
-        });
-
-        // update database
         const newCustomer = prisma.customer.create({
           data: {
             id: customerId,
@@ -282,36 +140,75 @@ export default async function editPlots(
             cnic: customer.customerCNIC,
           },
         });
-
-        if (chargeExists.length) {
-          const payment_plan = prisma.payment_Plan.upsert({
-            where: {
-              id: chargeExists[0].id,
-            },
-            update: {
-              payment_value: developmentCharges,
-            },
-            create: newPayment,
-          });
-          await prisma.$transaction([
-            updatePlot,
-            updatePaymentCustomerId,
-            payment_plan,
-            newCustomer,
-          ]);
-        } else {
-          const payment_plan = prisma.payment_Plan.create({
-            data: newPayment,
-          });
-          await prisma.$transaction([
-            newCustomer,
-            updatePlot,
-            updatePaymentCustomerId,
-            payment_plan,
-          ]);
-        }
+        await prisma.$transaction([
+          newCustomer,
+          updatePlot,
+          updatePaymentCustomerId,
+        ]);
         break;
     }
+    //     // set data to insert
+    //     const newPayment = {
+    //       payment_type: PaymentType.development_charge,
+    //       payment_value: parseInt(developmentCharges),
+    //       customer_id: customerId,
+    //       plot_id: parsedPlotId,
+    //       payment_date: paymentPlanParse.length
+    //         ? paymentPlanParse[paymentPlanParse.length - 1].payment_date
+    //         : soldDateString,
+    //     };
+
+    //     // find values in database to edit
+    //     const chargeExists = await prisma.payment_Plan.findMany({
+    //       where: {
+    //         plot_id: parsedPlotId,
+    //         customer_id: customerId,
+    //         payment_type: PaymentType.development_charge,
+    //       },
+    //       select: {
+    //         id: true,
+    //       },
+    //     });
+
+    //     // update database
+    //     const newCustomer = prisma.customer.create({
+    //       data: {
+    //         id: customerId,
+    //         name: customer.customerName,
+    //         son_of: customer.sonOf,
+    //         cnic: customer.customerCNIC,
+    //       },
+    //     });
+
+    //     if (chargeExists.length) {
+    //       const payment_plan = prisma.payment_Plan.upsert({
+    //         where: {
+    //           id: chargeExists[0].id,
+    //         },
+    //         update: {
+    //           payment_value: developmentCharges,
+    //         },
+    //         create: newPayment,
+    //       });
+    //       await prisma.$transaction([
+    //         updatePlot,
+    //         updatePaymentCustomerId,
+    //         payment_plan,
+    //         newCustomer,
+    //       ]);
+    //     } else {
+    //       const payment_plan = prisma.payment_Plan.create({
+    //         data: newPayment,
+    //       });
+    //       await prisma.$transaction([
+    //         newCustomer,
+    //         updatePlot,
+    //         updatePaymentCustomerId,
+    //         payment_plan,
+    //       ]);
+    //     }
+    //     break;
+    // }
     // if (!customer.newCustomer) {
     //   await prisma.$transaction([
     //     updatePlot,

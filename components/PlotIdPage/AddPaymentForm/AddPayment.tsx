@@ -76,8 +76,8 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
       <PaymentInput
         tableRows={tableRows}
         setTableRows={setTableRows}
-        descriptionField={"Add Payment"}
-        showDevelopmentCharge={true}
+        title={"Add Payment"}
+        showDescriptionField={true}
       />
       <Group position="center" style={{ margin: "15px 0 0 0" }}>
         <Button size="lg" onClick={onSubmitForm}>
