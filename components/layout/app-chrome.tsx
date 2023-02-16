@@ -87,11 +87,11 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
         },
       })}
       onClick={() => {
-        link === "/login"
-          ? signIn("google")
-          : // : link === "/logout"
-            //? signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_DOMAIN_URL}` })
-            router.push(link);
+        link === "/login";
+        //? signIn("google")
+        //: // : link === "/logout"
+        //? signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_DOMAIN_URL}` })
+        router.push(link);
       }}
     >
       <Group>

@@ -7,15 +7,15 @@ import { compare, beforeDateInput } from "@/utilities";
 import { PaymentSchedule } from "../api/payment/paymentStatus";
 
 const PaymentStatus: React.FC = () => {
-  const { status } = useSession({
-    required: true,
-    onUnauthenticated() {
-      signIn("google");
-    },
-  });
+  // const { status } = useSession({
+  //   required: true,
+  //   onUnauthenticated() {
+  //     signIn("google");
+  //   },
+  // });
   const [sliderValue, setSliderValue] = React.useState(40);
   const fetchStatus = useQuery(["upcomingPayments"], fetchPaymentStatus, {
-    enabled: status === "authenticated",
+    // enabled: status === "authenticated",
     staleTime: Infinity,
     cacheTime: Infinity,
   });

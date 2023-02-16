@@ -11,7 +11,7 @@ const Signout: React.FC = () => {
     return (
       <Button
         onClick={() => {
-          signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_DOMAIN_URL}` });
+          //signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_DOMAIN_URL}` });
         }}
       >
         Sign Out

@@ -66,7 +66,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   const queryClient = useQueryClient();
   // // router props
   const router = useRouter();
- 
+
   // plot metadata props
   const [plotId, setPlotId] = React.useState(plotNumber);
   const [dimension, setDimension] = React.useState(dimensionString);

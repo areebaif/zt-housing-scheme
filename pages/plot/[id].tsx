@@ -18,12 +18,12 @@ import { TableRowItem } from "@/components/TableRowsUpsert";
 
 const PlotId: React.FC = () => {
   const router = useRouter();
-  const { status } = useSession({
-    required: true,
-    onUnauthenticated() {
-      signIn("google");
-    },
-  });
+  // const { status } = useSession({
+  //   required: true,
+  //   onUnauthenticated() {
+  //     signIn("google");
+  //   },
+  // });
   const plotId = router.query?.id as string;
   const [showForm, setShowForm] = React.useState(false);
   const [isEditForm, setIsEditForm] = React.useState(false);
@@ -33,7 +33,7 @@ const PlotId: React.FC = () => {
   const fetchplot = ReactQuery.useQuery({
     queryKey: ["plotById", plotId],
     queryFn: () => fetchPlotById(plotId),
-    enabled: Boolean(plotId) && status === "authenticated",
+    enabled: Boolean(plotId), //&& status === "authenticated",
     staleTime: Infinity,
     cacheTime: Infinity,
   });
