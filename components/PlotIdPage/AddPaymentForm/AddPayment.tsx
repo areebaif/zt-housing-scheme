@@ -27,14 +27,13 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
   const queryClient = useQueryClient();
   // router
   const router = useRouter();
-  //   const routerReady = router.isReady;
-  //   const query = router.query;
+
   // plot details
   const [plotId, setPlotId] = React.useState(plotNumber);
   // customer details
   const [customerId, setCustomerId] = React.useState(customerNumber);
-  const [customerName, setCustomerName] = React.useState(customerSonOf);
-  const [sonOf, setSonOf] = React.useState(name);
+  const [customerName, setCustomerName] = React.useState(name);
+  const [sonOf, setSonOf] = React.useState(customerSonOf);
   const [customerCNIC, setCustomerCNIC] = React.useState(cnic);
   // table props
   const [tableRows, setTableRows] = React.useState<TableRowItem[]>([]);

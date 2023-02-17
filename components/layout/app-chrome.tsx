@@ -13,7 +13,6 @@ import {
   Title,
 } from "@mantine/core";
 
-import { useSession, signIn, signOut } from "next-auth/react";
 import { User } from "./User";
 import { IconMessages, IconDatabase, IconLogin } from "@tabler/icons-react";
 import process from "process";
@@ -43,19 +42,19 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
 };
 
 const Navigation: React.FC = () => {
-  const { data: session } = useSession();
+  //const { data: session } = useSession();
   return (
     <Navbar p="xs" width={{ base: 275 }}>
       <Navbar.Section grow mt="md">
         <MainLinks />
       </Navbar.Section>
-      {session ? (
+      {/* {session ? (
         <Navbar.Section>
           <User />
         </Navbar.Section>
       ) : (
         <div> </div>
-      )}
+      )} */}
     </Navbar>
   );
 };
@@ -148,9 +147,9 @@ const loginData = [
 ];
 
 export function MainLinks() {
-  const { data: session } = useSession();
-  const links = session
-    ? logoutData.map((link) => <MainLink {...link} key={link.label} />)
-    : loginData.map((link) => <MainLink {...link} key={link.label} />);
+  // const { data: session } = useSession();
+  const links =
+    //logoutData.map((link) => <MainLink {...link} key={link.label} />)
+    loginData.map((link) => <MainLink {...link} key={link.label} />);
   return <div>{links}</div>;
 }

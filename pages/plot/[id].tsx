@@ -4,7 +4,7 @@ import * as ReactQuery from "@tanstack/react-query";
 import { Grid, Loader } from "@mantine/core";
 import { fetchPlotById } from "../../r-query/functions";
 import { PaymentType } from "@prisma/client";
-import { useSession, signIn } from "next-auth/react";
+
 import {
   PaymentPlanTable,
   PaymentHistoryTable,

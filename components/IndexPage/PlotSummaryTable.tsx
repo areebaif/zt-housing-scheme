@@ -40,13 +40,13 @@ export const PlotSaleSummaryTable: React.FC<PlotSaleSummaryTableProps> = (
         grow
         gutter="xl"
       >
-        <Grid.Col span={4}>
+        <Grid.Col sx={(theme) => ({ paddingLeft: theme.spacing.sm })} span={4}>
           <Text fz="xl">{element.id}</Text>
         </Grid.Col>
-        <Grid.Col p="lg" span={4}>
+        <Grid.Col sx={(theme) => ({ paddingLeft: theme.spacing.lg })} span={4}>
           <Text fz="xl">{element.square_feet}</Text>
         </Grid.Col>
-        <Grid.Col span={4}>
+        <Grid.Col sx={(theme) => ({ paddingLeft: theme.spacing.xl })} span={4}>
           <Text fz="xl">{element.dimension}</Text>
         </Grid.Col>
       </Grid>
