@@ -3,7 +3,7 @@ import { Payment_Plan, Plot } from "@prisma/client";
 import { prisma } from "../../../db/prisma";
 import { PostReturnType } from "../payment/add";
 import { FormPostProps } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
-import { TableRowItem } from "@/components/TableRowsUpsert";
+import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 
 export interface PlotsSelectFields {
   id: number;

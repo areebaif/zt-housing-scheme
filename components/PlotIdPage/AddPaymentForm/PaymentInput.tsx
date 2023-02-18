@@ -1,7 +1,7 @@
-import * as react from "react";
-import { TableRowItem } from "../../TableRowsUpsert";
+import * as React from "react";
+import { TableRowItem } from "./PaymentInputTable";
 import { Card, Title } from "@mantine/core";
-import { UpsertTableRows } from "../../TableRowsUpsert";
+import { PaymentInputTable } from "./PaymentInputTable";
 
 type PaymentInputProps = {
   tableRows: TableRowItem[];
@@ -24,7 +24,7 @@ export const PaymentInput: React.FC<PaymentInputProps> = (props) => {
         <Title order={3}>{title}</Title>
       </Card.Section>
 
-      <UpsertTableRows
+      <PaymentInputTable
         tableRows={tableRows}
         setTableRows={setTableRows}
         showDescriptionField={showDescriptionField}

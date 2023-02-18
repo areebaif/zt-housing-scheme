@@ -13,7 +13,8 @@ import {
   postAddPlotSale,
   postEditPlotSale,
 } from "@/r-query/functions";
-import { TableRowItem } from "../../TableRowsUpsert";
+import { TableRowItem } from "../AddPaymentForm/PaymentInputTable";
+import { PaymentPlanInputCard } from ".";
 import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInput";
 import { formatAddTime } from "@/utilities";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
@@ -66,7 +67,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   const queryClient = useQueryClient();
   // // router props
   const router = useRouter();
- 
+
   // plot metadata props
   const [plotId, setPlotId] = React.useState(plotNumber);
   const [dimension, setDimension] = React.useState(dimensionString);
@@ -195,7 +196,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
       <SellDetailsInput {...sellDetailsData} />
 
       {!showEditFieldFlag ? (
-        <PaymentInput
+        <PaymentPlanInputCard
           tableRows={tableRows}
           setTableRows={setTableRows}
           title={"Payment Plan"}

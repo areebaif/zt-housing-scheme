@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, Group, Button, Title, Table, TextInput } from "@mantine/core";
-import { TableRowItem } from "@/components/TableRowsUpsert";
+import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 
 type PaymentPlanView = {
   paymentPlan: TableRowItem[];

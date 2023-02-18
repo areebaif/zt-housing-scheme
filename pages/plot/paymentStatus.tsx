@@ -1,21 +1,21 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { signIn, useSession } from "next-auth/react";
+
 import { fetchPaymentStatus } from "@/r-query/functions";
 import { Table, Card, Loader, Title, Slider, Flex, Group } from "@mantine/core";
 import { compare, beforeDateInput } from "@/utilities";
 import { PaymentSchedule } from "../api/payment/paymentStatus";
 
 const PaymentStatus: React.FC = () => {
-  const { status } = useSession({
-    required: true,
-    onUnauthenticated() {
-      signIn("google");
-    },
-  });
+  // const { status } = useSession({
+  //   required: true,
+  //   onUnauthenticated() {
+  //     signIn("google");
+  //   },
+  // });
   const [sliderValue, setSliderValue] = React.useState(40);
   const fetchStatus = useQuery(["upcomingPayments"], fetchPaymentStatus, {
-    enabled: status === "authenticated",
+    // enabled: status === "authenticated",
     staleTime: Infinity,
     cacheTime: Infinity,
   });

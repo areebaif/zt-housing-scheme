@@ -11,7 +11,7 @@ import {
   Select,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
-import { formatAddTime } from "../utilities";
+import { formatAddTime } from "../../../utilities";
 import { PaymentType } from "@prisma/client";
 
 // export enum TypePayment {
@@ -29,24 +29,20 @@ export interface TableRowItem {
   description?: string;
   paymentType: PaymentType;
 }
-export interface UpsertTableRowsProps {
+export interface PaymentInputTableProps {
   //tableHeader: string;
   tableRows: TableRowItem[];
   setTableRows: (data: TableRowItem[]) => void;
   showDescriptionField?: boolean;
 }
 
-export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
+export const PaymentInputTable: React.FC<PaymentInputTableProps> = (
   UpsertTableRowsProps
 ) => {
   // props
   const { tableRows, setTableRows, showDescriptionField } =
     UpsertTableRowsProps;
 
-  // state
-  const [fixedPaymentPlan, setFixedPaymentPlan] = React.useState<JSX.Element[]>(
-    []
-  );
   const [description, setDescription] = React.useState("");
   const [paymentPlanDateItem, setPaymentPlanDateItem] =
     React.useState<Date | null>(null);
@@ -79,11 +75,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
   };
 
   const onRowDelete = (key: number) => {
-    setFixedPaymentPlan(
-      fixedPaymentPlan.filter((item, index) => index !== key - 1)
-    );
-
-    setTableRows(tableRows.filter((item, index) => index !== key - 1));
+    setTableRows(tableRows.filter((item, index) => index !== key));
   };
 
   const onAddRow = () => {
@@ -96,11 +88,9 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
       throw new Error("please enter date,value and payment type to add a row");
     }
 
-    const key = fixedPaymentPlan?.length + 1;
-    const date = new Date(`${paymentPlanDateItem}`);
+    const key = tableRows?.length ? tableRows?.length : 0;
+
     const dateISO = formatAddTime(`${paymentPlanDateItem}`);
-    const dateString = date.toDateString();
-    const paymnetType = paymentPlanPaymentType;
 
     setTableRows([
       ...tableRows,
@@ -116,20 +106,6 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
       },
     ]);
 
-    setFixedPaymentPlan((el) => [
-      ...fixedPaymentPlan,
-      <tr key={key}>
-        <td>{dateString}</td>
-        <td>{paymnetType}</td>
-        {showDescriptionField ? <td>{description}</td> : undefined}
-        <td>{paymentPlanValueItem}</td>
-        <td>
-          <Button variant="outline" onClick={() => onRowDelete(key)}>
-            Delete
-          </Button>
-        </td>
-      </tr>,
-    ]);
     setPaymentPlanValueItem(undefined);
     setPaymentPlanPaymentType(null);
     setPaymentPlanDateItem(null);
@@ -179,6 +155,7 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
               />
             ) : undefined}
             <NumberInput
+              hideControls={true}
               label="payment value"
               value={paymentPlanValueItem}
               placeholder={"value to be collected"}
@@ -223,7 +200,28 @@ export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
                 <th>Delete Values</th>
               </tr>
             </thead>
-            <tbody>{fixedPaymentPlan}</tbody>
+            <tbody>
+              {tableRows.map((item, index) => {
+                return (
+                  <tr key={index}>
+                    <td>{new Date(`${item.dateISOString}`).toDateString()}</td>
+                    <td>{item.paymentType}</td>
+                    {showDescriptionField ? (
+                      <td>{item.description}</td>
+                    ) : undefined}
+                    <td>{item.value}</td>
+                    <td>
+                      <Button
+                        variant="outline"
+                        onClick={() => onRowDelete(index)}
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </Table>
         </Card.Section>
       </Card>

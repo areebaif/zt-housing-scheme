@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Payment_Plan, Plot } from "@prisma/client";
 import { prisma } from "../../../db/prisma";
 import { PostReturnType } from "../payment/add";
-import { TableRowItem } from "@/components/TableRowsUpsert";
+import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 
 export interface PlotsSelectFields {
   id: number;
@@ -56,42 +56,6 @@ export default async function upsertPlots(
         sold_price: sellPrice,
       },
     });
-    //
-
-    //   data:
-    //     developmentCharges + downPayment !== sellPrice
-    //       ? {
-    //           payment_type: PaymentType.down_payment,
-    //           payment_value: downPayment,
-    //           customer_id: customerId,
-    //           plot_id: parsedPlotId,
-    //           payment_date: soldDateString,
-    //         }
-    //       : developmentCharges && downPayment
-    //       ? [
-    //           {
-    //             payment_type: PaymentType.down_payment,
-    //             payment_value: downPayment,
-    //             customer_id: customerId,
-    //             plot_id: parsedPlotId,
-    //             payment_date: soldDateString,
-    //           },
-    //           {
-    //             payment_type: PaymentType.development_charge,
-    //             payment_value: developmentCharges,
-    //             customer_id: customerId,
-    //             plot_id: parsedPlotId,
-    //             payment_date: soldDateString,
-    //           },
-    //         ]
-    //       : {
-    //           payment_type: PaymentType.down_payment,
-    //           payment_value: downPayment,
-    //           customer_id: customerId,
-    //           plot_id: parsedPlotId,
-    //           payment_date: soldDateString,
-    //         },
-    // });
 
     const paymentPlanArr: Payment_Plan[] = paymentPlan.map(
       (item: TableRowItem) => {

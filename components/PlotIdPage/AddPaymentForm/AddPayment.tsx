@@ -2,7 +2,7 @@ import * as React from "react";
 import { useRouter } from "next/router";
 import { Text, Group, Button, Loader, Card, Title, Grid } from "@mantine/core";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { TableRowItem } from "../../TableRowsUpsert";
+import { TableRowItem } from "./PaymentInputTable";
 import { postPlotPayment } from "@/r-query/functions";
 import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInput";
 
@@ -27,14 +27,13 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
   const queryClient = useQueryClient();
   // router
   const router = useRouter();
-  //   const routerReady = router.isReady;
-  //   const query = router.query;
+
   // plot details
   const [plotId, setPlotId] = React.useState(plotNumber);
   // customer details
   const [customerId, setCustomerId] = React.useState(customerNumber);
-  const [customerName, setCustomerName] = React.useState(customerSonOf);
-  const [sonOf, setSonOf] = React.useState(name);
+  const [customerName, setCustomerName] = React.useState(name);
+  const [sonOf, setSonOf] = React.useState(customerSonOf);
   const [customerCNIC, setCustomerCNIC] = React.useState(cnic);
   // table props
   const [tableRows, setTableRows] = React.useState<TableRowItem[]>([]);

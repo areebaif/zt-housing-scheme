@@ -3,7 +3,7 @@ import { PlotsSelectFields } from "../pages/api/plot/all";
 import { PlotDetail } from "../pages/api/plot/[id]";
 import { CustomerSelectFields, ReturnError } from "@/pages/api/customer/all";
 import { PaymentStatus } from "@/pages/api/payment/paymentStatus";
-import { TableRowItem } from "../components/TableRowsUpsert";
+import { TableRowItem } from "../components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 import { PostReturnType } from "@/pages/api/payment/add";
 
 export const fetchAllPlots = async () => {
@@ -76,7 +76,7 @@ export const postEditPlotSale = async (data: any) => {
     },
     body: JSON.stringify(data),
   });
-  console.log(response);
+
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }

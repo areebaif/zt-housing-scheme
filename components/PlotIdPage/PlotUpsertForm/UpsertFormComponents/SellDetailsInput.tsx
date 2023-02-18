@@ -15,26 +15,12 @@ type SellDetailsInputProps = {
 export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
   props: SellDetailsInputProps
 ) => {
-  const {
-    sellDate,
-    setSellDate,
-    sellPrice,
-    setSellPrice,
+  const sellPriceRef = React.useRef(null);
 
-    // developmentChargePercent,
-    // setDevelopmentChargePercent,
-  } = props;
-  // const onChangeDevelopmentCharge = (val: number | undefined) => {
-  //   setDevelopmentChargePercent(val);
-  //   // setDevelopmentCharges(val && sellPrice ? (val / 100) * sellPrice : 0);
-  // };
+  const { sellDate, setSellDate, sellPrice, setSellPrice } = props;
+
   const onChangeSellPrice = (val: number | undefined) => {
     setSellPrice(val);
-    // setDevelopmentCharges(
-    //   val && developmentChargePercent
-    //     ? (developmentChargePercent / 100) * val
-    //     : 0
-    // );
   };
   return (
     <Card
@@ -59,11 +45,12 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
             onChange={setSellDate}
           />
           <NumberInput
+            hideControls={true}
             label="sell price"
             value={sellPrice}
             placeholder={"enter sold value"}
             withAsterisk
-            onChange={(val) => onChangeSellPrice(val)}
+            onChange={(e) => onChangeSellPrice(e)}
             parser={(sellPrice) => sellPrice?.replace(/\$\s?|(,*)/g, "")}
             error={
               sellPrice
@@ -80,69 +67,6 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
                 : "";
             }}
           />
-          {/* <NumberInput
-            label="down payment"
-            value={downPayment}
-            placeholder={"enter down payment"}
-            withAsterisk
-            onChange={(val) => setDownPayment(val)}
-            parser={(downPayment) => downPayment?.replace(/\$\s?|(,*)/g, "")}
-            error={
-              downPayment
-                ? downPayment < 1
-                  ? "enter values above 0"
-                  : false
-                : true
-            }
-            formatter={(value) => {
-              return value
-                ? !Number.isNaN(parseFloat(value))
-                  ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : ""
-                : "";
-            }}
-          /> */}
-          {/* <NumberInput
-            label="development charges (% of sell price)"
-            value={developmentChargePercent}
-            placeholder={"enter value between 0 and 100"}
-            onChange={(val) => onChangeDevelopmentCharge(val)}
-            parser={(developmentCharges) =>
-              developmentCharges?.replace(/\$\s?|(,*)/g, "")
-            }
-            error={
-              developmentChargePercent
-                ? developmentChargePercent < 0 || developmentChargePercent > 100
-                  ? "enter values between 0 and 100"
-                  : false
-                : false
-            }
-            formatter={(value) => {
-              return value
-                ? !Number.isNaN(parseFloat(value))
-                  ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : ""
-                : "";
-            }}
-          /> */}
-          {/* <NumberInput
-            label="development charges (pkr)"
-            value={developmentCharges}
-            placeholder={
-              developmentCharges === 0 ? "enter sell price and % for value" : ""
-            }
-            disabled={true}
-            parser={(developmentCharges) =>
-              developmentCharges?.replace(/\$\s?|(,*)/g, "")
-            }
-            formatter={(value) => {
-              return value
-                ? !Number.isNaN(parseFloat(value))
-                  ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : ""
-                : "";
-            }}
-          /> */}
         </Flex>
       </Card.Section>
     </Card>
