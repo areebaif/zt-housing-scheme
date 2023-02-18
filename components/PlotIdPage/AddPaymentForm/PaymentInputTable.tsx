@@ -11,7 +11,7 @@ import {
   Select,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
-import { formatAddTime } from "../utilities";
+import { formatAddTime } from "../../../utilities";
 import { PaymentType } from "@prisma/client";
 
 // export enum TypePayment {
@@ -29,14 +29,14 @@ export interface TableRowItem {
   description?: string;
   paymentType: PaymentType;
 }
-export interface UpsertTableRowsProps {
+export interface PaymentInputTableProps {
   //tableHeader: string;
   tableRows: TableRowItem[];
   setTableRows: (data: TableRowItem[]) => void;
   showDescriptionField?: boolean;
 }
 
-export const UpsertTableRows: React.FC<UpsertTableRowsProps> = (
+export const PaymentInputTable: React.FC<PaymentInputTableProps> = (
   UpsertTableRowsProps
 ) => {
   // props

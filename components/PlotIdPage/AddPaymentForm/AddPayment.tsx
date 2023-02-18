@@ -2,7 +2,7 @@ import * as React from "react";
 import { useRouter } from "next/router";
 import { Text, Group, Button, Loader, Card, Title, Grid } from "@mantine/core";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { TableRowItem } from "../../TableRowsUpsert";
+import { TableRowItem } from "./PaymentInputTable";
 import { postPlotPayment } from "@/r-query/functions";
 import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInput";
 

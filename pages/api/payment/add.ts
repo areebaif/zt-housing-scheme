@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../../db/prisma";
-import { TableRowItem } from "@/components/TableRowsUpsert";
+import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 
 export interface PostReturnType {
   created?: true;

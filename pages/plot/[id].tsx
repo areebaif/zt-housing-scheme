@@ -14,7 +14,7 @@ import {
 import { AddPayment } from "@/components/PlotIdPage/AddPaymentForm/AddPayment";
 import { PlotUpsertForm } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
 import { PlotDetail } from "../api/plot/[id]";
-import { TableRowItem } from "@/components/TableRowsUpsert";
+import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 
 const PlotId: React.FC = () => {
   const router = useRouter();
