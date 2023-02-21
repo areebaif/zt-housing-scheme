@@ -14,9 +14,6 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
 ) => {
   const { sellDate, setSellDate, sellPrice, setSellPrice } = props;
 
-  // const onChangeSellPrice = (val: number | undefined) => {
-  //   setSellPrice(val);
-  // };
   return (
     <Card
       shadow="sm"

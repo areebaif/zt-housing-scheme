@@ -19,26 +19,29 @@ import { PaymentPlanInputCard } from ".";
 import { formatAddTime } from "@/utilities";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
 
-export interface AllPlotId {
+export type AllPlotId = {
   id: number;
   squareFeet: string;
   dimension: string;
   sellPrice: number | undefined;
-}
+};
+export type CustomerFormPost = {
+  customerCNIC: string;
+  customerName: string;
+  sonOf: string;
+  newCustomer: boolean;
+};
 
-export interface FormPostProps {
+export type FormPostProps = {
   plotId: AllPlotId[];
   sellPrice: number;
   soldDateString: string;
-  customer: {
-    customerCNIC: string;
-    customerName: string;
-    sonOf: string;
-    newCustomer: boolean;
-  };
+  customer: CustomerFormPost;
   paymentPlan: TableRowItem[];
   isEditPaymentPlan: boolean;
-}
+  isEditPlotIdDetail: boolean;
+  plotSaleId: number | undefined;
+};
 type AddSaleFormProps = {
   plot: Plot[];
   soldPrice: number | undefined;
@@ -67,6 +70,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     isEditForm,
     setShowForm,
     showForm,
+    plotSaleId,
   } = props;
   const queryClient = useQueryClient();
   // // router props
@@ -143,6 +147,8 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
       },
       paymentPlan: tableRows,
       isEditPaymentPlan,
+      isEditPlotIdDetail,
+      plotSaleId,
     };
     console.log(data);
     mutation.mutate(data);

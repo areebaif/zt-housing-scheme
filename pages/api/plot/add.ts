@@ -1,10 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Payment_Plan, Plot } from "@prisma/client";
 import { prisma } from "../../../db/prisma";
 import { PostReturnType } from "../payment/add";
 import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 import { AllPlotId } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
+import { CustomerFormPost } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
+import { PaymentPlanSelectFields } from "./edit";
 
 export interface PlotsSelectFields {
   id: number;
@@ -13,33 +14,17 @@ export interface PlotsSelectFields {
   status: string;
 }
 
-// export interface FormPostProps {
-//   plotId: AllPlotId[];
-//   sellPrice: number;
-//   soldDateString: string;
-//   customer: {
-//     customerCNIC: string;
-//     customerName: string;
-//     sonOf: string;
-//     newCustomer: boolean;
-//   };
-//   paymentPlan: TableRowItem[];
-//   isEditPaymentPlan: boolean;
-// }
-
 export default async function upsertPlots(
   req: NextApiRequest,
   res: NextApiResponse<PostReturnType>
 ) {
   try {
-    const { customer, paymentPlan } = req.body;
+    const paymentPlan = req.body.paymentPlan as TableRowItem[];
+    const customer = req.body.customer as CustomerFormPost;
     const plotId = req.body.plotId as AllPlotId[];
     const sellPrice = req.body.sellPrice as number;
     const soldDateString = req.body.soldDateString as string;
-    // things to check for
-    // 1 new customer existing customer
 
-    //const parsedPlotId = parseInt(plotId);
     // check existing customer or new customer
     let customerId: number;
 
@@ -91,8 +76,8 @@ export default async function upsertPlots(
       });
     });
 
-    const paymentPlanArr: Payment_Plan[] = paymentPlan.map(
-      (item: TableRowItem) => {
+    const paymentPlanArr: PaymentPlanSelectFields[] = paymentPlan.map(
+      (item) => {
         return {
           payment_type: item.paymentType,
           sale_id: saleInsertId,
@@ -128,6 +113,6 @@ export default async function upsertPlots(
   } catch (err) {
     return res
       .status(404)
-      .json({ error: "something went wrong please trey again" });
+      .json({ error: "something went wrong please try again" });
   }
 }

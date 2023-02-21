@@ -1,44 +1,45 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Payment_Plan, Plot } from "@prisma/client";
+import { PaymentType, Payment_Plan, Plot } from "@prisma/client";
 import { prisma } from "../../../db/prisma";
 import { PostReturnType } from "../payment/add";
-import { FormPostProps } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
+import { CustomerFormPost } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
 import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
+import { AllPlotId } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
 
-export interface PlotsSelectFields {
+export type PaymentPlanSelectFields = {
+  payment_type: PaymentType;
+  sale_id: number;
+  payment_date: string;
+  payment_value: number | undefined;
+};
+
+export type PlotsSelectFields = {
   id: number;
   dimension: string | null;
   square_feet: number | null;
   status: string;
-}
+};
 
 export default async function editPlots(
   req: NextApiRequest,
   res: NextApiResponse<PostReturnType>
 ) {
   try {
-    const {
-      plotId,
-      sellPrice,
-      soldDateString,
-      customer,
-      paymentPlan,
-      isEditPaymentPlan,
-    } = req.body;
-    // const reqBody = req.body as FormPostProps;
-    // const plotId = reqBody.plotId;
-    // const sellPrice = reqBody.sellPrice;
-    // const soldDateString = reqBody.soldDateString;
-    // const customer = reqBody.customer;
-    // const isEditPaymentPlan = reqBody;
-    // const paymentPlan = req.body;
-    console.log(isEditPaymentPlan, "uyou!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    const parsedPlotId = parseInt(plotId);
-    // check existing customer or new customer
+    const paymentPlan = req.body.paymentPlan as TableRowItem[];
+    const customer = req.body.customer as CustomerFormPost;
+    const plotId = req.body.plotId as AllPlotId[];
+    const sellPrice = req.body.sellPrice as number;
+    const soldDateString = req.body.soldDateString as string;
+    const isEditPaymentPlan = req.body.isEditPaymentPlan as boolean;
+    const plotSaleId = req.body.plotSaleId as number | undefined;
+    const isEditPlotIdDetail = req.body.isEditPlotIdDetail as boolean;
+
+    if (typeof plotSaleId !== "number")
+      throw new Error("plotSale id is not defined");
+
+    // check if old customer then cnic exists or new customer then do an entry
     let customerId: number | undefined;
-    const oldCustomerId = await prisma.plot.findUnique({
-      where: { id: parsedPlotId },
-    });
+
     if (!customer.newCustomer) {
       const customerVal = await prisma.customer.findUnique({
         where: { cnic: customer.customerCNIC },
@@ -56,71 +57,76 @@ export default async function editPlots(
         : 1;
       customerId = customerInsertId;
     }
-    const updatePlot = prisma.plot.update({
+
+    // update Sale
+    const updateSale = prisma.sale.update({
       where: {
-        id: parsedPlotId,
+        id: plotSaleId,
       },
       data: {
         customer_id: customerId,
-        status: "partially_paid",
         sold_date: soldDateString,
-        sold_price: sellPrice,
+        total_sale_price: sellPrice,
       },
     });
 
-    const updatePaymentCustomerId = prisma.payments.updateMany({
-      where: {
-        plot_id: parsedPlotId,
-        customer_id: oldCustomerId?.customer_id!,
-      },
-      data: {
-        customer_id: customerId,
-      },
-    });
-
-    const paymentPlanArr: Payment_Plan[] = paymentPlan.map(
-      (item: TableRowItem) => {
+    const paymentPlanArr: PaymentPlanSelectFields[] = paymentPlan.map(
+      (item) => {
         return {
-          payment_date: item.dateISOString,
           payment_type: item.paymentType,
+          sale_id: plotSaleId,
+          payment_date: item.dateISOString,
           payment_value: item.value,
-          plot_id: parsedPlotId,
-          customer_id: customerId,
         };
       }
     );
 
+    /* scenarios : new customer, old customer
+    // new payment plan , old payent plan
+    // new plot id, old plot id
+    // I calculated the combinations, There are total 8 combinatons of these 6 values
+    */
     const bool = true;
     switch (bool) {
-      case !customer.newCustomer && isEditPaymentPlan:
-        const deleteCustomerPlan = prisma.payment_Plan.deleteMany({
-          where: {
-            plot_id: parsedPlotId,
-          },
-        });
-        const payment_plan = prisma.payment_Plan.createMany({
-          data: paymentPlanArr,
-        });
-        await prisma.$transaction([
-          updatePlot,
-          deleteCustomerPlan,
-          payment_plan,
-          updatePaymentCustomerId,
-        ]);
-        break;
-      case Boolean(!customer.newCustomer && !isEditPaymentPlan):
-        await prisma.$transaction([updatePlot, updatePaymentCustomerId]);
-        break;
-
-      case customer.newCustomer && isEditPaymentPlan:
+      ////////////// case 1 : new customer, new payment plan, new plots
+      case customer.newCustomer && isEditPaymentPlan && isEditPlotIdDetail:
+        // delete old payment plan
         const deletePlan = prisma.payment_Plan.deleteMany({
           where: {
-            plot_id: parsedPlotId,
+            sale_id: plotSaleId,
           },
         });
+        // update old plots where status becomes not sold, no sale_id, no sale_price, no fully sold date
+        const oldPlotUpdate = prisma.plot.updateMany({
+          where: {
+            sale_id: plotSaleId,
+          },
+          data: {
+            plot_status: "not_sold",
+            sale_id: null,
+            sale_price: null,
+            fully_sold_date: null,
+          },
+        });
+        // update new plots
+        const updateNewPlot = plotId.map((plot) => {
+          return prisma.plot.update({
+            where: {
+              id: plot.id,
+            },
+            data: {
+              sale_price: plot.sellPrice,
+              plot_status: "partially_paid",
+              sale_id: plotSaleId,
+            },
+          });
+        });
+
+        // create new payment plan
         const new_plan = prisma.payment_Plan.createMany({
           data: paymentPlanArr,
         });
+        // create new customer
         const addCustomer = prisma.customer.create({
           data: {
             id: customerId,
@@ -129,17 +135,32 @@ export default async function editPlots(
             cnic: customer.customerCNIC,
           },
         });
+        // do these transactions in a lock
         await prisma.$transaction([
           addCustomer,
-          updatePlot,
-          updatePaymentCustomerId,
+          updateSale,
+          oldPlotUpdate,
+          ...updateNewPlot,
           deletePlan,
           new_plan,
         ]);
         break;
 
-      case Boolean(customer.newCustomer && !isEditPaymentPlan):
-        const newCustomer = prisma.customer.create({
+      ////////////// case 2 : new customer, new payment plan, old plots
+      case customer.newCustomer && isEditPaymentPlan && !isEditPlotIdDetail:
+        // delete old payment plan
+        const deleteOldPlan = prisma.payment_Plan.deleteMany({
+          where: {
+            sale_id: plotSaleId,
+          },
+        });
+
+        // create new payment plan
+        const newPlan = prisma.payment_Plan.createMany({
+          data: paymentPlanArr,
+        });
+        // create new customer
+        const addNewCustomer = prisma.customer.create({
           data: {
             id: customerId,
             name: customer.customerName,
@@ -147,11 +168,182 @@ export default async function editPlots(
             cnic: customer.customerCNIC,
           },
         });
+        // do these transactions in a lock
         await prisma.$transaction([
-          newCustomer,
-          updatePlot,
-          updatePaymentCustomerId,
+          addNewCustomer,
+          updateSale,
+          deleteOldPlan,
+          newPlan,
         ]);
+        break;
+
+      ////////////// case 3 : new customer, old payment plan, new plots
+      case customer.newCustomer && !isEditPaymentPlan && isEditPlotIdDetail:
+        // update old plots where status becomes not sold, no sale_id, no sale_price, no fully sold date
+        const oldPlot = prisma.plot.updateMany({
+          where: {
+            sale_id: plotSaleId,
+          },
+          data: {
+            plot_status: "not_sold",
+            sale_id: null,
+            sale_price: null,
+            fully_sold_date: null,
+          },
+        });
+        // update new plots
+        const newPlot = plotId.map((plot) => {
+          return prisma.plot.update({
+            where: {
+              id: plot.id,
+            },
+            data: {
+              sale_price: plot.sellPrice,
+              plot_status: "partially_paid",
+              sale_id: plotSaleId,
+            },
+          });
+        });
+
+        // create new customer
+        const addNewCust = prisma.customer.create({
+          data: {
+            id: customerId,
+            name: customer.customerName,
+            son_of: customer.sonOf,
+            cnic: customer.customerCNIC,
+          },
+        });
+        // do these transactions in a lock
+        await prisma.$transaction([
+          addNewCust,
+          updateSale,
+          oldPlot,
+          ...newPlot,
+        ]);
+        break;
+
+      ////////////// case 4 : new customer, old payment plan, old plots
+      case customer.newCustomer && !isEditPaymentPlan && !isEditPlotIdDetail:
+        // create new customer
+        const addCust = prisma.customer.create({
+          data: {
+            id: customerId,
+            name: customer.customerName,
+            son_of: customer.sonOf,
+            cnic: customer.customerCNIC,
+          },
+        });
+        // do these transactions in a lock
+        await prisma.$transaction([addCust, updateSale]);
+        break;
+
+      ////////////// case 5 :  old customer, new payment plan, new plots
+      case !customer.newCustomer && isEditPaymentPlan && isEditPlotIdDetail:
+        // delete old payment plan
+        const delPaymentPlan = prisma.payment_Plan.deleteMany({
+          where: {
+            sale_id: plotSaleId,
+          },
+        });
+        // update old plots where status becomes not sold, no sale_id, no sale_price, no fully sold date
+        const oldPlots = prisma.plot.updateMany({
+          where: {
+            sale_id: plotSaleId,
+          },
+          data: {
+            plot_status: "not_sold",
+            sale_id: null,
+            sale_price: null,
+            fully_sold_date: null,
+          },
+        });
+        // update new plots
+        const newPlots = plotId.map((plot) => {
+          return prisma.plot.update({
+            where: {
+              id: plot.id,
+            },
+            data: {
+              sale_price: plot.sellPrice,
+              plot_status: "partially_paid",
+              sale_id: plotSaleId,
+            },
+          });
+        });
+
+        // create new payment plan
+        const newPaymentPlan = prisma.payment_Plan.createMany({
+          data: paymentPlanArr,
+        });
+        // do these transactions in a lock
+        await prisma.$transaction([
+          updateSale,
+          oldPlots,
+          ...newPlots,
+          delPaymentPlan,
+          newPaymentPlan,
+        ]);
+        break;
+
+      ////////////// case 6 :  old customer, new payment plan, old plots
+      case !customer.newCustomer && isEditPaymentPlan && !isEditPlotIdDetail:
+        // delete old payment plan
+        const delPayPlan = prisma.payment_Plan.deleteMany({
+          where: {
+            sale_id: plotSaleId,
+          },
+        });
+        // create new payment plan
+        const newPayPlan = prisma.payment_Plan.createMany({
+          data: paymentPlanArr,
+        });
+        // do these transactions in a lock
+        await prisma.$transaction([updateSale, delPayPlan, newPayPlan]);
+        break;
+
+      ////////////// case 7 :  old customer, old payment plan, new plots
+      case !customer.newCustomer && !isEditPaymentPlan && isEditPlotIdDetail:
+        // update old plots where status becomes not sold, no sale_id, no sale_price, no fully sold date
+        const oldPlotsUpdate = prisma.plot.updateMany({
+          where: {
+            sale_id: plotSaleId,
+          },
+          data: {
+            plot_status: "not_sold",
+            sale_id: null,
+            sale_price: null,
+            fully_sold_date: null,
+          },
+        });
+        // update new plots
+        const newPlotsUpdate = plotId.map((plot) => {
+          return prisma.plot.update({
+            where: {
+              id: plot.id,
+            },
+            data: {
+              sale_price: plot.sellPrice,
+              plot_status: "partially_paid",
+              sale_id: plotSaleId,
+            },
+          });
+        });
+
+        // do these transactions in a lock
+        await prisma.$transaction([
+          updateSale,
+          oldPlotsUpdate,
+          ...newPlotsUpdate,
+        ]);
+        break;
+
+      ////////////// case 8 :  old customer, old payment plan, new plots
+      case !customer.newCustomer && !isEditPaymentPlan && !isEditPlotIdDetail:
+        // update old plots where status becomes not sold, no sale_id, no sale_price, no fully sold date
+
+        // do these transactions in a lock
+        await prisma.$transaction([updateSale]);
         break;
     }
 
@@ -159,6 +351,6 @@ export default async function editPlots(
   } catch (err) {
     return res
       .status(404)
-      .json({ error: "something went wrong please trey again" });
+      .json({ error: "something went wrong please try again" });
   }
 }
