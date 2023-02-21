@@ -24,6 +24,7 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
     name,
     cnic,
     setShowAddPaymentForm,
+    
     plotSaleId,
   } = props;
   const queryClient = useQueryClient();

@@ -7,6 +7,7 @@ import { fetchNotSoldPlots } from "@/r-query/functions";
 import { AllPlotId } from "../../PlotUpsertForm";
 import { PlotIdInputTable } from "./PlotIdInputTable";
 import { PlotDetailEditCard } from "./PlotDetailsEditCard";
+import { NotSoldPlotsSelectFields } from "@/pages/api/plot/notSold";
 
 type PlotDetailsInputCardProps = {
   plot: Plot[];
@@ -16,6 +17,8 @@ type PlotDetailsInputCardProps = {
   showForm: boolean;
   isEditPlotIdDetail: boolean;
   setIsEditPlotIdDetail: (val: boolean) => void;
+  sellPrice: number | undefined;
+  setSellPrice: (val: number | undefined) => void;
 };
 export const PlotDetailsInputCard: React.FC<PlotDetailsInputCardProps> = (
   props
@@ -28,14 +31,26 @@ export const PlotDetailsInputCard: React.FC<PlotDetailsInputCardProps> = (
     showForm,
     isEditPlotIdDetail,
     setIsEditPlotIdDetail,
+    sellPrice,
+    setSellPrice,
   } = props;
   const [isEditFlag, setIsEditFlag] = React.useState(isEditForm);
+  const [notSoldPlots, setNotSoldPlots] = React.useState<
+    NotSoldPlotsSelectFields[]
+  >([]);
 
   const fetchPlots = useQuery(["notSoldPlots"], fetchNotSoldPlots, {
     staleTime: Infinity,
     cacheTime: Infinity,
     enabled: showForm,
   });
+  const plots = fetchPlots.data;
+  React.useEffect(() => {
+    if (plots?.length) {
+      setNotSoldPlots(plots);
+    }
+  }, [plots]);
+
   if (fetchPlots.isLoading) {
     return <Loader />;
   }
@@ -47,8 +62,11 @@ export const PlotDetailsInputCard: React.FC<PlotDetailsInputCardProps> = (
     plot,
     allPlotSale,
     setAllPlotSale,
-    notSoldPlots: fetchPlots.data,
+    setNotSoldPlots,
+    notSoldPlots,
     setIsEditFlag,
+    sellPrice,
+    setSellPrice,
   };
 
   const plotEditDetails = {
@@ -56,7 +74,11 @@ export const PlotDetailsInputCard: React.FC<PlotDetailsInputCardProps> = (
     setIsEditFlag,
     setAllPlotSale,
     isEditPlotIdDetail,
+    setNotSoldPlots,
+    notSoldPlots,
     setIsEditPlotIdDetail,
+    sellPrice,
+    setSellPrice,
   };
   return isEditFlag ? (
     <PlotDetailEditCard {...plotEditDetails} />
@@ -71,7 +93,9 @@ export const PlotDetailsInputCard: React.FC<PlotDetailsInputCardProps> = (
       <Card.Section withBorder inheritPadding py="xs">
         <Title order={3}>Plot Details</Title>
       </Card.Section>
-      <PlotIdInputTable {...plotIdInputData} />
+      {notSoldPlots.length ? (
+        <PlotIdInputTable {...plotIdInputData} />
+      ) : undefined}
     </Card>
   );
 };

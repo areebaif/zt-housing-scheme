@@ -7,7 +7,6 @@ import {
   SellDetailsInput,
   PlotDetailsInputCard,
   CustomerDetailsInput,
-  PaymentPlanView,
 } from ".";
 import {
   fetchAllCustomers,
@@ -52,7 +51,6 @@ type AddSaleFormProps = {
   setShowForm: (val: boolean) => void;
   showForm: boolean;
   plotSaleId: number | undefined;
-
 };
 
 export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
@@ -171,6 +169,8 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     setAllPlotSale,
     isEditPlotIdDetail,
     setIsEditPlotIdDetail,
+    sellPrice,
+    setSellPrice,
   };
   const sellDetailsData = {
     sellDate,
@@ -190,25 +190,19 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     setIsNewCustomer,
     isEditForm,
   };
+  const paymentPlanInputCard = {
+    tableRows,
+    setTableRows,
+    setShowEditFieldFlag,
+    showEditFieldFlag,
+    setIsEditPaymentPlan,
+  };
   return (
     <React.Fragment>
       <PlotDetailsInputCard {...plotDetailsData} />
-      <CustomerDetailsInput {...customerDetailsData} />
       <SellDetailsInput {...sellDetailsData} />
-      {!showEditFieldFlag ? (
-        <PaymentPlanInputCard
-          tableRows={tableRows}
-          setTableRows={setTableRows}
-          title={"Payment Plan"}
-        />
-      ) : (
-        <PaymentPlanView
-          paymentPlan={tableRows}
-          setTableRows={setTableRows}
-          setShowEditFieldFlag={setShowEditFieldFlag}
-          setIsEditPaymentPlan={setIsEditPaymentPlan}
-        />
-      )}
+      <CustomerDetailsInput {...customerDetailsData} />
+      <PaymentPlanInputCard {...paymentPlanInputCard} />
       <Group position="center" style={{ margin: "15px 0 0 0" }}>
         <Button size="xl" onClick={onSubmitForm}>
           Submit

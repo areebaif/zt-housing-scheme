@@ -10,6 +10,8 @@ type PlotIdInput = {
   setAllPlotSale: (val: AllPlotId[]) => void;
   selectPlotIdData: NotSoldPlotsSelectFields[];
   setSelectPlotIdData: (val: NotSoldPlotsSelectFields[]) => void;
+  sellPrice: number | undefined;
+  setSellPrice: (val: number | undefined) => void;
 };
 
 export const PlotIdInput: React.FC<PlotIdInput> = (props: PlotIdInput) => {
@@ -19,6 +21,8 @@ export const PlotIdInput: React.FC<PlotIdInput> = (props: PlotIdInput) => {
     setAllPlotSale,
     plot,
     selectPlotIdData,
+    sellPrice,
+    setSellPrice,
     setSelectPlotIdData,
   } = props;
   // state
@@ -28,7 +32,6 @@ export const PlotIdInput: React.FC<PlotIdInput> = (props: PlotIdInput) => {
   const [selectPlotIdVal, setSelectPlotIdVal] = React.useState<string | null>(
     plot[0].id.toString()
   );
-
   const findPlot = () => {
     const plot = selectPlotIdData?.filter(
       (item) => item.value === selectPlotIdVal
@@ -48,6 +51,11 @@ export const PlotIdInput: React.FC<PlotIdInput> = (props: PlotIdInput) => {
         sellPrice: individualPlotSalePrice,
       },
     ]);
+    const parsedSellPrice = sellPrice ? sellPrice : 0;
+    const parsedIndividualPlotSalePrice = individualPlotSalePrice
+      ? individualPlotSalePrice
+      : 0;
+    setSellPrice(parsedSellPrice + parsedIndividualPlotSalePrice);
 
     setSelectPlotIdVal("");
     setIndividualPlotSalePrice(undefined);

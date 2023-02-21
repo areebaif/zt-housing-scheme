@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Card, NumberInput, Flex, Title } from "@mantine/core";
+import { Card, NumberInput, Flex, Title, Text, Box } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 
 type SellDetailsInputProps = {
@@ -7,21 +7,16 @@ type SellDetailsInputProps = {
   setSellDate: (val: Date | null) => void;
   sellPrice: number | undefined;
   setSellPrice: (price: number | undefined) => void;
-
-  // developmentChargePercent: number | undefined;
-  // setDevelopmentChargePercent: (charges: number | undefined) => void;
 };
 
 export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
   props: SellDetailsInputProps
 ) => {
-  const sellPriceRef = React.useRef(null);
-
   const { sellDate, setSellDate, sellPrice, setSellPrice } = props;
 
-  const onChangeSellPrice = (val: number | undefined) => {
-    setSellPrice(val);
-  };
+  // const onChangeSellPrice = (val: number | undefined) => {
+  //   setSellPrice(val);
+  // };
   return (
     <Card
       shadow="sm"
@@ -44,29 +39,25 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
             value={sellDate}
             onChange={setSellDate}
           />
-          <NumberInput
-            hideControls={true}
-            label="total sale price"
-            value={sellPrice}
-            placeholder={"enter sold value"}
-            withAsterisk
-            onChange={(e) => onChangeSellPrice(e)}
-            parser={(sellPrice) => sellPrice?.replace(/\$\s?|(,*)/g, "")}
-            error={
-              sellPrice
-                ? sellPrice < 1
-                  ? "enter values above 0"
-                  : false
-                : true
-            }
-            formatter={(value) => {
-              return value
-                ? !Number.isNaN(parseFloat(value))
-                  ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : ""
-                : "";
-            }}
-          />
+          <Box
+            sx={(theme) => ({
+              paddingTop: theme.spacing.xs * 0.5,
+              paddingLeft: theme.spacing.lg,
+            })}
+          >
+            <Text weight={500} size={"sm"}>
+              Total sell price:
+            </Text>{" "}
+            <Text
+              sx={(theme) => ({
+                paddingTop: theme.spacing.xs * 0.5,
+              })}
+            >
+              {sellPrice
+                ? `${sellPrice}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : "0"}{" "}
+            </Text>
+          </Box>
         </Flex>
       </Card.Section>
     </Card>

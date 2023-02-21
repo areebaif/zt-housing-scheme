@@ -2,15 +2,15 @@ import * as React from "react";
 import { Card, Group, Button, Title, Table, TextInput } from "@mantine/core";
 import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 
-type PaymentPlanView = {
+type PaymentPlanEditView = {
   paymentPlan: TableRowItem[];
   setTableRows: (val: TableRowItem[]) => void;
   setShowEditFieldFlag: (val: boolean) => void;
   setIsEditPaymentPlan: (val: boolean) => void;
 };
 
-export const PaymentPlanView: React.FC<PaymentPlanView> = (
-  props: PaymentPlanView
+export const PaymentPlanEditView: React.FC<PaymentPlanEditView> = (
+  props: PaymentPlanEditView
 ) => {
   const {
     paymentPlan,

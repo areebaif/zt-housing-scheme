@@ -1,16 +1,10 @@
 import * as React from "react";
 import { Plot } from "@prisma/client";
 
-import {
-  Card,
-  Flex,
-  Title,
-  Group,
-  Text,
-  Button,
-  TextInput,
-  Table,
-} from "@mantine/core";
+import { Card, Title, Group, Button, TextInput, Table } from "@mantine/core";
+import notSoldPlots, {
+  NotSoldPlotsSelectFields,
+} from "@/pages/api/plot/notSold";
 import { AllPlotId } from "../../PlotUpsertForm";
 type PlotDetailEditProps = {
   plot: Plot[];
@@ -18,6 +12,10 @@ type PlotDetailEditProps = {
   setAllPlotSale: (val: AllPlotId[]) => void;
   isEditPlotIdDetail: boolean;
   setIsEditPlotIdDetail: (val: boolean) => void;
+  setNotSoldPlots: (val: NotSoldPlotsSelectFields[]) => void;
+  notSoldPlots: NotSoldPlotsSelectFields[];
+  sellPrice: number | undefined;
+  setSellPrice: (val: number | undefined) => void;
   // need acess to all plot sale when you are dleteing set allPlotSale to just the first value and sell price equal to its sell price and use has ability to set price
 };
 
@@ -29,7 +27,10 @@ export const PlotDetailEditCard: React.FC<PlotDetailEditProps> = (
     setIsEditFlag,
     setAllPlotSale,
     isEditPlotIdDetail,
+    notSoldPlots,
+    setNotSoldPlots,
     setIsEditPlotIdDetail,
+    setSellPrice,
   } = props;
   let totalSalePrice = 0;
   plot.forEach((item) => {
@@ -51,7 +52,19 @@ export const PlotDetailEditCard: React.FC<PlotDetailEditProps> = (
           <Button
             variant="outline"
             onClick={() => {
+              const formattedData = plot.map((item) => {
+                return {
+                  ...item,
+                  value: item.id.toString(),
+                  label: item.id.toString(),
+                };
+              });
+              const sortData = [...notSoldPlots, ...formattedData].sort(
+                (a, b) => a.id - b.id
+              );
+              setNotSoldPlots([...sortData]);
               setIsEditFlag(false);
+              setSellPrice(undefined);
               setIsEditPlotIdDetail(true);
               setAllPlotSale([]);
             }}
