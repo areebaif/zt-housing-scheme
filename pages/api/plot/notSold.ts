@@ -4,19 +4,24 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../db/prisma";
 import { ReturnError } from "../customer/all";
 
-export interface PlotsSelectFields {
+export interface NotSoldPlotsSelectFields {
   id: number;
   dimension: string | null;
   square_feet: number | null;
   plot_status: string;
+  value: string;
+  label: string;
 }
 
-export default async function allPlots(
+export default async function notSoldPlots(
   req: NextApiRequest,
-  res: NextApiResponse<PlotsSelectFields[] | ReturnError>
+  res: NextApiResponse<NotSoldPlotsSelectFields[] | ReturnError>
 ) {
   try {
     const data = await prisma.plot.findMany({
+      where: {
+        plot_status: "not_sold",
+      },
       select: {
         id: true,
         dimension: true,
@@ -24,7 +29,15 @@ export default async function allPlots(
         plot_status: true,
       },
     });
-    res.status(200).json(data);
+    const formattedData = data.map((plot) => {
+      return {
+        ...plot,
+        value: plot.id.toString(),
+        label: plot.id.toString(),
+      };
+    });
+
+    res.status(200).json(formattedData);
   } catch (err) {
     return res
       .status(404)

@@ -4,7 +4,7 @@ import { addMonth, formatAddTime } from "@/utilities";
 
 import { Button, Table, Card } from "@mantine/core";
 
-import { SeriesInputViewCard } from "./SeriesInputViewCard";
+import { RecurringItemViewCard } from "./RecurringItemViewCard";
 import { AddRecurringItemsInput } from "./AddRecurringItemsInput";
 import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 import { AddIndividualItemInput } from "./AddIndividualItemInput";
@@ -14,7 +14,7 @@ interface PaymentPlanTableProps {
   setTableRows: (data: TableRowItem[]) => void;
 }
 
-export const PaymentPlanTable: React.FC<PaymentPlanTableProps> = (props) => {
+export const PaymentPlanInputTable: React.FC<PaymentPlanTableProps> = (props) => {
   // props
   const { tableRows, setTableRows } = props;
 
@@ -236,7 +236,7 @@ export const PaymentPlanTable: React.FC<PaymentPlanTableProps> = (props) => {
         {!isSeriesGenerated ? (
           <AddRecurringItemsInput {...addrecurringItems} />
         ) : (
-          <SeriesInputViewCard {...seriesDetailCard} />
+          <RecurringItemViewCard {...seriesDetailCard} />
         )}
       </Card>
       <PaymentPlanInputTableView {...paymentPlanInputTableView} />
@@ -282,7 +282,9 @@ const PaymentPlanInputTableView: React.FC<PaymentPlanInputTableView> = (
                 <tr key={index}>
                   <td>{new Date(`${item.dateISOString}`).toDateString()}</td>
                   <td>{item.paymentType}</td>
-                  <td>{item.value}</td>
+                  <td>
+                    {`${item.value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </td>
                   {index === deleteStartIndex ? (
                     <td>
                       <Button

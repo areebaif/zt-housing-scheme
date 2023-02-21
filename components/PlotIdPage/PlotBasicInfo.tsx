@@ -1,21 +1,19 @@
 import * as React from "react";
 import { Button, Card, Title, Grid, Group, Text } from "@mantine/core";
-import { useRouter } from "next/router";
-import { Payments } from "@prisma/client";
 import { PlotDetail } from "@/pages/api/plot/[id]";
 
-export interface PlotBasicInfoProps {
+export type PlotBasicInfoProps = {
   plotDetail: PlotDetail;
-  plotId: string;
   setShowForm: (val: boolean) => void;
   setIsEditForm: (val: boolean) => void;
-}
+};
 
 export const PlotBasicInfo: React.FC<PlotBasicInfoProps> = (props) => {
   //Props
-  const { plotDetail, plotId, setShowForm, setIsEditForm } = props;
-  //Hooks
-  const router = useRouter();
+  const { plotDetail, setShowForm, setIsEditForm } = props;
+
+  const allPlots = plotDetail.plot;
+
   return (
     <Card shadow="sm" p="xl" radius="md" withBorder style={{ height: "100%" }}>
       <Card.Section withBorder inheritPadding py="xs">
@@ -25,33 +23,43 @@ export const PlotBasicInfo: React.FC<PlotBasicInfoProps> = (props) => {
             onClick={() => {
               setShowForm(true);
               {
-                plotDetail?.plot.status === "not_sold"
+                plotDetail?.plot[0].plot_status === "not_sold"
                   ? setIsEditForm(false)
                   : setIsEditForm(true);
               }
             }}
           >
-            {plotDetail?.plot.status === "not_sold"
+            {plotDetail?.plot[0].plot_status === "not_sold"
               ? "Add Sale"
               : "Edit Details"}
           </Button>
         </Group>
       </Card.Section>
       <Card.Section inheritPadding py="xs">
-        <Grid gutter={5} gutterXs="md" gutterMd="xl" gutterXl={50}>
-          <Grid.Col span={3}>
-            <Text weight={"bold"}>Plot Number:</Text>{" "}
-            <Text>{plotDetail?.plot?.id} </Text>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Text weight={"bold"}>Square ft:</Text>{" "}
-            <Text>{plotDetail?.plot?.square_feet} </Text>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Text weight={"bold"}>Dimension:</Text>{" "}
-            <Text>{plotDetail?.plot?.dimension} </Text>
-          </Grid.Col>
-        </Grid>
+        {allPlots.map((plot) => {
+          return (
+            <Grid
+              key={plot.id}
+              gutter={5}
+              gutterXs="md"
+              gutterMd="xl"
+              gutterXl={50}
+            >
+              <Grid.Col span={3}>
+                <Text weight={"bold"}>Plot Number:</Text>{" "}
+                <Text>{plot.id} </Text>
+              </Grid.Col>
+              <Grid.Col span={3}>
+                <Text weight={"bold"}>Square ft:</Text>{" "}
+                <Text>{plot.square_feet} </Text>
+              </Grid.Col>
+              <Grid.Col span={3}>
+                <Text weight={"bold"}>Dimension:</Text>{" "}
+                <Text>{plot.dimension} </Text>
+              </Grid.Col>
+            </Grid>
+          );
+        })}
       </Card.Section>
     </Card>
   );

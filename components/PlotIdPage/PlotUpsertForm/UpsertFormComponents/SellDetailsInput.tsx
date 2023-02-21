@@ -46,7 +46,7 @@ export const SellDetailsInput: React.FC<SellDetailsInputProps> = (
           />
           <NumberInput
             hideControls={true}
-            label="sell price"
+            label="total sale price"
             value={sellPrice}
             placeholder={"enter sold value"}
             withAsterisk

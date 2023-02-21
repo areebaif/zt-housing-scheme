@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, Title } from "@mantine/core";
-import { PaymentPlanTable } from "./PaymentPlanInput";
+import { PaymentPlanInputTable } from "./PaymentPlanInputTable";
 import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 
 // export enum TypePayment {
@@ -31,7 +31,7 @@ export const PaymentPlanInputCard: React.FC<PaymentPlanInputProps> = (
       <Card.Section withBorder inheritPadding py="xs">
         <Title order={3}>{title}</Title>
       </Card.Section>
-      <PaymentPlanTable tableRows={tableRows} setTableRows={setTableRows} />
+      <PaymentPlanInputTable tableRows={tableRows} setTableRows={setTableRows} />
     </Card>
   );
 };

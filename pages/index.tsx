@@ -3,7 +3,7 @@ import * as React from "react";
 // Hook Imports
 import { useQuery } from "@tanstack/react-query";
 
-import { Grid, Text, Flex, Loader } from "@mantine/core";
+import { Grid, Loader } from "@mantine/core";
 // Component Imports
 import { PlotSaleSummaryTable, TotalsSummary } from "@/components";
 // Utilities
@@ -25,18 +25,18 @@ const AllPlots: React.FC = () => {
   const plots = fetchPlots.data;
   // table data
   const notSoldPlots = plots?.filter((element) => {
-    return element.status === "not_sold";
+    return element.plot_status === "not_sold";
   });
   const partiallySold = plots?.filter((element) => {
-    return element.status === "partially_paid";
+    return element.plot_status === "partially_paid";
   });
 
   const fullySold = plots?.filter((element) => {
-    return element.status === "fully_paid";
+    return element.plot_status === "fully_paid";
   });
 
   const registryTransferred = plots?.filter((element) => {
-    return element.status === "registry_transferred";
+    return element.plot_status === "registry_transferred";
   });
 
   return (

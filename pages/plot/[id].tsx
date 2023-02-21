@@ -37,7 +37,7 @@ const PlotId: React.FC = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-  if (fetchplot.isLoading || status === "loading") {
+  if (fetchplot.isLoading) {
     return <Loader />;
   }
 
@@ -52,17 +52,8 @@ const PlotId: React.FC = () => {
   plotDetail?.payment_history?.forEach((item) => {
     totalPayment = totalPayment + item.payment_value;
   });
-  let plotDownPayment: number | undefined;
-  let plotDevelopmentCharge: number | undefined;
+
   const paymentPlanMap = plotDetail.payment_plan?.map((item) => {
-    if (item.payment_type === PaymentType.down_payment) {
-      plotDownPayment = item.payment_value ? item.payment_value : undefined;
-    }
-    if (item.payment_type === PaymentType.development_charge) {
-      plotDevelopmentCharge = item.payment_value
-        ? item.payment_value
-        : undefined;
-    }
     const res: TableRowItem = {
       id: item.id,
       dateParsed: item.payment_date
@@ -72,37 +63,32 @@ const PlotId: React.FC = () => {
         ? new Date(item.payment_date).toISOString()
         : "",
       value: item.payment_value ? item.payment_value : undefined,
-      description: item.description ? item.description : undefined,
       paymentType: item.payment_type,
     };
     return res;
   });
 
   const FormData = {
-    plotNumber: plotId,
-    dimensionString: plotDetail.plot.dimension ? plotDetail.plot.dimension : "",
-    squareFt: plotDetail.plot.square_feet
-      ? plotDetail.plot.square_feet?.toString()
-      : "",
-    soldPrice: plotDetail.plot.sold_price
-      ? plotDetail.plot.sold_price
+    plot: plotDetail.plot,
+    soldPrice: plotDetail.sale?.sold_price
+      ? plotDetail.sale?.sold_price
       : undefined,
     name: plotDetail.customer?.name ? plotDetail.customer?.name : "",
     son_of: plotDetail.customer?.son_of ? plotDetail.customer?.son_of : "",
     cnic: plotDetail.customer?.cnic ? plotDetail.customer?.cnic : "",
-    soldDate: plotDetail.plot.sold_date
-      ? new Date(plotDetail.plot.sold_date)
+    soldDate: plotDetail.sale?.sold_date
+      ? new Date(plotDetail.sale?.sold_date)
       : null,
     futurePaymentPlan: paymentPlanMap?.length ? paymentPlanMap : [],
     isEditForm,
     setIsEditForm,
-    plotDownPayment,
     setShowForm,
-    plotDevelopmentCharge,
+    showForm,
+    plotSaleId: plotDetail.sale?.plotSaleId
   };
 
   const addPaymentProps = {
-    plotNumber: plotId,
+    plotNumber: plotDetail.plot,
     customerNumber: plotDetail.customer?.id
       ? plotDetail.customer?.id.toString()
       : "",
@@ -112,12 +98,12 @@ const PlotId: React.FC = () => {
       : "",
     cnic: plotDetail.customer?.cnic ? plotDetail.customer?.cnic : "",
     setShowAddPaymentForm,
+    plotSaleId: plotDetail.sale?.plotSaleId
   };
 
   return !showForm && !showAddPaymentForm ? (
     <PlotSummary
       plotDetail={plotDetail}
-      plotId={plotId}
       totalPayment={totalPayment}
       setShowForm={setShowForm}
       setIsEditForm={setIsEditForm}
@@ -132,7 +118,6 @@ const PlotId: React.FC = () => {
 
 type PlotSummaryProps = {
   plotDetail: PlotDetail;
-  plotId: string;
   totalPayment: number;
   setShowForm: (val: boolean) => void;
   setIsEditForm: (val: boolean) => void;
@@ -141,7 +126,6 @@ type PlotSummaryProps = {
 
 const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
   const {
-    plotId,
     plotDetail,
     totalPayment,
     setShowForm,
@@ -154,7 +138,6 @@ const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
         <Grid.Col span={"auto"}>
           <PlotBasicInfo
             plotDetail={plotDetail}
-            plotId={plotId}
             setShowForm={setShowForm}
             setIsEditForm={setIsEditForm}
           />
@@ -163,17 +146,15 @@ const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
           <SellInfo plotDetail={plotDetail} totalPayment={totalPayment} />
         </Grid.Col>
       </Grid>
-      {plotDetail.plot.status !== "not_sold" ? (
+      {plotDetail.plot[0].plot_status !== "not_sold" ? (
         <React.Fragment>
           <PaymentPlanTable
             tableRows={plotDetail.payment_plan}
             customerName={plotDetail?.customer?.name}
             sonOf={plotDetail?.customer?.son_of}
           />
-
           <PaymentHistoryTable
             plotDetail={plotDetail}
-            plotId={plotId}
             tableRows={plotDetail.payment_history}
             setShowAddPaymentForm={setShowAddPaymentForm}
           />

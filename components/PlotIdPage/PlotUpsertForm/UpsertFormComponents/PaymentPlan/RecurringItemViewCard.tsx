@@ -9,7 +9,7 @@ export type SeriesCardProps = {
   recurringPlanPaymentType: string;
 };
 
-export const SeriesInputViewCard: React.FC<SeriesCardProps> = (
+export const RecurringItemViewCard: React.FC<SeriesCardProps> = (
   props: SeriesCardProps
 ) => {
   const {

@@ -1,17 +1,7 @@
 import * as React from "react";
-import { PlotsSelectFields } from "@/pages/api/plot/add";
+import { PlotsSelectFields } from "@/pages/api/plot/all";
 import { useRouter } from "next/router";
-import {
-  Table,
-  Title,
-  Card,
-  Flex,
-  Text,
-  Grid,
-  ScrollArea,
-  Box,
-  Divider,
-} from "@mantine/core";
+import { Title, Card, Text, Grid, Box, Divider } from "@mantine/core";
 
 export interface PlotSaleSummaryTableProps {
   tableHead: string;

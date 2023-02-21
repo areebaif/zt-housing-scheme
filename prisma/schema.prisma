@@ -25,16 +25,81 @@ enum PaymentType {
   other
 }
 
+enum PlotTransferStatus {
+yes
+no
+}
+
+// model Plot {
+//   id Int @id
+//   dimension String?  @db.VarChar(255)
+//   square_feet Int?
+//   status Status
+//   sold_date  DateTime?
+//   fully_sold_date DateTime?
+//   sold_price Int?
+//   created_at DateTime @default(now())
+//   customer_id Int?
+// }
+
+// model Customer {
+//   id Int @id @default(autoincrement())
+//   name String  @db.VarChar(255)
+//   son_of String?  @db.VarChar(255)
+//   cnic String @unique  @db.VarChar(15)
+//   created_at DateTime @default(now())
+// }
+
+// model Payment_Plan {
+//   id Int @id @default(autoincrement())
+//   description String?
+//   payment_type PaymentType
+//   plot_id Int
+//   customer_id Int
+//   payment_date DateTime?
+//   payment_value Int?
+// }
+
+// model Payments {
+//   id Int @id @default(autoincrement())
+//   description String?  @db.VarChar(255)
+//   payment_type PaymentType
+//   plot_id Int
+//   customer_id Int
+//   payment_date DateTime
+//   payment_value Int
+// }
+
+// model Sale_Registry {
+//   id Int @id @default(autoincrement())
+//   plot_id Int @unique
+//   created_at DateTime @default(now())
+//   registry_transfer_date DateTime?
+//   registry_given_to_name String?
+//   registry_given_to_son_of String?
+//   registry_given_to_cnic String?
+// }
+
 model Plot {
   id Int @id
-  dimension String?  @db.VarChar(255)
+  dimension String? @db.VarChar(255)
   square_feet Int?
-  status Status
-  sold_date  DateTime?
+  sale_id Int?
+  sale_price Int?
   fully_sold_date DateTime?
-  sold_price Int?
   created_at DateTime @default(now())
-  customer_id Int?
+  updated_at DateTime  @updatedAt
+  plot_status Status
+}
+
+
+model Sale {
+  id Int @id
+  customer_id Int
+  sold_date DateTime
+  total_sale_price Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Customer {
@@ -43,35 +108,48 @@ model Customer {
   son_of String?  @db.VarChar(255)
   cnic String @unique  @db.VarChar(15)
   created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Payment_Plan {
   id Int @id @default(autoincrement())
-  description String?
   payment_type PaymentType
-  plot_id Int
-  customer_id Int
+  sale_id Int
   payment_date DateTime?
   payment_value Int?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Payments {
   id Int @id @default(autoincrement())
-  description String?  @db.VarChar(255)
+  description String? 
   payment_type PaymentType
-  plot_id Int
-  customer_id Int
+  sale_id Int
   payment_date DateTime
   payment_value Int
+  created_at DateTime @default(now())
 }
+
+// model Plot_Sale {
+//   id Int @id @default(autoincrement())
+//   customer_sale_id Int
+//   plot_id Int
+//   customer_id Int
+//   sold_date DateTime
+//   created_at DateTime @default(now())
+//   updated_at DateTime @updatedAt  
+//}
+
 
 model Sale_Registry {
   id Int @id @default(autoincrement())
-  plot_id Int @unique
+  plot_id Int
   created_at DateTime @default(now())
+  customer_transfer_status PlotTransferStatus
+  customer_id Int?
   registry_transfer_date DateTime?
   registry_given_to_name String?
   registry_given_to_son_of String?
   registry_given_to_cnic String?
 }
-

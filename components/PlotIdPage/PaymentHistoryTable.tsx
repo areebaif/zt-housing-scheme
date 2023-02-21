@@ -4,21 +4,17 @@ import { Payments } from "@prisma/client";
 import { PlotDetail } from "@/pages/api/plot/[id]";
 import { useRouter } from "next/router";
 
-export interface PaymentHistoryTableProps {
+export type PaymentHistoryTableProps = {
   tableRows?: Payments[];
   plotDetail: PlotDetail;
-  plotId: string;
   setShowAddPaymentForm: (val: boolean) => void;
-}
+};
 
 export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
   PaymentHistoryTable
 ) => {
   //Props
-  const { tableRows, plotDetail, plotId, setShowAddPaymentForm } =
-    PaymentHistoryTable;
-  // Hooks
-  const router = useRouter();
+  const { tableRows, setShowAddPaymentForm } = PaymentHistoryTable;
   // Display Funcs
   const paymentHistoryRows = tableRows?.map((element) => {
     const date = new Date(`${element.payment_date}`);

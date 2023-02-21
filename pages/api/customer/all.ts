@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Plot } from "@prisma/client";
 
 import { prisma } from "../../../db/prisma";
-import { createIncrementalCompilerHost } from "typescript";
+
 
 export interface CustomerSelectFields {
   id: number;

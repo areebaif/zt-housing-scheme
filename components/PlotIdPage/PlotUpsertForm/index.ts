@@ -1,12 +1,12 @@
 import { SellDetailsInput } from "./UpsertFormComponents/SellDetailsInput";
-import { PlotDetailsInput } from "./UpsertFormComponents/PlotDetailsInput";
+import { PlotDetailsInputCard } from "./UpsertFormComponents/PlotDetails/PlotDetailsInputCard";
 import { CustomerDetailsInput } from "./UpsertFormComponents/CustomerDetailInput";
-import { PaymentPlanView } from "./UpsertFormComponents/PaymentPlanView";
+import { PaymentPlanView } from "./UpsertFormComponents/PaymentPlan/PaymentPlanEditView";
 import { PaymentPlanInputCard } from "./UpsertFormComponents/PaymentPlan/PaymentPlanInputCard";
 
 export {
   SellDetailsInput,
-  PlotDetailsInput,
+  PlotDetailsInputCard,
   CustomerDetailsInput,
   PaymentPlanView,
   PaymentPlanInputCard,

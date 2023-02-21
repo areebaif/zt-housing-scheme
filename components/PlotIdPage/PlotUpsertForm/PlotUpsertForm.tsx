@@ -1,10 +1,11 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { Plot } from "@prisma/client";
 import { Group, Button, Loader } from "@mantine/core";
 import {
   SellDetailsInput,
-  PlotDetailsInput,
+  PlotDetailsInputCard,
   CustomerDetailsInput,
   PaymentPlanView,
 } from ".";
@@ -15,12 +16,19 @@ import {
 } from "@/r-query/functions";
 import { TableRowItem } from "../AddPaymentForm/PaymentInputTable";
 import { PaymentPlanInputCard } from ".";
-import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInput";
+//import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInput";
 import { formatAddTime } from "@/utilities";
 import { CustomerSelectFields } from "@/pages/api/customer/all";
 
+export interface AllPlotId {
+  id: number;
+  squareFeet: string;
+  dimension: string;
+  sellPrice: number | undefined;
+}
+
 export interface FormPostProps {
-  plotId: string;
+  plotId: AllPlotId[];
   sellPrice: number;
   soldDateString: string;
   customer: {
@@ -32,12 +40,9 @@ export interface FormPostProps {
   paymentPlan: TableRowItem[];
   isEditPaymentPlan: boolean;
 }
-interface AddSaleFormProps {
-  plotNumber: string;
-  dimensionString: string;
-  squareFt: string;
+type AddSaleFormProps = {
+  plot: Plot[];
   soldPrice: number | undefined;
-  plotDownPayment: number | undefined;
   name: string;
   son_of: string;
   cnic: string;
@@ -45,16 +50,16 @@ interface AddSaleFormProps {
   futurePaymentPlan: TableRowItem[] | [];
   isEditForm: boolean;
   setShowForm: (val: boolean) => void;
-  //setIsEditForm: (val: boolean) => void;
-}
+  showForm: boolean;
+  plotSaleId: number | undefined;
+
+};
 
 export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   props: AddSaleFormProps
 ) => {
   const {
-    plotNumber,
-    dimensionString,
-    squareFt,
+    plot,
     soldPrice,
     name,
     son_of,
@@ -63,20 +68,18 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     futurePaymentPlan,
     isEditForm,
     setShowForm,
+    showForm,
   } = props;
   const queryClient = useQueryClient();
   // // router props
   const router = useRouter();
-
   // plot metadata props
-  const [plotId, setPlotId] = React.useState(plotNumber);
-  const [dimension, setDimension] = React.useState(dimensionString);
-  const [squareFeet, setSquareFeet] = React.useState(squareFt);
+  const [allPlotSale, setAllPlotSale] = React.useState<AllPlotId[]>([]);
+  const [isEditPlotIdDetail, setIsEditPlotIdDetail] = React.useState(false);
   // sell info props
   const [sellPrice, setSellPrice] = React.useState<number | undefined>(
     soldPrice
   );
-
   const [sellDate, setSellDate] = React.useState<Date | null>(soldDate);
   // new customer props
   const [customerName, setCustomerName] = React.useState(name);
@@ -106,7 +109,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     onSuccess: () => {
       queryClient.invalidateQueries();
       setShowForm(false);
-      router.push(`/plot/${plotId}`);
+      router.push(`/plot/${plot[0].id}`);
     },
     onError: () => {
       return <div>error occured: Please try again later</div>;
@@ -114,7 +117,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   });
   const onSubmitForm = () => {
     // plot and sell information validation
-    if (!plotId || !sellDate || !sellPrice)
+    if (!sellDate || !sellPrice)
       throw new Error(
         "please provide plotNumber, Sell Date ad Sell Price to submit the form"
       );
@@ -131,7 +134,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     }
     const soldDateString = formatAddTime(`${sellDate}`);
     const data: FormPostProps = {
-      plotId,
+      plotId: allPlotSale,
       sellPrice,
       soldDateString,
       customer: {
@@ -161,21 +164,19 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   }
 
   const plotDetailsData = {
-    plotId,
-    setPlotId,
-    dimension,
-    setDimension,
-    squareFeet,
-    setSquareFeet,
+    plot,
+    isEditForm,
+    showForm,
+    allPlotSale,
+    setAllPlotSale,
+    isEditPlotIdDetail,
+    setIsEditPlotIdDetail,
   };
   const sellDetailsData = {
     sellDate,
     setSellDate,
     sellPrice,
     setSellPrice,
-
-    // developmentChargePercent,
-    // setDevelopmentChargePercent,
   };
   const customerDetailsData = {
     customerCNIC,
@@ -191,10 +192,9 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   };
   return (
     <React.Fragment>
-      <PlotDetailsInput {...plotDetailsData} />
+      <PlotDetailsInputCard {...plotDetailsData} />
       <CustomerDetailsInput {...customerDetailsData} />
       <SellDetailsInput {...sellDetailsData} />
-
       {!showEditFieldFlag ? (
         <PaymentPlanInputCard
           tableRows={tableRows}
@@ -204,13 +204,11 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
       ) : (
         <PaymentPlanView
           paymentPlan={tableRows}
-          descriptionField={true}
           setTableRows={setTableRows}
           setShowEditFieldFlag={setShowEditFieldFlag}
           setIsEditPaymentPlan={setIsEditPaymentPlan}
         />
       )}
-
       <Group position="center" style={{ margin: "15px 0 0 0" }}>
         <Button size="xl" onClick={onSubmitForm}>
           Submit
