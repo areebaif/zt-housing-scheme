@@ -11,14 +11,16 @@ export const TotalsSummary: React.FC<TotalsSummaryProps> = (props) => {
   const { plots } = props;
   // Derived from Plots data from Props
   const notSoldPlots = plots?.filter(
-    (element) => element.status === "not_sold"
+    (element) => element.plot_status === "not_sold"
   );
   const partiallySold = plots?.filter(
-    (element) => element.status === "partially_paid"
+    (element) => element.plot_status === "partially_paid"
   );
-  const fullySold = plots?.filter((element) => element.status === "fully_paid");
+  const fullySold = plots?.filter(
+    (element) => element.plot_status === "fully_paid"
+  );
   const registryTransferred = plots?.filter(
-    (element) => element.status === "registry_transferred"
+    (element) => element.plot_status === "registry_transferred"
   );
   // Render
   return (

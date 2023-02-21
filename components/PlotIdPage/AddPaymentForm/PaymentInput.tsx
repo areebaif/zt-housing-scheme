@@ -23,7 +23,6 @@ export const PaymentInput: React.FC<PaymentInputProps> = (props) => {
       <Card.Section withBorder inheritPadding py="xs">
         <Title order={3}>{title}</Title>
       </Card.Section>
-
       <PaymentInputTable
         tableRows={tableRows}
         setTableRows={setTableRows}

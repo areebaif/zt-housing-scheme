@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../../db/prisma";
 import { ReturnError } from "../customer/all";
+
 export interface PaymentStatus {
   paymentStatus: PaymentSchedule[];
 }
@@ -54,7 +55,7 @@ type SQLQueryTotalPlannedPayment = {
   plot_id: number;
 };
 
-export default async function allCustomers(
+export default async function paymentStatus(
   req: NextApiRequest,
   res: NextApiResponse<PaymentStatus | ReturnError>
 ) {

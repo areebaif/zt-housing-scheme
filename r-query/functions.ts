@@ -5,6 +5,7 @@ import { CustomerSelectFields, ReturnError } from "@/pages/api/customer/all";
 import { PaymentStatus } from "@/pages/api/payment/paymentStatus";
 import { TableRowItem } from "../components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 import { PostReturnType } from "@/pages/api/payment/add";
+import { NotSoldPlotsSelectFields } from "@/pages/api/plot/notSold";
 
 export const fetchAllPlots = async () => {
   const response = await fetch("/api/plot/all", {
@@ -13,11 +14,25 @@ export const fetchAllPlots = async () => {
       "Content-Type": "application/json",
     },
   });
-  console.log(response);
+
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
   const res: PlotsSelectFields[] = await response.json();
+  return res;
+};
+
+export const fetchNotSoldPlots = async () => {
+  const response = await fetch("/api/plot/notSold", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const res: NotSoldPlotsSelectFields[] = await response.json();
   return res;
 };
 
@@ -86,8 +101,7 @@ export const postEditPlotSale = async (data: any) => {
 
 export const postPlotPayment = async (data: {
   payment: TableRowItem[];
-  customerId: string;
-  plotId: string;
+  saleId: number;
 }) => {
   const response = await fetch(`/api/payment/add`, {
     method: "POST",

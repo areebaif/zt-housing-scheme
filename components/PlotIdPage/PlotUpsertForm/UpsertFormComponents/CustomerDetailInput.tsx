@@ -161,6 +161,7 @@ export const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (
               setIsEditFlag={setIsEditFlag}
               setCustomerName={setCustomerName}
               setSonOf={setSonOf}
+              setIsNewCustomer={setIsNewCustomer}
             />
           )
         ) : (
@@ -173,6 +174,7 @@ export const CustomerDetailsInput: React.FC<CustomerDetailsInputProps> = (
             setIsEditFlag={setIsEditFlag}
             setCustomerName={setCustomerName}
             setSonOf={setSonOf}
+            setIsNewCustomer={setIsNewCustomer}
           />
         )}
       </Card.Section>
@@ -189,6 +191,7 @@ type CustomerDetailCardProps = {
   setIsEditFlag: (val: boolean) => void;
   setCustomerName: (va: string) => void;
   setSonOf: (va: string) => void;
+  setIsNewCustomer: (val: boolean) => void;
 };
 
 const CustomerDetailCard: React.FC<CustomerDetailCardProps> = (
@@ -203,6 +206,7 @@ const CustomerDetailCard: React.FC<CustomerDetailCardProps> = (
     setIsEditFlag,
     setCustomerName,
     setSonOf,
+    setIsNewCustomer,
   } = props;
 
   return (
@@ -245,6 +249,7 @@ const CustomerDetailCard: React.FC<CustomerDetailCardProps> = (
           setShowCustomerCard(false);
           setCustomerName("");
           setSonOf("");
+          setIsNewCustomer(false);
         }}
       >
         Edit

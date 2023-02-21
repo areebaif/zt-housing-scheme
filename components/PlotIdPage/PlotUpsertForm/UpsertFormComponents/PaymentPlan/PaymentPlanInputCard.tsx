@@ -1,37 +1,48 @@
 import * as React from "react";
 import { Card, Title } from "@mantine/core";
-import { PaymentPlanTable } from "./PaymentPlanInput";
+import { PaymentPlanInputTable } from "./PaymentPlanInputTable";
 import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
+import { PaymentPlanInput } from "./PaymentPlanInput";
+import { PaymentPlanEditView } from "./PaymentPlanEditView";
 
 // export enum TypePayment {
 //   down_payment = "down_payment",
-//   development_charge = "development_charge",
+//   development_charge = "development_charge",""
 //   installment = "installment",
 //   other = "other",
 // }
 
-type PaymentPlanInputProps = {
+type PaymentPlanInputCardProps = {
   tableRows: TableRowItem[];
   setTableRows: (rows: TableRowItem[]) => void;
-  title: string;
+
+  showEditFieldFlag: boolean;
+  setShowEditFieldFlag: (val: boolean) => void;
+  setIsEditPaymentPlan: (val: boolean) => void;
 };
 
-export const PaymentPlanInputCard: React.FC<PaymentPlanInputProps> = (
+export const PaymentPlanInputCard: React.FC<PaymentPlanInputCardProps> = (
   props
 ) => {
-  const { tableRows, setTableRows, title } = props;
-  return (
-    <Card
-      shadow="sm"
-      p="lg"
-      radius="md"
-      withBorder
-      style={{ overflow: "inherit", margin: "15px 0 0 0" }}
-    >
-      <Card.Section withBorder inheritPadding py="xs">
-        <Title order={3}>{title}</Title>
-      </Card.Section>
-      <PaymentPlanTable tableRows={tableRows} setTableRows={setTableRows} />
-    </Card>
+  const {
+    tableRows,
+    setTableRows,
+    showEditFieldFlag,
+    setIsEditPaymentPlan,
+    setShowEditFieldFlag,
+  } = props;
+  return !showEditFieldFlag ? (
+    <PaymentPlanInput
+      tableRows={tableRows}
+      setTableRows={setTableRows}
+      title={"Payment Plan"}
+    />
+  ) : (
+    <PaymentPlanEditView
+      paymentPlan={tableRows}
+      setTableRows={setTableRows}
+      setShowEditFieldFlag={setShowEditFieldFlag}
+      setIsEditPaymentPlan={setIsEditPaymentPlan}
+    />
   );
 };

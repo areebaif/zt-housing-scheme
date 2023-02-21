@@ -2,45 +2,29 @@ import * as React from "react";
 import { Card, Group, Button, Title, Table, TextInput } from "@mantine/core";
 import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 
-type PaymentPlanView = {
+type PaymentPlanEditView = {
   paymentPlan: TableRowItem[];
-  descriptionField?: boolean;
   setTableRows: (val: TableRowItem[]) => void;
-  //isEditForm: boolean;
   setShowEditFieldFlag: (val: boolean) => void;
   setIsEditPaymentPlan: (val: boolean) => void;
 };
 
-export const PaymentPlanView: React.FC<PaymentPlanView> = (
-  props: PaymentPlanView
+export const PaymentPlanEditView: React.FC<PaymentPlanEditView> = (
+  props: PaymentPlanEditView
 ) => {
   const {
     paymentPlan,
-    descriptionField,
     setTableRows,
     setShowEditFieldFlag,
     setIsEditPaymentPlan,
   } = props;
 
-  const jsxRows: JSX.Element[] = [];
-
-  paymentPlan.forEach((item, index) => {
-    const key = index;
-    const date = new Date(`${item.dateISOString}`);
-    const paymentType = item.paymentType;
-    const description = item.description;
-    const dateString = date.toDateString();
-    const value = item.value;
-
-    jsxRows.push(
-      <tr key={key}>
-        <td>{dateString}</td>
-        <td>{paymentType}</td>
-        <td>{description}</td>
-        <td>{value}</td>
-      </tr>
-    );
-  });
+  let TotalValue = 0;
+  paymentPlan.length
+    ? paymentPlan.forEach((item) => {
+        return (TotalValue = TotalValue + item.value!);
+      })
+    : 0;
 
   return (
     <Card
@@ -82,11 +66,34 @@ export const PaymentPlanView: React.FC<PaymentPlanView> = (
               <tr>
                 <th>Date</th>
                 <th>Payment Type</th>
-                {descriptionField ? <th>Description</th> : undefined}
                 <th>Value</th>
               </tr>
             </thead>
-            <tbody>{jsxRows}</tbody>
+            <tbody>
+              {paymentPlan.map((item, index) => {
+                const key = index;
+                const date = new Date(`${item.dateISOString}`);
+                const paymentType = item.paymentType;
+                const dateString = date.toDateString();
+                const value = item.value;
+                return (
+                  <tr key={key}>
+                    <td>{dateString}</td>
+                    <td>{paymentType}</td>
+                    <td>{`${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                  </tr>
+                );
+              })}
+              {paymentPlan.length ? (
+                <tr key={paymentPlan.length}>
+                  <td>Total</td>
+                  <td></td>
+                  <td>
+                    {`${TotalValue}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </td>
+                </tr>
+              ) : undefined}
+            </tbody>
           </Table>
         </Card.Section>
       </Card>

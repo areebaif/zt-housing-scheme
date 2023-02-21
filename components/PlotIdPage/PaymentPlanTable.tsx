@@ -2,11 +2,11 @@ import * as React from "react";
 import { Table, Text, Title, Card } from "@mantine/core";
 import { Payment_Plan } from "@prisma/client";
 
-export interface PaymentPlanTable {
+export type PaymentPlanTable = {
   tableRows?: Payment_Plan[];
   customerName?: string;
   sonOf?: string | null;
-}
+};
 
 export const PaymentPlanTable: React.FC<PaymentPlanTable> = (
   PaymentPlanTable
@@ -16,11 +16,9 @@ export const PaymentPlanTable: React.FC<PaymentPlanTable> = (
     const date = new Date(`${element.payment_date}`);
     return (
       <tr key={element.id}>
-        <td>{element.plot_id}</td>
         <td>{customerName}</td>
         <td>{sonOf}</td>
         <td>{element.payment_type}</td>
-        <td>{element.description}</td>
         <td>{date.toDateString()}</td>
         <td>
           {`${element.payment_value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -44,11 +42,9 @@ export const PaymentPlanTable: React.FC<PaymentPlanTable> = (
         <Table fontSize={"lg"} highlightOnHover>
           <thead>
             <tr>
-              <th>Plot Number</th>
               <th>Customer Name</th>
               <th>Son/ of</th>
               <th>Payment Type</th>
-              <th>Description</th>
               <th>Estimated Payment Date</th>
               <th>Estimated Payment Value</th>
             </tr>

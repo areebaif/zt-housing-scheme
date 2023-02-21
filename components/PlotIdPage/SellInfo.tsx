@@ -25,8 +25,8 @@ export const SellInfo: React.FC<SellInfoProps> = (props) => {
             <Text span weight={"bold"}>
               Sell Price:{" "}
             </Text>
-            {plotDetail?.plot?.sold_price
-              ? `${plotDetail?.plot?.sold_price}`.replace(
+            {plotDetail?.sale?.sold_price
+              ? `${plotDetail?.sale?.sold_price}`.replace(
                   /\B(?=(\d{3})+(?!\d))/g,
                   ","
                 )
@@ -36,8 +36,8 @@ export const SellInfo: React.FC<SellInfoProps> = (props) => {
             <Text span weight={"bold"}>
               Sell Date:{" "}
             </Text>
-            {plotDetail?.plot.sold_date
-              ? new Date(`${plotDetail?.plot.sold_date}`).toDateString()
+            {plotDetail?.sale?.sold_date
+              ? new Date(`${plotDetail?.sale?.sold_date}`).toDateString()
               : ""}
           </Text>
           <Text>

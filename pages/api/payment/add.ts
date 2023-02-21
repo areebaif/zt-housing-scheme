@@ -14,20 +14,23 @@ export default async function addPayment(
   res: NextApiResponse<PostReturnType>
 ) {
   try {
+    console.log(
+      req.body,
+      " I am here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    );
     const payment = req.body.payment as TableRowItem[];
-    const customerId = req.body.customerId as string;
-    const plotId = req.body.plotId as string;
-    const parsedCustomerId = parseInt(customerId);
-    const parsedPlotId = parseInt(plotId);
+    //const customerId = req.body.customerId as string;
+    const saleId = req.body.saleId as number;
+    //const parsedCustomerId = parseInt(customerId);
+    //const parsedPlotId = parseInt(plotId);
 
     const parsedTableRows = payment.map((item) => {
       return {
+        description: item.description,
+        payment_type: item.paymentType,
+        sale_id: saleId,
         payment_date: item.dateISOString,
         payment_value: item.value!,
-        payment_type: item.paymentType,
-        plot_id: parsedPlotId,
-        customer_id: parsedCustomerId,
-        description: item.description,
       };
     });
 
@@ -37,17 +40,17 @@ export default async function addPayment(
 
     const totalPayments = await prisma.$queryRaw<
       { total_payment_value: number }[]
-    >`select sum(payment_value) as total_payment_value from Payments where plot_id=${parsedPlotId};`;
-    const soldPrice = await prisma.plot.findUnique({
+    >`select sum(payment_value) as total_payment_value from Payments where sale_id=${saleId};`;
+    const soldPrice = await prisma.sale.findUnique({
       where: {
-        id: parsedPlotId,
+        id: saleId,
       },
       select: {
-        sold_price: true,
+        total_sale_price: true,
       },
     });
 
-    if (totalPayments[0].total_payment_value! >= soldPrice?.sold_price!) {
+    if (totalPayments[0].total_payment_value! >= soldPrice?.total_sale_price!) {
       const sortedPayments = [...payment];
 
       sortedPayments.sort((a: TableRowItem, b: TableRowItem) => {
@@ -58,12 +61,12 @@ export default async function addPayment(
       });
       const soldDate = sortedPayments[sortedPayments.length - 1].dateISOString;
 
-      const fullySoldPlot = await prisma.plot.update({
+      const fullySoldPlot = await prisma.plot.updateMany({
         where: {
-          id: parsedPlotId,
+          sale_id: saleId,
         },
         data: {
-          status: "fully_paid",
+          plot_status: "fully_paid",
           fully_sold_date: soldDate,
         },
       });
@@ -72,6 +75,6 @@ export default async function addPayment(
   } catch (err) {
     return res
       .status(404)
-      .json({ error: "something went wrong please trey again" });
+      .json({ error: "something went wrong please try again" });
   }
 }

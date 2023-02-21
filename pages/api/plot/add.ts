@@ -1,9 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Payment_Plan, Plot } from "@prisma/client";
 import { prisma } from "../../../db/prisma";
 import { PostReturnType } from "../payment/add";
 import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
+import { AllPlotId } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
+import { CustomerFormPost } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
+import { PaymentPlanSelectFields } from "./edit";
 
 export interface PlotsSelectFields {
   id: number;
@@ -17,21 +19,23 @@ export default async function upsertPlots(
   res: NextApiResponse<PostReturnType>
 ) {
   try {
-    const { plotId, sellPrice, soldDateString, customer, paymentPlan } =
-      req.body;
-    // things to check for
-    // 1 new customer existing customer
+    const paymentPlan = req.body.paymentPlan as TableRowItem[];
+    const customer = req.body.customer as CustomerFormPost;
+    const plotId = req.body.plotId as AllPlotId[];
+    const sellPrice = req.body.sellPrice as number;
+    const soldDateString = req.body.soldDateString as string;
 
-    const parsedPlotId = parseInt(plotId);
     // check existing customer or new customer
-    let customerId: number | undefined;
+    let customerId: number;
 
     if (!customer.newCustomer) {
       const customerVal = await prisma.customer.findUnique({
         where: { cnic: customer.customerCNIC },
       });
-      customerId = customerVal?.id;
-      if (!customerId) throw new Error("cannot find customer with supplied Id");
+
+      if (!customerVal?.id)
+        throw new Error("cannot find customer with supplied Id");
+      customerId = customerVal.id;
     } else {
       const customerMaxId = await prisma.customer.aggregate({
         _max: {
@@ -43,28 +47,42 @@ export default async function upsertPlots(
         : 1;
       customerId = customerInsertId;
     }
-
-    const updatePlot = prisma.plot.update({
-      where: {
-        id: parsedPlotId,
-      },
-      data: {
-        customer_id: customerId,
-        status: "partially_paid",
-        sold_date: soldDateString,
-        fully_sold_date: soldDateString,
-        sold_price: sellPrice,
+    const saleMaxId = await prisma.sale.aggregate({
+      _max: {
+        id: true,
       },
     });
+    const saleInsertId = saleMaxId._max.id ? saleMaxId._max.id + 1 : 1;
+    // add sale reciept
+    const sale = prisma.sale.create({
+      data: {
+        id: saleInsertId,
+        customer_id: customerId,
+        sold_date: soldDateString,
+        total_sale_price: sellPrice,
+      },
+    });
+    // update Plots
+    const updatePlot = plotId.map((plot) => {
+      return prisma.plot.update({
+        where: {
+          id: plot.id,
+        },
+        data: {
+          sale_price: plot.sellPrice,
+          plot_status: "partially_paid",
+          sale_id: saleInsertId,
+        },
+      });
+    });
 
-    const paymentPlanArr: Payment_Plan[] = paymentPlan.map(
-      (item: TableRowItem) => {
+    const paymentPlanArr: PaymentPlanSelectFields[] = paymentPlan.map(
+      (item) => {
         return {
-          payment_date: item.dateISOString,
           payment_type: item.paymentType,
+          sale_id: saleInsertId,
+          payment_date: item.dateISOString,
           payment_value: item.value,
-          plot_id: parsedPlotId,
-          customer_id: customerId,
         };
       }
     );
@@ -74,7 +92,7 @@ export default async function upsertPlots(
     });
 
     if (!customer.newCustomer) {
-      await prisma.$transaction([updatePlot, payment_plan]);
+      await prisma.$transaction([...updatePlot, payment_plan, sale]);
     } else {
       const addCustomer = prisma.customer.create({
         data: {
@@ -84,12 +102,17 @@ export default async function upsertPlots(
           cnic: customer.customerCNIC,
         },
       });
-      await prisma.$transaction([addCustomer, updatePlot, payment_plan]);
+      await prisma.$transaction([
+        addCustomer,
+        ...updatePlot,
+        payment_plan,
+        sale,
+      ]);
     }
     res.status(201).json({ created: true });
   } catch (err) {
     return res
       .status(404)
-      .json({ error: "something went wrong please trey again" });
+      .json({ error: "something went wrong please try again" });
   }
 }

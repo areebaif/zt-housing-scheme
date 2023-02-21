@@ -209,7 +209,9 @@ export const PaymentInputTable: React.FC<PaymentInputTableProps> = (
                     {showDescriptionField ? (
                       <td>{item.description}</td>
                     ) : undefined}
-                    <td>{item.value}</td>
+                    <td>
+                      {`${item.value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </td>
                     <td>
                       <Button
                         variant="outline"
