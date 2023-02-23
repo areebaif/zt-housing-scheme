@@ -39,6 +39,8 @@ export const PlotIdInput: React.FC<PlotIdInput> = (props: PlotIdInput) => {
     return plot;
   };
   const handleAddPlot = () => {
+    if (!selectPlotIdVal || !individualPlotSalePrice)
+      throw new Error("you must enter plot number and sale price");
     const result = findPlot();
     setAllPlotSale([
       ...allPlotSale,

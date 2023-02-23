@@ -10,7 +10,7 @@ export type SellInfoProps = {
 export const SellInfo: React.FC<SellInfoProps> = (props) => {
   const { plotDetail, totalPayment } = props;
   return (
-    <Card shadow="sm" p="lg" radius="md" withBorder>
+    <Card style={{ height: "100%" }} shadow="sm" p="lg" radius="md" withBorder>
       <Card.Section withBorder inheritPadding py="xs">
         <Title order={3}>Sell Information </Title>
       </Card.Section>

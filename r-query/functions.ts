@@ -2,7 +2,7 @@ import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
 import { PlotsSelectFields } from "../pages/api/plot/all";
 import { PlotDetail } from "../pages/api/plot/[id]";
 import { CustomerSelectFields, ReturnError } from "@/pages/api/customer/all";
-import { PaymentStatus } from "@/pages/api/payment/paymentStatus";
+import { PaymentStatusByPlot } from "@/pages/api/payment/paymentStatus";
 import { TableRowItem } from "../components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 import { PostReturnType } from "@/pages/api/payment/add";
 import { NotSoldPlotsSelectFields } from "@/pages/api/plot/notSold";
@@ -127,6 +127,6 @@ export const fetchPaymentStatus = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  const res: PaymentStatus = await response.json();
+  const res: PaymentStatusByPlot = await response.json();
   return res;
 };

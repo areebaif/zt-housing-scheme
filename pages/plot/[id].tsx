@@ -84,7 +84,7 @@ const PlotId: React.FC = () => {
     setIsEditForm,
     setShowForm,
     showForm,
-    plotSaleId: plotDetail.sale?.plotSaleId
+    plotSaleId: plotDetail.sale?.plotSaleId,
   };
 
   const addPaymentProps = {
@@ -98,7 +98,7 @@ const PlotId: React.FC = () => {
       : "",
     cnic: plotDetail.customer?.cnic ? plotDetail.customer?.cnic : "",
     setShowAddPaymentForm,
-    plotSaleId: plotDetail.sale?.plotSaleId
+    plotSaleId: plotDetail.sale?.plotSaleId,
   };
 
   return !showForm && !showAddPaymentForm ? (
@@ -134,7 +134,7 @@ const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
   } = props;
   return (
     <React.Fragment>
-      <Grid align={"stretch"} style={{ margin: "25px 0 0 0" }}>
+      <Grid align={"stretch"}>
         <Grid.Col span={"auto"}>
           <PlotBasicInfo
             plotDetail={plotDetail}
