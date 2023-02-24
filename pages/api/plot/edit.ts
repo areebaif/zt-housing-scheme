@@ -133,6 +133,8 @@ export default async function editPlots(
             name: customer.customerName,
             son_of: customer.sonOf,
             cnic: customer.customerCNIC,
+            address: customer.customerAddress,
+            phone_number: customer.customerPhone,
           },
         });
         // do these transactions in a lock
@@ -166,6 +168,8 @@ export default async function editPlots(
             name: customer.customerName,
             son_of: customer.sonOf,
             cnic: customer.customerCNIC,
+            address: customer.customerAddress,
+            phone_number: customer.customerPhone,
           },
         });
         // do these transactions in a lock
@@ -212,6 +216,8 @@ export default async function editPlots(
             name: customer.customerName,
             son_of: customer.sonOf,
             cnic: customer.customerCNIC,
+            address: customer.customerAddress,
+            phone_number: customer.customerPhone,
           },
         });
         // do these transactions in a lock
@@ -232,6 +238,8 @@ export default async function editPlots(
             name: customer.customerName,
             son_of: customer.sonOf,
             cnic: customer.customerCNIC,
+            address: customer.customerAddress,
+            phone_number: customer.customerPhone,
           },
         });
         // do these transactions in a lock

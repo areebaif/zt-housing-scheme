@@ -37,7 +37,7 @@ export const AddIndividualItemInput: React.FC<AddIndividualItemInput> = (
   } = props;
   return (
     <Card.Section inheritPadding py="md">
-      <Title order={5}>Add Individual Item</Title>
+      <Title order={5}>Add Individual Payment</Title>
       <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
         <DatePicker
           inputFormat="ddd MMM D YYYY"

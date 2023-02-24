@@ -6,7 +6,6 @@ import {
   Customer,
   Payments,
   Payment_Plan,
-  Prisma,
 } from "@prisma/client";
 import { ReturnError } from "../customer/all";
 import { prisma } from "../../../db/prisma";
@@ -42,6 +41,7 @@ export default async function allPosts(
       const plotSale = await prisma.sale.findUnique({
         where: { id: saleId },
       });
+
       const customerId = plotSale?.customer_id;
 
       const customer = await prisma.customer.findUnique({

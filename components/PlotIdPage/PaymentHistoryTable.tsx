@@ -41,7 +41,7 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
     >
       <Card.Section withBorder inheritPadding py="xs">
         <Group position="apart">
-          <Title order={3}>History</Title>
+          <Title order={3}>Payment History</Title>
           <Button
             onClick={() => {
               setShowAddPaymentForm(true);

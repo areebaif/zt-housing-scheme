@@ -30,6 +30,8 @@ export type CustomerFormPost = {
   customerName: string;
   sonOf: string;
   newCustomer: boolean;
+  customerPhone: string;
+  customerAddress: string;
 };
 
 export type FormPostProps = {
@@ -48,6 +50,8 @@ type AddSaleFormProps = {
   name: string;
   son_of: string;
   cnic: string;
+  phone: string;
+  address: string;
   soldDate: Date | null;
   futurePaymentPlan: TableRowItem[] | [];
   isEditForm: boolean;
@@ -65,6 +69,8 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     name,
     son_of,
     cnic,
+    phone,
+    address,
     soldDate,
     futurePaymentPlan,
     isEditForm,
@@ -87,6 +93,8 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   const [customerName, setCustomerName] = React.useState(name);
   const [sonOf, setSonOf] = React.useState(son_of);
   const [customerCNIC, setCustomerCNIC] = React.useState(cnic);
+  const [customerPhone, setCustomerPhone] = React.useState(phone);
+  const [customerAddress, setCustomerAddres] = React.useState(address);
   //existing customer props
   const [existingCustomerBackendData, setExistingCustomerBackendData] =
     React.useState<CustomerSelectFields[] | undefined>([]);
@@ -125,8 +133,17 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
       );
     //customer data fields validation
     if (!customerCNIC) throw new Error("Please enter cnic");
-    if (isNewCustomer && (!customerName || !customerCNIC || !sonOf))
-      throw new Error("please enter customer name son of and cnic");
+    if (
+      isNewCustomer &&
+      (!customerName ||
+        !customerCNIC ||
+        !sonOf ||
+        !customerAddress ||
+        !customerPhone)
+    )
+      throw new Error(
+        "please enter customer name son of, phone no, address and cnic"
+      );
     // payment plan field validation
     const hasDownPayment = tableRows.filter((item) => {
       return item.paymentType === "down_payment";
@@ -144,6 +161,8 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
         customerName,
         sonOf,
         newCustomer: isNewCustomer,
+        customerPhone,
+        customerAddress,
       },
       paymentPlan: tableRows,
       isEditPaymentPlan,
@@ -151,7 +170,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
       plotSaleId,
     };
     console.log(data);
-    mutation.mutate(data);
+    //mutation.mutate(data);
   };
 
   React.useEffect(() => {
@@ -195,6 +214,10 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     isNewCustomer,
     setIsNewCustomer,
     isEditForm,
+    customerPhone,
+    setCustomerPhone,
+    customerAddress,
+    setCustomerAddres,
   };
   const paymentPlanInputCard = {
     tableRows,

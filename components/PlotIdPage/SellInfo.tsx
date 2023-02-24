@@ -50,6 +50,12 @@ export const SellInfo: React.FC<SellInfoProps> = (props) => {
           </Text>
           <Text>
             <Text span weight={"bold"}>
+              Customer CNIC:
+            </Text>{" "}
+            {plotDetail?.customer?.cnic}
+          </Text>
+          <Text>
+            <Text span weight={"bold"}>
               Customer Name:
             </Text>{" "}
             {plotDetail?.customer?.name}
@@ -62,9 +68,15 @@ export const SellInfo: React.FC<SellInfoProps> = (props) => {
           </Text>
           <Text>
             <Text span weight={"bold"}>
-              Customer CNIC:
-            </Text>{" "}
-            {plotDetail?.customer?.cnic}
+              Phone No:{" "}
+            </Text>
+            {plotDetail?.customer?.phone_number}{" "}
+          </Text>
+          <Text>
+            <Text span weight={"bold"}>
+              Address:{" "}
+            </Text>
+            {plotDetail?.customer?.address}{" "}
           </Text>
         </Flex>
       </Card.Section>

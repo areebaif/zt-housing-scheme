@@ -42,7 +42,7 @@ export const AddRecurringItemsInput: React.FC<AddRecurringItemProps> = (
 
   return (
     <Card.Section inheritPadding py="md">
-      <Title order={5}>Add Recurring Items</Title>
+      <Title order={5}>Add Recurring Installment</Title>
       <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
         <DatePicker
           inputFormat="ddd MMM D YYYY"
@@ -58,13 +58,13 @@ export const AddRecurringItemsInput: React.FC<AddRecurringItemProps> = (
           value={recurringPlanEndDate}
           onChange={setRecurringPlanEndDate}
         />
-        <Select
+        {/* <Select
           value={PaymentType.installment}
           readOnly
           //onChange={onSetRecurringPaymentType}
           label={"payment type"}
           data={data}
-        />
+        /> */}
         <NumberInput
           hideControls={true}
           label="recurring month"
