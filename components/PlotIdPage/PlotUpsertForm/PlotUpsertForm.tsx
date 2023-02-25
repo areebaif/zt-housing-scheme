@@ -169,8 +169,8 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
       isEditPlotIdDetail,
       plotSaleId,
     };
-    console.log(data);
-    //mutation.mutate(data);
+    //console.log(data);
+    mutation.mutate(data);
   };
 
   React.useEffect(() => {

@@ -1,12 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import {
-  Plot,
-  Status,
-  Customer,
-  Payments,
-  Payment_Plan,
-} from "@prisma/client";
+import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
 import { ReturnError } from "../customer/all";
 import { prisma } from "../../../db/prisma";
 
@@ -90,6 +84,6 @@ export default async function allPosts(
   } catch (error) {
     return res
       .status(404)
-      .json({ error: "something went wrong please trey again" });
+      .json({ error: "something went wrong please try again" });
   }
 }
