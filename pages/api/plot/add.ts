@@ -100,6 +100,8 @@ export default async function upsertPlots(
           name: customer.customerName,
           son_of: customer.sonOf,
           cnic: customer.customerCNIC,
+          address: customer.customerAddress,
+          phone_number: customer.customerPhone,
         },
       });
       await prisma.$transaction([

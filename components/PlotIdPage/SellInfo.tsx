@@ -10,7 +10,7 @@ export type SellInfoProps = {
 export const SellInfo: React.FC<SellInfoProps> = (props) => {
   const { plotDetail, totalPayment } = props;
   return (
-    <Card shadow="sm" p="lg" radius="md" withBorder>
+    <Card style={{ height: "100%" }} shadow="sm" p="lg" radius="md" withBorder>
       <Card.Section withBorder inheritPadding py="xs">
         <Title order={3}>Sell Information </Title>
       </Card.Section>
@@ -50,6 +50,12 @@ export const SellInfo: React.FC<SellInfoProps> = (props) => {
           </Text>
           <Text>
             <Text span weight={"bold"}>
+              Customer CNIC:
+            </Text>{" "}
+            {plotDetail?.customer?.cnic}
+          </Text>
+          <Text>
+            <Text span weight={"bold"}>
               Customer Name:
             </Text>{" "}
             {plotDetail?.customer?.name}
@@ -62,9 +68,15 @@ export const SellInfo: React.FC<SellInfoProps> = (props) => {
           </Text>
           <Text>
             <Text span weight={"bold"}>
-              Customer CNIC:
-            </Text>{" "}
-            {plotDetail?.customer?.cnic}
+              Phone No:{" "}
+            </Text>
+            {plotDetail?.customer?.phone_number}{" "}
+          </Text>
+          <Text>
+            <Text span weight={"bold"}>
+              Address:{" "}
+            </Text>
+            {plotDetail?.customer?.address}{" "}
           </Text>
         </Flex>
       </Card.Section>

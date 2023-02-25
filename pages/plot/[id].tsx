@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import * as ReactQuery from "@tanstack/react-query";
 import { Grid, Loader } from "@mantine/core";
 import { fetchPlotById } from "../../r-query/functions";
-import { PaymentType } from "@prisma/client";
 
 import {
   PaymentPlanTable,
@@ -76,6 +75,10 @@ const PlotId: React.FC = () => {
     name: plotDetail.customer?.name ? plotDetail.customer?.name : "",
     son_of: plotDetail.customer?.son_of ? plotDetail.customer?.son_of : "",
     cnic: plotDetail.customer?.cnic ? plotDetail.customer?.cnic : "",
+    phone: plotDetail.customer?.phone_number
+      ? plotDetail.customer?.phone_number
+      : "",
+    address: plotDetail.customer?.address ? plotDetail.customer?.address : "",
     soldDate: plotDetail.sale?.sold_date
       ? new Date(plotDetail.sale?.sold_date)
       : null,
@@ -84,7 +87,7 @@ const PlotId: React.FC = () => {
     setIsEditForm,
     setShowForm,
     showForm,
-    plotSaleId: plotDetail.sale?.plotSaleId
+    plotSaleId: plotDetail.sale?.plotSaleId,
   };
 
   const addPaymentProps = {
@@ -98,7 +101,7 @@ const PlotId: React.FC = () => {
       : "",
     cnic: plotDetail.customer?.cnic ? plotDetail.customer?.cnic : "",
     setShowAddPaymentForm,
-    plotSaleId: plotDetail.sale?.plotSaleId
+    plotSaleId: plotDetail.sale?.plotSaleId,
   };
 
   return !showForm && !showAddPaymentForm ? (
@@ -134,7 +137,7 @@ const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
   } = props;
   return (
     <React.Fragment>
-      <Grid align={"stretch"} style={{ margin: "25px 0 0 0" }}>
+      <Grid align={"stretch"}>
         <Grid.Col span={"auto"}>
           <PlotBasicInfo
             plotDetail={plotDetail}
