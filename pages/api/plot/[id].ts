@@ -13,8 +13,13 @@ export interface PlotDetail {
   };
   customer?: Customer | null;
   payment_history?: Payments[];
-  payment_plan?: Payment_Plan[];
+  payment_plan?: PaymentPlan[];
 }
+
+type PaymentStatus = {
+  status: string;
+};
+type PaymentPlan = Payment_Plan & PaymentStatus;
 
 export default async function allPosts(
   req: NextApiRequest,
@@ -51,6 +56,10 @@ export default async function allPosts(
           payment_date: "asc",
         },
       });
+      let sumPayments = 0;
+      payments.forEach((item) => {
+        sumPayments = sumPayments + item.payment_value;
+      });
       const paymentPlan = await prisma.payment_Plan.findMany({
         where: {
           sale_id: saleId,
@@ -59,6 +68,34 @@ export default async function allPosts(
           payment_date: "asc",
         },
       });
+      let sumPaymentPlan = 0;
+      let lastPaymentPlanValue = paymentPlan[0].payment_value; // index -1
+      let firstHit = false;
+      const planPaymentStatus = paymentPlan.map((item, index) => {
+        // set lastPaymentPlanValue
+        if (index - 1 > 0) {
+          lastPaymentPlanValue = paymentPlan[index - 1].payment_value;
+        }
+        // set paymentValue
+        item.payment_value
+          ? (sumPaymentPlan = sumPaymentPlan + item.payment_value)
+          : (sumPaymentPlan = sumPaymentPlan + 0);
+
+        if (sumPaymentPlan <= sumPayments) {
+          return { ...item, status: "paid" };
+        }
+        // case where the customer has paid according to payment plan
+        if (sumPaymentPlan - sumPayments === item.payment_value) {
+          return { ...item, status: "not paid" };
+        }
+        // case where customers have paid partially
+        if (sumPaymentPlan - sumPayments > 0 && !firstHit) {
+          firstHit = true;
+          return { ...item, status: "partially paid" };
+        }
+        return { ...item, status: "not paid" };
+      });
+
       const allPlots = await prisma.plot.findMany({
         where: { sale_id: saleId },
       });
@@ -75,8 +112,9 @@ export default async function allPosts(
         sale: saleInfo,
         customer: customer,
         payment_history: payments,
-        payment_plan: paymentPlan,
+        payment_plan: planPaymentStatus,
       };
+
       res.status(200).json(plotDetail);
     } else {
       res.status(200).json({ plot: [plot] });
