@@ -70,7 +70,8 @@ export default async function allPosts(
       });
       let sumPaymentPlan = 0;
       let lastPaymentPlanValue = paymentPlan[0].payment_value; // index -1
-      let firstHit = false;
+      let firstHit = true;
+      let properlyPaid = false;
       const planPaymentStatus = paymentPlan.map((item, index) => {
         // set lastPaymentPlanValue
         if (index - 1 > 0) {
@@ -80,17 +81,22 @@ export default async function allPosts(
         item.payment_value
           ? (sumPaymentPlan = sumPaymentPlan + item.payment_value)
           : (sumPaymentPlan = sumPaymentPlan + 0);
-
+        if (sumPayments === 0)
+          return {
+            ...item,
+            status: "not paid",
+          };
         if (sumPaymentPlan <= sumPayments) {
           return { ...item, status: "paid" };
         }
         // case where the customer has paid according to payment plan
         if (sumPaymentPlan - sumPayments === item.payment_value) {
+          properlyPaid = true;
           return { ...item, status: "not paid" };
         }
         // case where customers have paid partially
-        if (sumPaymentPlan - sumPayments > 0 && !firstHit) {
-          firstHit = true;
+        if (sumPaymentPlan - sumPayments > 0 && firstHit && !properlyPaid) {
+          firstHit = false;
           return { ...item, status: "partially paid" };
         }
         return { ...item, status: "not paid" };
