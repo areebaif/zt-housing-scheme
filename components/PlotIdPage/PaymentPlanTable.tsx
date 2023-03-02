@@ -79,7 +79,12 @@ export const PaymentPlanTable: React.FC<PaymentPlanTable> = (
                   <Text fz="xl">{element.status}</Text>
                 </Grid.Col>
                 <Grid.Col span={2}>
-                  <Text fz="xl">{element.payment_value}</Text>
+                  <Text fz="xl">
+                    {`${element.payment_value}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ","
+                    )}
+                  </Text>
                 </Grid.Col>
               </Grid>
             </React.Fragment>
