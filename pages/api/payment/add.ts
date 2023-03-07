@@ -17,10 +17,10 @@ export default async function addPayment(
     const payment = req.body.payment as TableRowItem[];
     const saleId = req.body.saleId as number;
     let sumPaymentToBeAdded = 0;
-
     const parsedTableRows = payment.map((item) => {
       item.value
-        ? (sumPaymentToBeAdded = sumPaymentToBeAdded + item.value)
+        ? (sumPaymentToBeAdded =
+            sumPaymentToBeAdded + parseInt(`${item.value}`))
         : (sumPaymentToBeAdded = sumPaymentToBeAdded + 0);
       return {
         description: item.description,
@@ -31,9 +31,15 @@ export default async function addPayment(
       };
     });
 
-    const totalPayments = await prisma.$queryRaw<
-      { total_payment_value: number }[]
-    >`select sum(payment_value) as total_payment_value from Payments where sale_id=${saleId};`;
+    const totalPayments = await prisma.payments.aggregate({
+      _sum: {
+        payment_value: true,
+      },
+      where: {
+        sale_id: saleId,
+      },
+    });
+
     const soldPrice = await prisma.sale.findUnique({
       where: {
         id: saleId,
@@ -44,9 +50,10 @@ export default async function addPayment(
     });
     // we need to check if adding these payments will ensure that plot is fully sold
     // If it is fully sold then we need to update plot status , hence these transactions need to happen in a lock
-    const sumAfterPaymentAdded =
-      totalPayments[0].total_payment_value + sumPaymentToBeAdded;
-
+    const sumAfterPaymentAdded = totalPayments._sum.payment_value
+      ? totalPayments._sum.payment_value + sumPaymentToBeAdded
+      : 0 + sumPaymentToBeAdded;
+      
     if (sumAfterPaymentAdded >= soldPrice?.total_sale_price!) {
       const sortedPayments = [...payment];
       sortedPayments.sort((a: TableRowItem, b: TableRowItem) => {
