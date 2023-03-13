@@ -1,5 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+// https://planetscale.com/docs/tutorials/automatic-prisma-migrations
 
 generator client {
   provider = "prisma-client-js"
@@ -96,4 +97,22 @@ model Sale_Registry {
   registry_given_to_phone String?
   registry_ready_for_customer_date DateTime?
   registry_transferred_to_customer DateTime?
+}
+
+model VerificationRequest {
+  id         String   @id @default(cuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String   @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
