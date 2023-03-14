@@ -4,6 +4,17 @@ import EmailProvider from "next-auth/providers/email";
 import { SessionStrategy } from "next-auth";
 import { prisma } from "@/db/prisma";
 
+if (
+  !process.env.EMAIL_SERVER_HOST ||
+  !process.env.EMAIL_SERVER_PORT ||
+  !process.env.EMAIL_SERVER_USER ||
+  !process.env.EMAIL_SERVER_PASSWORD ||
+  !process.env.EMAIL_FROM
+) {
+  throw new Error(
+    "provide google id and client secret!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  );
+}
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -18,11 +29,13 @@ export const authOptions = {
     // Defaults to `session.maxAge`.
     maxAge: 60 * 60 * 24 * 30,
   },
+
   providers: [
     EmailProvider({
+      // type: "email",
       server: {
         host: process.env.EMAIL_SERVER_HOST,
-        port: process.env.EMAIL_SERVER_PORT,
+        port: parseInt(process.env.EMAIL_SERVER_PORT),
         auth: {
           user: process.env.EMAIL_SERVER_USER,
           pass: process.env.EMAIL_SERVER_PASSWORD,
@@ -34,6 +47,6 @@ export const authOptions = {
   pages: {
     signIn: "/auth/signin",
     signOut: "/auth/signout",
-  }
+  },
 };
 export default NextAuth(authOptions);

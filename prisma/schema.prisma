@@ -99,20 +99,20 @@ model Sale_Registry {
   registry_transferred_to_customer DateTime?
 }
 
-model VerificationRequest {
-  id         String   @id @default(cuid())
+model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
   @@unique([identifier, token])
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String   @unique
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id            Int @id @default(autoincrement())
+  //name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  //image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
 }

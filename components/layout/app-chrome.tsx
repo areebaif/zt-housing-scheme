@@ -15,7 +15,6 @@ import {
 
 import { User } from "./User";
 import { IconMessages, IconDatabase, IconLogin } from "@tabler/icons-react";
-import process from "process";
 
 export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
   return (
@@ -86,10 +85,6 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
         },
       })}
       onClick={() => {
-        link === "/login";
-        //? signIn("google")
-        //: // : link === "/logout"
-        //? signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_DOMAIN_URL}` })
         router.push(link);
       }}
     >
@@ -142,7 +137,7 @@ const loginData = [
     icon: <IconLogin size={16} />,
     color: "violet",
     label: "Login",
-    link: "/login",
+    link: "/auth/signin",
   },
 ];
 
