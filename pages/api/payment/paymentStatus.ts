@@ -42,7 +42,7 @@ export type PaymentStatusBySaleIdCustomerId = PaymentPlanBySaleIdCustomerId &
 interface SumPaymentHistory {
   totalPaid: number;
   lastPaymentDate: string;
-  plot_id: string;
+  //plot_id: string;
   sale_id: number;
   customer_id: number;
   name: string;
@@ -50,11 +50,22 @@ interface SumPaymentHistory {
   cnic: string;
 }
 
+type SumPaymentHistoryWithPlotId = {
+  totalPaid: number;
+  lastPaymentDate: string;
+  plot_id: number[];
+  sale_id: number;
+  customer_id: number;
+  name: string;
+  son_of: string;
+  cnic: string;
+};
+
 type RemainingPayments = {
   totalPlannedPayments: number;
   remainingPayment?: number;
 };
-type PaymentHistoryWithRemainingPayments = SumPaymentHistory &
+type PaymentHistoryWithRemainingPayments = SumPaymentHistoryWithPlotId &
   RemainingPayments;
 
 export default async function paymentStatus(
@@ -68,14 +79,46 @@ export default async function paymentStatus(
 
     //, Customer.name, Customer.son_of, Customer.cnic // join  Customer on Customer.id = Sale.customer_id
     // totalPaid	lastPaymentDate	sale_id	customer_id,	name	son_of	cnic
-    const sumPaymentHistoryBySaleIdCustomerId = await prisma.$queryRaw<
+    const sumPaymentHistoryBySaleId = await prisma.$queryRaw<
       SumPaymentHistory[]
-    >`select SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate, Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of, GROUP_CONCAT(Plot.id) as plot_id from Payments join Sale on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id join Plot on Plot.sale_id=Sale.id  group by Sale.id,Customer.id;`;
+    >`select SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate, Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of from Payments join Sale on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id group by Sale.id,Customer.id;`;
 
     // payment_type	sale_id	payment_date	payment_value	created_at
     const paymentPlanBySaleId = await prisma.$queryRaw<
       PaymentPlanBySaleIdCustomerId[]
     >`select * from Payment_Plan order by payment_date, sale_id;`;
+
+    const plotData = await prisma.plot.findMany({
+      select: { id: true, sale_id: true },
+    });
+
+    const sumPaymentHistoryBySaleIdCustomerId: SumPaymentHistoryWithPlotId[] =
+      [];
+
+    sumPaymentHistoryBySaleId.forEach((el) => {
+      plotData.forEach((item) => {
+        if (item.sale_id === el.sale_id) {
+          if (sumPaymentHistoryBySaleIdCustomerId.length === 0) {
+            const obj = { ...el, plot_id: [item.id] };
+            sumPaymentHistoryBySaleIdCustomerId.push(obj);
+          } else {
+            const lastPlot =
+              sumPaymentHistoryBySaleIdCustomerId[
+                sumPaymentHistoryBySaleIdCustomerId.length - 1
+              ];
+            const lastplotSaleId = lastPlot.sale_id;
+            if (lastplotSaleId === el.sale_id) {
+              sumPaymentHistoryBySaleIdCustomerId[
+                sumPaymentHistoryBySaleIdCustomerId.length - 1
+              ].plot_id.push(item.id);
+            } else {
+              const obj = { ...el, plot_id: [item.id] };
+              sumPaymentHistoryBySaleIdCustomerId.push(obj);
+            }
+          }
+        }
+      });
+    });
 
     const paymentHistoryWithRemainingPayments = sumPaymentPlanBySaleId.map(
       (sumPaymentPlan) => {
@@ -111,9 +154,10 @@ export default async function paymentStatus(
             const difference = sum - totalPaid!;
             if (sum >= totalPaid! && difference > 0) {
               const payPlan = { ...element };
+              const plot_id = String(item?.plot_id);
               const obj: PaymentStatusBySaleIdCustomerId = {
                 ...element,
-                plot_id: item?.plot_id,
+                plot_id: plot_id,
                 name: item?.name!,
                 son_of: item?.son_of!,
                 cnic: item?.cnic!,
