@@ -1,4 +1,4 @@
-import { PaymentType } from "@prisma/client";
+import { PaymentType, Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../../db/prisma";
@@ -69,6 +69,8 @@ export default async function paymentStatus(
 ) {
   try {
     // payment_value, sale_id (total payment plan value by sale id)
+    //     const sumPaymentPlanBySaleId = await prisma.$queryRaw<SumPaymentPlan[]>`
+    //   select sum(payment_value) as payment_value, sale_id from Payment_Plan group by sale_id;`;
     const sumPaymentPlanBySaleId = await prisma.payment_Plan.groupBy({
       by: ["sale_id"],
       _sum: {
@@ -79,7 +81,8 @@ export default async function paymentStatus(
     const paymentPlanBySaleId = await prisma.$queryRaw<
       PaymentPlanBySaleIdCustomerId[]
     >`select * from Payment_Plan order by payment_date, sale_id;`;
-    
+
+    //, Customer.name, Customer.son_of, Customer.cnic // join  Customer on Customer.id = Sale.customer_id
     // totalPaid	lastPaymentDate	sale_id	customer_id,	name	son_of	cnic
     // TODO: it doesnt show plot with 0 payments, we need to do a left join so that we get sale id where payments table have no sale_id
     // plot number 29 payments are wrong why??
