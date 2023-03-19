@@ -35,8 +35,8 @@ export type PaymentStatusBySaleIdCustomerId = PaymentPlanBySaleIdCustomerId &
   CustomerPayments;
 
 interface SumPaymentHistory {
-  totalPaid: number;
-  lastPaymentDate: string;
+  totalPaid: number | null;
+  lastPaymentDate: string | null;
   //plot_id: string;
   sale_id: number;
   customer_id: number;
@@ -46,8 +46,8 @@ interface SumPaymentHistory {
 }
 
 type SumPaymentHistoryWithPlotId = {
-  totalPaid: number;
-  lastPaymentDate: string;
+  totalPaid: number | null;
+  lastPaymentDate: string | null;
   plot_id: number[];
   sale_id: number;
   customer_id: number;
@@ -76,17 +76,22 @@ export default async function paymentStatus(
       },
     });
     // payment_type	sale_id	payment_date	payment_value	created_at
+    // const paymentPlanBySaleId = await prisma.payment_Plan.findMany({
+    //   orderBy: [{
+    //     payment_date: "asc"
+    //   }, {
+    //     sale_id: "asc"
+    //   }]
+    // })
     const paymentPlanBySaleId = await prisma.$queryRaw<
       PaymentPlanBySaleIdCustomerId[]
     >`select * from Payment_Plan order by payment_date, sale_id;`;
-    
+
     // totalPaid	lastPaymentDate	sale_id	customer_id,	name	son_of	cnic
-    // TODO: it doesnt show plot with 0 payments, we need to do a left join so that we get sale id where payments table have no sale_id
-    // plot number 29 payments are wrong why??
+    // we are doing left join becuase there are plots which have been sold but they dont have any payments
     const sumPaymentHistoryBySaleId = await prisma.$queryRaw<
       SumPaymentHistory[]
-    >`select SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate, Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of from Payments join Sale on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id group by Sale.id,Customer.id;`;
-
+    >`select Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of, SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate from Sale left join Payments on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id group by Sale.id,Customer.id;`;
     const plotData = await prisma.plot.findMany({
       select: { id: true, sale_id: true },
     });
@@ -130,8 +135,9 @@ export default async function paymentStatus(
                 ? sumPaymentPlan._sum.payment_value
                 : 0,
             };
-            returnObject.remainingPayment =
-              returnObject.totalPlannedPayments - returnObject.totalPaid;
+            returnObject.remainingPayment = returnObject.totalPaid
+              ? returnObject.totalPlannedPayments - returnObject.totalPaid
+              : returnObject.totalPlannedPayments - 0;
             return returnObject;
           }
         });
@@ -162,7 +168,9 @@ export default async function paymentStatus(
                 name: item?.name!,
                 son_of: item?.son_of!,
                 cnic: item?.cnic!,
-                lastPaymentDate: item?.lastPaymentDate,
+                lastPaymentDate: item?.lastPaymentDate
+                  ? item?.lastPaymentDate
+                  : undefined,
                 paymentCollectionValue: null,
                 paymentValueStatus:
                   payPlan.payment_value! - difference === 0 &&
