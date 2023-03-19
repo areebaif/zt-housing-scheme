@@ -7,11 +7,6 @@ export interface PaymentStatusByPlot {
   paymentStatus: PaymentStatusBySaleIdCustomerId[];
 }
 
-type SumPaymentPlan = {
-  payment_value: number;
-  sale_id: number;
-};
-
 export type PaymentPlanBySaleIdCustomerId = {
   id: number;
   sale_id: number;
@@ -40,8 +35,8 @@ export type PaymentStatusBySaleIdCustomerId = PaymentPlanBySaleIdCustomerId &
   CustomerPayments;
 
 interface SumPaymentHistory {
-  totalPaid: number;
-  lastPaymentDate: string;
+  totalPaid: number | null;
+  lastPaymentDate: string | null;
   //plot_id: string;
   sale_id: number;
   customer_id: number;
@@ -51,8 +46,8 @@ interface SumPaymentHistory {
 }
 
 type SumPaymentHistoryWithPlotId = {
-  totalPaid: number;
-  lastPaymentDate: string;
+  totalPaid: number | null;
+  lastPaymentDate: string | null;
   plot_id: number[];
   sale_id: number;
   customer_id: number;
@@ -74,20 +69,29 @@ export default async function paymentStatus(
 ) {
   try {
     // payment_value, sale_id (total payment plan value by sale id)
-    const sumPaymentPlanBySaleId = await prisma.$queryRaw<SumPaymentPlan[]>`
-  select sum(payment_value) as payment_value, sale_id from Payment_Plan group by sale_id;`;
-
-    //, Customer.name, Customer.son_of, Customer.cnic // join  Customer on Customer.id = Sale.customer_id
-    // totalPaid	lastPaymentDate	sale_id	customer_id,	name	son_of	cnic
-    const sumPaymentHistoryBySaleId = await prisma.$queryRaw<
-      SumPaymentHistory[]
-    >`select SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate, Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of from Payments join Sale on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id group by Sale.id,Customer.id;`;
-
+    const sumPaymentPlanBySaleId = await prisma.payment_Plan.groupBy({
+      by: ["sale_id"],
+      _sum: {
+        payment_value: true,
+      },
+    });
     // payment_type	sale_id	payment_date	payment_value	created_at
+    // const paymentPlanBySaleId = await prisma.payment_Plan.findMany({
+    //   orderBy: [{
+    //     payment_date: "asc"
+    //   }, {
+    //     sale_id: "asc"
+    //   }]
+    // })
     const paymentPlanBySaleId = await prisma.$queryRaw<
       PaymentPlanBySaleIdCustomerId[]
     >`select * from Payment_Plan order by payment_date, sale_id;`;
 
+    // totalPaid	lastPaymentDate	sale_id	customer_id,	name	son_of	cnic
+    // we are doing left join becuase there are plots which have been sold but they dont have any payments
+    const sumPaymentHistoryBySaleId = await prisma.$queryRaw<
+      SumPaymentHistory[]
+    >`select Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of, SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate from Sale left join Payments on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id group by Sale.id,Customer.id;`;
     const plotData = await prisma.plot.findMany({
       select: { id: true, sale_id: true },
     });
@@ -127,10 +131,13 @@ export default async function paymentStatus(
           if (payments.sale_id === sumPaymentPlan.sale_id) {
             returnObject = {
               ...payments,
-              totalPlannedPayments: sumPaymentPlan.payment_value,
+              totalPlannedPayments: sumPaymentPlan._sum.payment_value
+                ? sumPaymentPlan._sum.payment_value
+                : 0,
             };
-            returnObject.remainingPayment =
-              returnObject.totalPlannedPayments - returnObject.totalPaid;
+            returnObject.remainingPayment = returnObject.totalPaid
+              ? returnObject.totalPlannedPayments - returnObject.totalPaid
+              : returnObject.totalPlannedPayments - 0;
             return returnObject;
           }
         });
@@ -161,7 +168,9 @@ export default async function paymentStatus(
                 name: item?.name!,
                 son_of: item?.son_of!,
                 cnic: item?.cnic!,
-                lastPaymentDate: item?.lastPaymentDate,
+                lastPaymentDate: item?.lastPaymentDate
+                  ? item?.lastPaymentDate
+                  : undefined,
                 paymentCollectionValue: null,
                 paymentValueStatus:
                   payPlan.payment_value! - difference === 0 &&
