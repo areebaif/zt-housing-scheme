@@ -23,12 +23,7 @@ const Login: React.FC = () => {
   const [showInvalidEmailMessage, setShowInvalidEmailMessage] =
     React.useState(false);
 
-  // TODO: remove this when i have logout function TODO:
-  //   if (session) {
-  //     console.log(session, "hua");
-  //     router.push("/");
-  //   }
-
+  
   return !showInvalidEmailMessage ? (
     isValidEmail ? (
       <div>Check your email for signin link</div>
@@ -89,7 +84,7 @@ export const EmailInput: React.FC<EmailInput> = (props: EmailInput) => {
   }
 
   const onSubmit = () => {
-    console.log(userEmail, "youu");
+   
     setFetchEmailStatus(true);
     setShowInvalidEmailMessage(false);
   };

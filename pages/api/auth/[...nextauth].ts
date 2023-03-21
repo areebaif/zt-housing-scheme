@@ -11,10 +11,9 @@ if (
   !process.env.EMAIL_SERVER_PASSWORD ||
   !process.env.EMAIL_FROM
 ) {
-  throw new Error(
-    "provide google id and client secret!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  );
+  throw new Error("no environemnt variables exit");
 }
+// TODO: create a callback function for signin and check authorize email that way
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
