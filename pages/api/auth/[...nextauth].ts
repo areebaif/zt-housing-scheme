@@ -3,6 +3,8 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import EmailProvider from "next-auth/providers/email";
 import { SessionStrategy } from "next-auth";
 import { prisma } from "@/db/prisma";
+//import { User } from "@prisma/client";
+import { User } from "next-auth";
 
 if (
   !process.env.EMAIL_SERVER_HOST ||
@@ -28,7 +30,20 @@ export const authOptions = {
     // Defaults to `session.maxAge`.
     maxAge: 60 * 60 * 24 * 30,
   },
-
+  callbacks: {
+    async signIn(props: { user: any }) {
+      const { user } = props;
+      if (!user.verifiedUser) {
+        return false;
+      }
+      return true;
+    },
+    async jwt(props: { token: any; user?: any; isNewUser?: boolean }) {
+      const { token, user, isNewUser } = props;
+      console.log(token, user, isNewUser, "jwt");
+      return token;
+    },
+  },
   providers: [
     EmailProvider({
       // type: "email",

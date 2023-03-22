@@ -16,77 +16,20 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { fetchValidEmail } from "@/r-query/functions";
 
 const Login: React.FC = () => {
-  const { data: session } = useSession();
-  console.log(session, "hello");
   const router = useRouter();
-  const [isValidEmail, setIsValidEmail] = React.useState(false);
-  const [showInvalidEmailMessage, setShowInvalidEmailMessage] =
-    React.useState(false);
-
-  
-  return !showInvalidEmailMessage ? (
-    isValidEmail ? (
-      <div>Check your email for signin link</div>
-    ) : (
-      <EmailInput
-        setIsValidEmail={setIsValidEmail}
-        setShowInvalidEmailMessage={setShowInvalidEmailMessage}
-      />
-    )
-  ) : (
-    <>
-      <div>You are not authorized to signIn</div>
-      <EmailInput
-        setIsValidEmail={setIsValidEmail}
-        setShowInvalidEmailMessage={setShowInvalidEmailMessage}
-      />
-    </>
-  );
-};
-
-export default Login;
-
-type EmailInput = {
-  setIsValidEmail: (data: boolean) => void;
-  setShowInvalidEmailMessage: (data: boolean) => void;
-};
-
-export const EmailInput: React.FC<EmailInput> = (props: EmailInput) => {
-  const { setIsValidEmail, setShowInvalidEmailMessage } = props;
   const [userEmail, setUserEmail] = React.useState("");
-  const [fetchEmailStatus, setFetchEmailStatus] = React.useState(false);
 
-  const emailStatus = ReactQuery.useQuery({
-    queryKey: ["validEmail"],
-    queryFn: () => fetchValidEmail(userEmail),
-    enabled: fetchEmailStatus,
-    onSuccess: (data) => {
-      setFetchEmailStatus(false);
-      if (data.email?.length) {
-        const email = data.email;
-        signIn("email", {
-          redirect: false,
-          email: email,
-          callbackUrl: "http://localhost:3000/",
-        });
-        setIsValidEmail(true);
-      } else {
-        setShowInvalidEmailMessage(true);
-      }
-    },
-  });
-  //   if (emailStatus.isLoading) {
-  //     return <Loader />;
-  //   }
-
-  if (emailStatus.isError) {
-    return <span>Error: error occured</span>;
-  }
-
-  const onSubmit = () => {
-   
-    setFetchEmailStatus(true);
-    setShowInvalidEmailMessage(false);
+  const onSubmit = async () => {
+    const res = await signIn("email", {
+      redirect: false,
+      email: userEmail,
+    });
+    console.log(res);
+    if (res?.error) {
+      // TODO: display component saying hey your email is not authroised
+      throw new Error("not authorised");
+    }
+    // TODO: display component saying hey check your email
   };
 
   return (
@@ -114,7 +57,13 @@ export const EmailInput: React.FC<EmailInput> = (props: EmailInput) => {
             <Text size={"sm"}>
               Don't have an account? <Text weight={"bold"}> Contact Admin</Text>
             </Text>
-            <Button onClick={onSubmit} radius="md" size="sm">
+            <Button
+              onClick={() => {
+                onSubmit();
+              }}
+              radius="md"
+              size="sm"
+            >
               Login
             </Button>
           </Group>
@@ -123,3 +72,5 @@ export const EmailInput: React.FC<EmailInput> = (props: EmailInput) => {
     </Container>
   );
 };
+
+export default Login;

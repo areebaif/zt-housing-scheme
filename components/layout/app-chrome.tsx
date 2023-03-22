@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 // Mantine Imports
 import {
   AppShell,
@@ -41,19 +42,19 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
 };
 
 const Navigation: React.FC = () => {
-  //const { data: session } = useSession();
+  const { data: session } = useSession();
   return (
     <Navbar p="xs" width={{ base: 275 }}>
       <Navbar.Section grow mt="md">
         <MainLinks />
       </Navbar.Section>
-      {/* {session ? (
+      {session ? (
         <Navbar.Section>
           <User />
         </Navbar.Section>
       ) : (
         <div> </div>
-      )} */}
+      )}
     </Navbar>
   );
 };
@@ -92,7 +93,6 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
         <ThemeIcon color={color} variant="light">
           {icon}
         </ThemeIcon>
-
         <Text size="sm">{label}</Text>
       </Group>
     </UnstyledButton>
@@ -142,9 +142,9 @@ const loginData = [
 ];
 
 export function MainLinks() {
-  // const { data: session } = useSession();
-  const links =
-    //logoutData.map((link) => <MainLink {...link} key={link.label} />)
-    loginData.map((link) => <MainLink {...link} key={link.label} />);
+  const { data: session } = useSession();
+  const links = session
+    ? logoutData.map((link) => <MainLink {...link} key={link.label} />)
+    : loginData.map((link) => <MainLink {...link} key={link.label} />);
   return <div>{links}</div>;
 }

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useSession } from "next-auth/react";
 import {
   IconChevronRight,
   IconChevronLeft,
@@ -16,7 +17,8 @@ import {
 
 export const User: React.FC = () => {
   const theme = useMantineTheme();
-
+  const { data: session } = useSession();
+  console.log(session, "user");
   return (
     <Box
       sx={{
