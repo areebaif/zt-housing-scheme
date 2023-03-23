@@ -18,7 +18,8 @@ import {
 export const User: React.FC = () => {
   const theme = useMantineTheme();
   const { data: session } = useSession();
-  console.log(session, "user");
+  const userName = session?.user?.name;
+  const email = session?.user?.email;
   return (
     <Box
       sx={{
@@ -57,17 +58,17 @@ export const User: React.FC = () => {
           /> */}
           <Box sx={{ flex: 1 }}>
             <Text size="sm" weight={500}>
-              Amy Horsefighter
+              {userName}
             </Text>
             <Text color="dimmed" size="xs">
-              ahorsefighter@gmail.com
+              {email}
             </Text>
           </Box>
-          {theme.dir === "ltr" ? (
+          {/* {theme.dir === "ltr" ? (
             <IconChevronRight size={18} />
           ) : (
             <IconChevronLeft size={18} />
-          )}
+          )} */}
         </Group>
       </UnstyledButton>
     </Box>

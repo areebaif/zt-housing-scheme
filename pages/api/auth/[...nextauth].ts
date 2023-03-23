@@ -15,7 +15,6 @@ if (
 ) {
   throw new Error("no environemnt variables exit");
 }
-// TODO: create a callback function for signin and check authorize email that way
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -31,8 +30,9 @@ export const authOptions = {
     maxAge: 60 * 60 * 24 * 30,
   },
   callbacks: {
-    async signIn(props: { user: any }) {
+    async signIn(props: { user: User & { verifiedUser?: boolean } }) {
       const { user } = props;
+      console.log(user, "huauauauau");
       if (!user.verifiedUser) {
         return false;
       }
@@ -46,7 +46,6 @@ export const authOptions = {
   },
   providers: [
     EmailProvider({
-      // type: "email",
       server: {
         host: process.env.EMAIL_SERVER_HOST,
         port: parseInt(process.env.EMAIL_SERVER_PORT),
