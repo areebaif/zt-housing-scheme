@@ -22,7 +22,6 @@ const PlotId: React.FC = () => {
   const { data: session, status } = useSession({
     required: true,
   });
-  console.log(session, " I am session!!!!");
 
   const plotId = router.query?.id as string;
   const [showForm, setShowForm] = React.useState(false);

@@ -1,6 +1,4 @@
 import * as React from "react";
-import { useRouter } from "next/router";
-import * as ReactQuery from "@tanstack/react-query";
 
 import {
   Button,
@@ -24,7 +22,6 @@ const Login: React.FC = () => {
       email: userEmail,
       callbackUrl: "/",
     });
-    console.log(res);
     if (res?.error) {
       setDisplayError(true);
     }
@@ -90,10 +87,10 @@ const LoginCard: React.FC<LoginCardProps> = (props: LoginCardProps) => {
           value={userEmail}
           onChange={(event) => setUserEmail(event.currentTarget.value)}
         />
-        <Group position="apart" mb={"xl"}>
-          <Group spacing={"xs"} position="left">
-            <Text size={"lg"}>Don't have an account ?</Text>
-            <Text weight={"bold"}>Contact Admin</Text>
+        <Group position="apart" mb="xl">
+          <Group spacing="xs" position="left">
+            <Text size="lg">Dont have an account ?</Text>
+            <Text weight="bold">Contact Admin</Text>
           </Group>
           <Button
             onClick={() => {

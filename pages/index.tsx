@@ -11,8 +11,6 @@ import { PlotSaleSummaryTable, TotalsSummary } from "@/components";
 import { fetchAllPlots } from "@/r-query/functions";
 
 const AllPlots: React.FC = () => {
-  const { data: session, status } = useSession();
-  console.log(session, " I am session");
   const fetchPlots = useQuery(["allPlots"], fetchAllPlots, {
     staleTime: Infinity,
     cacheTime: Infinity,
