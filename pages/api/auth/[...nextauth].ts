@@ -6,6 +6,7 @@ import { prisma } from "@/db/prisma";
 //import { User } from "@prisma/client";
 import { User } from "next-auth";
 
+
 if (
   !process.env.EMAIL_SERVER_HOST ||
   !process.env.EMAIL_SERVER_PORT ||
@@ -32,16 +33,10 @@ export const authOptions = {
   callbacks: {
     async signIn(props: { user: User & { verifiedUser?: boolean } }) {
       const { user } = props;
-      console.log(user, "huauauauau");
       if (!user.verifiedUser) {
         return false;
       }
       return true;
-    },
-    async jwt(props: { token: any; user?: any; isNewUser?: boolean }) {
-      const { token, user, isNewUser } = props;
-      console.log(token, user, isNewUser, "jwt");
-      return token;
     },
   },
   providers: [

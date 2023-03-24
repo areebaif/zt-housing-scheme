@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useSession } from "next-auth/react";
 
 // Hook Imports
 import { useQuery } from "@tanstack/react-query";
@@ -10,6 +11,8 @@ import { PlotSaleSummaryTable, TotalsSummary } from "@/components";
 import { fetchAllPlots } from "@/r-query/functions";
 
 const AllPlots: React.FC = () => {
+  const { data: session, status } = useSession();
+  console.log(session, " I am session");
   const fetchPlots = useQuery(["allPlots"], fetchAllPlots, {
     staleTime: Infinity,
     cacheTime: Infinity,

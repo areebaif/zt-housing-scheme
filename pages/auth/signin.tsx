@@ -10,14 +10,10 @@ import {
   Container,
   Group,
   Text,
-  Loader,
-  CardSection,
 } from "@mantine/core";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { fetchValidEmail } from "@/r-query/functions";
+import { signIn } from "next-auth/react";
 
 const Login: React.FC = () => {
-  const router = useRouter();
   const [userEmail, setUserEmail] = React.useState("");
   const [displayError, setDisplayError] = React.useState(false);
   const [isUserAuthorised, setIsUserAuthorized] = React.useState(false);
@@ -68,14 +64,19 @@ const LoginCard: React.FC<LoginCardProps> = (props: LoginCardProps) => {
     <Card shadow="sm" p="xl" radius="md" withBorder>
       <Card.Section withBorder inheritPadding py="xs">
         <Title order={2} ta="center" mt="xl" mb="md">
-          Welcome back!
+          Login to continue
         </Title>
         <TextInput
           size="md"
           sx={{ fontSize: "xl" }}
           mt={"xl"}
           pb={"xl"}
-          placeholder="email address"
+          placeholder="email"
+          error={
+            userEmail.length <= 0 || !userEmail.includes("@")
+              ? "invalid email"
+              : false
+          }
           label={
             <Text
               sx={(theme) => ({
@@ -83,7 +84,7 @@ const LoginCard: React.FC<LoginCardProps> = (props: LoginCardProps) => {
               })}
               size={"lg"}
             >
-              email
+              email address
             </Text>
           }
           value={userEmail}
