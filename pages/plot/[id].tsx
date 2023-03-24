@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useRouter } from "next/router";
-import * as ReactQuery from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+
 import { Grid, Loader } from "@mantine/core";
 import { fetchPlotById } from "../../r-query/functions";
 
@@ -17,22 +19,20 @@ import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInpu
 
 const PlotId: React.FC = () => {
   const router = useRouter();
-  // const { status } = useSession({
-  //   required: true,
-  //   onUnauthenticated() {
-  //     signIn("google");
-  //   },
-  // });
+  const { data: session, status } = useSession({
+    required: true,
+  });
+
   const plotId = router.query?.id as string;
   const [showForm, setShowForm] = React.useState(false);
   const [isEditForm, setIsEditForm] = React.useState(false);
   const [showAddPaymentForm, setShowAddPaymentForm] = React.useState(false);
 
   // backend data fetch
-  const fetchplot = ReactQuery.useQuery({
+  const fetchplot = useQuery({
     queryKey: ["plotById", plotId],
     queryFn: () => fetchPlotById(plotId),
-    enabled: Boolean(plotId), //&& status === "authenticated",
+    enabled: Boolean(plotId) && status === "authenticated",
     staleTime: Infinity,
     cacheTime: Infinity,
   });

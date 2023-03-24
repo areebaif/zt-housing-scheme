@@ -1,30 +1,20 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 
 import { fetchPaymentStatus } from "@/r-query/functions";
-import {
-  Table,
-  Card,
-  Loader,
-  Title,
-  Slider,
-  Flex,
-  Group,
-  NumberInput,
-} from "@mantine/core";
+import { Table, Card, Loader, Title, Group, NumberInput } from "@mantine/core";
 import { compare, beforeDateInput } from "@/utilities";
 import { PaymentStatusBySaleIdCustomerId } from "../api/payment/paymentStatus";
 
 const PaymentStatus: React.FC = () => {
-  // const { status } = useSession({
-  //   required: true,
-  //   onUnauthenticated() {
-  //     signIn("google");
-  //   },
-  // });
+  const { data: session, status } = useSession({
+    required: true,
+  });
+
   const [numberInput, setNumberInput] = React.useState(40);
   const fetchStatus = useQuery(["upcomingPayments"], fetchPaymentStatus, {
-    // enabled: status === "authenticated",
+    enabled: status === "authenticated",
     staleTime: Infinity,
     cacheTime: Infinity,
   });
