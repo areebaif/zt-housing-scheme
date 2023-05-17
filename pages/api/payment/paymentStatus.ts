@@ -3,18 +3,24 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../../db/prisma";
 
-export interface PaymentStatusByPlot {
+export enum PaymentValueStatus {
+  partiallyPaid = "partial payment",
+  notPaid = "not paid",
+}
+
+export type PaymentStatusByPlot = {
   paymentStatus: PaymentStatusBySaleIdCustomerId[];
 }
 
 export type PaymentPlanBySaleIdCustomerId = {
+  // the Id is paymentPlanId
   id: number;
-  sale_id: number;
-  plot_id: string | undefined;
-  customer_id: number;
   payment_type: PaymentType;
+  sale_id: number;
   payment_date: string;
   payment_value: number | null;
+  plot_id: string | undefined;
+  customer_id: number | undefined;
 };
 
 type CustomerPayments = {
@@ -26,24 +32,18 @@ type CustomerPayments = {
   paymentCollectionValue: number | null;
 };
 
-export enum PaymentValueStatus {
-  partiallyPaid = "partial payment",
-  notPaid = "not paid",
-}
-
 export type PaymentStatusBySaleIdCustomerId = PaymentPlanBySaleIdCustomerId &
   CustomerPayments;
 
-interface SumPaymentHistory {
+type SumPaymentHistory = {
   totalPaid: number | null;
   lastPaymentDate: string | null;
-  //plot_id: string;
   sale_id: number;
   customer_id: number;
   name: string;
   son_of: string;
   cnic: string;
-}
+};
 
 type SumPaymentHistoryWithPlotId = {
   totalPaid: number | null;
@@ -76,16 +76,16 @@ export default async function paymentStatus(
       },
     });
     // payment_type	sale_id	payment_date	payment_value	created_at
-    // const paymentPlanBySaleId = await prisma.payment_Plan.findMany({
-    //   orderBy: [{
-    //     payment_date: "asc"
-    //   }, {
-    //     sale_id: "asc"
-    //   }]
-    // })
-    const paymentPlanBySaleId = await prisma.$queryRaw<
-      PaymentPlanBySaleIdCustomerId[]
-    >`select * from Payment_Plan order by payment_date, sale_id;`;
+    const paymentPlanBySaleId = await prisma.payment_Plan.findMany({
+      orderBy: [
+        {
+          payment_date: "asc",
+        },
+        {
+          sale_id: "asc",
+        },
+      ],
+    });
 
     // totalPaid	lastPaymentDate	sale_id	customer_id,	name	son_of	cnic
     // we are doing left join becuase there are plots which have been sold but they dont have any payments
@@ -163,7 +163,16 @@ export default async function paymentStatus(
               const payPlan = { ...element };
               const plot_id = String(item?.plot_id);
               const obj: PaymentStatusBySaleIdCustomerId = {
-                ...element,
+                // destructuing paymentPlanbySaleId
+                id: element.id,
+                payment_type: element.payment_type,
+                sale_id: element.sale_id,
+                payment_date: element.payment_date
+                  ? element.payment_date.toISOString()
+                  : "",
+                payment_value: element.payment_value,
+                // new values
+                customer_id: item?.customer_id,
                 plot_id: plot_id,
                 name: item?.name!,
                 son_of: item?.son_of!,
