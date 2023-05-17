@@ -178,7 +178,6 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   }, [fetchCustomers.data]);
 
   if (fetchCustomers.isLoading || mutation.isLoading) {
-    // TODO: loading component
     return <Loader />;
   }
 

@@ -26,6 +26,12 @@ enum PaymentType {
   other
 }
 
+enum RegistryStatus {
+  waiting_government_approval
+  registry_ready_for_customer
+  registry_transferred_to_customer
+}
+
 model Plot {
   id Int @id
   dimension String? @db.VarChar(255)
@@ -37,7 +43,6 @@ model Plot {
   updated_at DateTime  @updatedAt
   plot_status Status
 }
-
 
 model Sale {
   id Int @id
@@ -79,11 +84,6 @@ model Payments {
   created_at DateTime @default(now())
 }
 
-enum RegistryStatus {
-  waiting_government_approval
-  registry_ready_for_customer
-  registry_transferred_to_customer
-}
 
 model Sale_Registry {
   id Int @id @default(autoincrement())
@@ -115,5 +115,4 @@ model User {
   //image         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
 }

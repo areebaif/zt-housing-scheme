@@ -130,18 +130,3 @@ export const fetchPaymentStatus = async () => {
   const res: PaymentStatusByPlot = await response.json();
   return res;
 };
-
-export const fetchValidEmail = async (email: string) => {
-  const response = await fetch(`/api/${email}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  const res: { id: string | null; email: string | null } =
-    await response.json();
-  return res;
-};

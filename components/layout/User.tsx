@@ -1,14 +1,11 @@
 import * as React from "react";
 import { useSession } from "next-auth/react";
 import {
-  IconChevronRight,
-  IconChevronLeft,
   IconUser,
 } from "@tabler/icons-react";
 import {
   UnstyledButton,
   Group,
-  Avatar,
   Text,
   Box,
   useMantineTheme,
