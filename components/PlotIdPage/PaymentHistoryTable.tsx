@@ -1,8 +1,17 @@
 import * as React from "react";
-import { Card, Table, Title, Group, Button } from "@mantine/core";
+import {
+  Card,
+  Table,
+  Title,
+  Group,
+  Button,
+  Modal,
+  Text,
+  Grid,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { Payments } from "@prisma/client";
 import { PlotDetail } from "@/pages/api/plot/[id]";
-import { useRouter } from "next/router";
 
 export type PaymentHistoryTableProps = {
   tableRows?: Payments[];
@@ -13,21 +22,88 @@ export type PaymentHistoryTableProps = {
 export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
   PaymentHistoryTable
 ) => {
-  //Props
+  // Props
   const { tableRows, setShowAddPaymentForm } = PaymentHistoryTable;
+  const [opened, { open, close }] = useDisclosure(false);
+  const [deletePaymentVal, setDeletePaymentVal] = React.useState({});
+
   // Display Funcs
   const paymentHistoryRows = tableRows?.map((element) => {
     const date = new Date(`${element.payment_date}`);
+
+    const onShowModal = (
+      id: number,
+      type: string,
+      date: string,
+      value: number
+    ) => {
+      console.log(id, type, date, value);
+      open();
+      // find the relevant record in table rows
+      //const deleteRecord = tableRows.filter((payment) => payment.id === id);
+      // here you will trigger a backend call
+    };
     return (
-      <tr key={element.id}>
-        <td>{element.id}</td>
-        <td>{element.payment_type}</td>
-        <td>{element.description}</td>
-        <td>{date.toDateString()}</td>
-        <td>
-          {`${element.payment_value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-        </td>
-      </tr>
+      <>
+        <Modal
+          overlayOpacity={0.6}
+          opened={opened}
+          onClose={close}
+          size={"xl"}
+          title={
+            <Title order={4} ta="center">
+              Delete Payment
+            </Title>
+          }
+          centered
+        >
+          <Text size={"lg"}>
+            Are you sure you want to delete the payment with the following
+            information:
+          </Text>{" "}
+          <Grid mt={"lg"} mb={"lg"} grow>
+            <Grid.Col span={4}>
+              <Text weight={"bold"}>Payment Type:</Text> <Text>{1} </Text>
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Text weight={"bold"}>Date:</Text> <Text>{} </Text>
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Text weight={"bold"}>Value:</Text> <Text>{} </Text>
+            </Grid.Col>
+          </Grid>
+          <Group position="center" mt="lg">
+            <Button size="md" onClick={close}>
+              No
+            </Button>
+            <Button size="md">Yes</Button>
+          </Group>
+        </Modal>
+        <tr key={element.id}>
+          {/*<td>{element.id}</td>*/}
+          <td>{element.payment_type}</td>
+          <td>{element.description}</td>
+          <td>{date.toDateString()}</td>
+          <td>
+            {`${element.payment_value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </td>
+          <td>
+            <Button
+              variant="outline"
+              onClick={() =>
+                onShowModal(
+                  element.id,
+                  element.payment_type,
+                  date.toDateString(),
+                  element.payment_value
+                )
+              }
+            >
+              Delete
+            </Button>
+          </td>
+        </tr>
+      </>
     );
   });
 
