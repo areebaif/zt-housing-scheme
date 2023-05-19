@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useRouter } from "next/router";
 import {
   Card,
   Table,
@@ -8,10 +9,13 @@ import {
   Modal,
   Text,
   Grid,
+  Loader,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Payments } from "@prisma/client";
 import { PlotDetail } from "@/pages/api/plot/[id]";
+import { postDeletePayment } from "@/r-query/functions";
 
 export type PaymentHistoryTableProps = {
   tableRows?: Payments[];
@@ -31,6 +35,18 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
     date: string;
     value: number;
   }>();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const mutation = useMutation({
+    mutationFn: postDeletePayment,
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      close();
+      // setPayment form false
+      //setShowAddPaymentForm(false);
+      //router.push(`/plot/${plotNumber[0].id}`);
+    },
+  });
 
   const onShowModal = (
     id: number,
@@ -41,6 +57,17 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
     setDeletePaymentVal({ id, type, date, value });
     open();
   };
+
+  const onDeletePaymentSubmit = () => {
+    if (deletePaymentVal?.id) mutation.mutate(deletePaymentVal.id);
+  };
+  if (mutation.isLoading) {
+    return <Loader />;
+  }
+
+  if (mutation.isError) {
+    return <>Something went wrong, please try again!</>;
+  }
 
   // Display Funcs
   const paymentHistoryRows = tableRows?.map((element) => {
@@ -81,6 +108,7 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
     value: deletePaymentVal?.value,
     close,
     opened,
+    onDeletePaymentSubmit,
   };
 
   return (
@@ -107,11 +135,11 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
         <Table highlightOnHover fontSize="lg">
           <thead>
             <tr>
-              <th>Payment Number</th>
               <th>PaymentType</th>
               <th>Description</th>
               <th>Date</th>
               <th>Value</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>{paymentHistoryRows}</tbody>
@@ -127,12 +155,13 @@ type ModalCardProps = {
   type: string | undefined;
   date: string | undefined;
   value: number | undefined;
-  close: any;
-  opened: any;
+  close: () => void;
+  opened: boolean;
+  onDeletePaymentSubmit: () => void;
 };
 
 const ModalCard: React.FC<ModalCardProps> = (props: ModalCardProps) => {
-  const { id, type, date, value, opened, close } = props;
+  const { id, type, date, value, opened, close, onDeletePaymentSubmit } = props;
 
   return (
     <Modal
@@ -167,7 +196,9 @@ const ModalCard: React.FC<ModalCardProps> = (props: ModalCardProps) => {
         <Button size="md" onClick={close}>
           No
         </Button>
-        <Button size="md">Yes</Button>
+        <Button size="md" onClick={onDeletePaymentSubmit}>
+          Yes
+        </Button>
       </Group>
     </Modal>
   );

@@ -14,9 +14,7 @@ export default async function deletePayment(
   res: NextApiResponse<PostReturnType>
 ) {
   try {
-    //const payment = req.body.payment as TableRowItem[];
     const paymentId = req.body.paymentId as number;
-
     // delete record
     await prisma.payments.delete({
       where: {
@@ -24,7 +22,6 @@ export default async function deletePayment(
       },
     });
 
-    //await prisma.$transaction([updatePayment, fullySoldPlot]);
     res.status(201).json({ deleted: true });
   } catch (err) {
     return res
