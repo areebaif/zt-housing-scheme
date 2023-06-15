@@ -16,3 +16,10 @@ source ./crates/upload-pokemon-data/create-tables.sql
 
 TODO:
 Copying filtered data like for a yearonly when production data is 10 yars old etc
+
+brew install mysql-client
+
+brew install planetscale/tap/pscale
+
+connect to your branch
+pscale shell zt-housing-scheme development
