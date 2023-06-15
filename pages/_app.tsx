@@ -1,7 +1,8 @@
 import * as React from "react";
+import type { AppProps } from "next/app";
+import { Analytics } from "@vercel/analytics/react";
 import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
 import { AppChrome } from "@/components";
 
@@ -18,6 +19,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
         <MantineProvider withGlobalStyles withNormalizeCSS>
           <AppChrome>
             <Component {...pageProps} />
+            <Analytics />
           </AppChrome>
         </MantineProvider>
       </QueryClientProvider>
