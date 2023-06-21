@@ -2,9 +2,9 @@ import * as React from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-
 import { Grid, Loader } from "@mantine/core";
 import { fetchPlotById } from "../../r-query/functions";
+import dynamic from "next/dynamic";
 
 import {
   PaymentPlanTable,
@@ -27,7 +27,6 @@ const PlotId: React.FC = () => {
   const [showForm, setShowForm] = React.useState(false);
   const [isEditForm, setIsEditForm] = React.useState(false);
   const [showAddPaymentForm, setShowAddPaymentForm] = React.useState(false);
-
   // backend data fetch
   const fetchplot = useQuery({
     queryKey: ["plotById", plotId],
@@ -36,6 +35,7 @@ const PlotId: React.FC = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
+
   if (fetchplot.isLoading) {
     return <Loader />;
   }
