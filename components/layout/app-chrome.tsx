@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { Image } from "@mantine/core";
 // Mantine Imports
 import {
   AppShell,
@@ -12,6 +14,8 @@ import {
   Text,
   Container,
   Title,
+  Flex,
+  Box,
 } from "@mantine/core";
 
 import { User } from "./User";
@@ -23,8 +27,20 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
       padding="md"
       navbar={<Navigation />}
       header={
-        <Header height={60} p="xs">
-          <Title order={2}>ZT Housing Scheme Manager</Title>
+        <Header pl="xl" height={103}>
+          <Group position="apart" pr="xl" mr="sm">
+            <Flex gap="xl">
+              <Link href={"/"}>
+                <Image src={"/zt-logo3.png"} height={100} width={100}></Image>{" "}
+              </Link>
+              <Title pt="xl" mt="xs" order={2}>
+                Sale and Payments Dashboard
+              </Title>
+            </Flex>
+            <Link href={"https://www.facebook.com/zahidtown"}>
+              <Image src={"/facebook-logo.png"} height={45} width={45}></Image>
+            </Link>
+          </Group>
         </Header>
       }
       styles={(theme) => ({
@@ -48,13 +64,10 @@ const Navigation: React.FC = () => {
       <Navbar.Section grow mt="md">
         <MainLinks />
       </Navbar.Section>
-      {session ? (
-        <Navbar.Section>
-          <User />
-        </Navbar.Section>
-      ) : (
-        <div> </div>
-      )}
+
+      <Navbar.Section>
+        <User />
+      </Navbar.Section>
     </Navbar>
   );
 };
@@ -102,13 +115,13 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
 const logoutData = [
   {
     icon: <IconDatabase size={16} />,
-    color: "blue",
+    color: "teal",
     label: "Sale Summary",
     link: "/",
   },
   {
     icon: <IconMessages size={16} />,
-    color: "teal",
+    color: "blue",
     label: "Payment Status",
     link: "/plot/paymentStatus",
   },
@@ -123,13 +136,13 @@ const logoutData = [
 const loginData = [
   {
     icon: <IconDatabase size={16} />,
-    color: "blue",
+    color: "teal",
     label: "Sale Summary",
     link: "/",
   },
   {
     icon: <IconMessages size={16} />,
-    color: "teal",
+    color: "blue",
     label: "Payment Status",
     link: "/plot/paymentStatus",
   },
