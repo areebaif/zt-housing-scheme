@@ -5,10 +5,7 @@ import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { AppChrome } from "@/components";
-
-// interface AppPropsWithAuth extends AppProps {
-//   Component: AppProps["Component"] & { auth: boolean };
-// }
+import dynamic from "next/dynamic";
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
   const [queryClient] = React.useState(() => new QueryClient());
@@ -26,5 +23,8 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
     </SessionProvider>
   );
 };
-
-export default App;
+//
+//export default App;
+export default dynamic(() => Promise.resolve(App), {
+  ssr: false,
+});

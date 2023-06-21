@@ -1,17 +1,17 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-
+import { useRouter } from "next/router";
 import { fetchPaymentStatus } from "@/r-query/functions";
 import { Table, Card, Loader, Title, Group, NumberInput } from "@mantine/core";
 import { compare, beforeDateInput } from "@/utilities";
 import { PaymentStatusBySaleIdCustomerId } from "../api/payment/paymentStatus";
 
 const PaymentStatus: React.FC = () => {
+  const router = useRouter();
   const { data: session, status } = useSession({
     required: true,
   });
-
   const [numberInput, setNumberInput] = React.useState(40);
   const fetchStatus = useQuery(["upcomingPayments"], fetchPaymentStatus, {
     enabled: status === "authenticated",
@@ -28,7 +28,6 @@ const PaymentStatus: React.FC = () => {
   }
 
   const onChangeNumberInput = (val: number | undefined) => {
-    console.log(val, "hua");
     if (!val) {
       setNumberInput(0);
     } else {
@@ -67,6 +66,7 @@ const PaymentStatus: React.FC = () => {
     </React.Fragment>
   );
 };
+
 type PaymentStatusTableProps = {
   tableRows: PaymentStatusBySaleIdCustomerId[];
   tableHead: string;

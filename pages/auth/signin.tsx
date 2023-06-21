@@ -39,6 +39,7 @@ const Login: React.FC = () => {
       ) : displayError ? (
         <UnAuthroizedEmailCard
           setDisplayError={setDisplayError}
+          setIsUserAuthorized={setIsUserAuthorized}
           userEmail={userEmail}
         />
       ) : (
@@ -110,12 +111,13 @@ const LoginCard: React.FC<LoginCardProps> = (props: LoginCardProps) => {
 type UnAuthroizedEmailCardProps = {
   setDisplayError: (val: boolean) => void;
   userEmail: string;
+  setIsUserAuthorized: (val: boolean) => void;
 };
 
 const UnAuthroizedEmailCard: React.FC<UnAuthroizedEmailCardProps> = (
   props: UnAuthroizedEmailCardProps
 ) => {
-  const { setDisplayError, userEmail } = props;
+  const { setDisplayError, userEmail, setIsUserAuthorized } = props;
   return (
     <Card shadow="sm" p="xl" radius="md" withBorder style={{ height: "100%" }}>
       <Text mt={"lg"} weight={"bold"}>
@@ -124,7 +126,13 @@ const UnAuthroizedEmailCard: React.FC<UnAuthroizedEmailCardProps> = (
       <Text mt={"xs"}>
         Please contact admin to white-list this email address.
       </Text>
-      <Button mt={"xl"} mb={"lg"} onClick={() => setDisplayError(false)}>
+      <Button
+        mt={"xl"}
+        mb={"lg"}
+        onClick={() => {
+          setDisplayError(false), setIsUserAuthorized(false);
+        }}
+      >
         Back
       </Button>
     </Card>
