@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useRouter } from "next/router";
 import {
   Card,
   Table,
@@ -36,7 +35,6 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
     value: number;
   }>();
   const queryClient = useQueryClient();
-  const router = useRouter();
   const mutation = useMutation({
     mutationFn: postDeletePayment,
     onSuccess: () => {

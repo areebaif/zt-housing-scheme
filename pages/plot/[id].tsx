@@ -4,13 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { Grid, Loader } from "@mantine/core";
 import { fetchPlotById } from "../../r-query/functions";
-import dynamic from "next/dynamic";
 
 import {
   PaymentPlanTable,
   PaymentHistoryTable,
   PlotBasicInfo,
   SellInfo,
+  CancelSaleForm,
 } from "@/components";
 import { AddPayment } from "@/components/PlotIdPage/AddPaymentForm/AddPayment";
 import { PlotUpsertForm } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
@@ -24,9 +24,12 @@ const PlotId: React.FC = () => {
   });
 
   const plotId = router.query?.id as string;
+  // this is the newSaleForm
   const [showForm, setShowForm] = React.useState(false);
+  // This is EditSaleForm
   const [isEditForm, setIsEditForm] = React.useState(false);
   const [showAddPaymentForm, setShowAddPaymentForm] = React.useState(false);
+  const [showCancelSaleForm, setShowCancelSaleForm] = React.useState(false);
   // backend data fetch
   const fetchplot = useQuery({
     queryKey: ["plotById", plotId],
@@ -103,19 +106,31 @@ const PlotId: React.FC = () => {
     setShowAddPaymentForm,
     plotSaleId: plotDetail.sale?.plotSaleId,
   };
+  const cancelSaleFormProps = {
+    plotDetail,
+    totalPayment,
+    setShowForm,
+    setIsEditForm,
+    showCancelSaleForm,
+    setShowCancelSaleForm,
+  };
 
-  return !showForm && !showAddPaymentForm ? (
+  return !showForm && !showAddPaymentForm && !showCancelSaleForm ? (
     <PlotSummary
       plotDetail={plotDetail}
       totalPayment={totalPayment}
       setShowForm={setShowForm}
       setIsEditForm={setIsEditForm}
       setShowAddPaymentForm={setShowAddPaymentForm}
+      setShowCancelSaleForm={setShowCancelSaleForm}
+      showCancelSaleForm={showCancelSaleForm}
     />
-  ) : !showAddPaymentForm ? (
+  ) : !showAddPaymentForm && showForm && !showCancelSaleForm ? (
     <PlotUpsertForm {...FormData} />
-  ) : (
+  ) : showAddPaymentForm && !showForm && !showCancelSaleForm ? (
     <AddPayment {...addPaymentProps} />
+  ) : (
+    <CancelSaleForm {...cancelSaleFormProps} />
   );
 };
 
@@ -125,6 +140,8 @@ type PlotSummaryProps = {
   setShowForm: (val: boolean) => void;
   setIsEditForm: (val: boolean) => void;
   setShowAddPaymentForm: (val: boolean) => void;
+  setShowCancelSaleForm: (val: boolean) => void;
+  showCancelSaleForm: boolean;
 };
 
 const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
@@ -134,6 +151,8 @@ const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
     setShowForm,
     setIsEditForm,
     setShowAddPaymentForm,
+    setShowCancelSaleForm,
+    showCancelSaleForm,
   } = props;
   return (
     <React.Fragment>
@@ -143,10 +162,16 @@ const PlotSummary: React.FC<PlotSummaryProps> = (props: PlotSummaryProps) => {
             plotDetail={plotDetail}
             setShowForm={setShowForm}
             setIsEditForm={setIsEditForm}
+            showCancelSaleForm={showCancelSaleForm}
           />
         </Grid.Col>
         <Grid.Col span={"auto"}>
-          <SellInfo plotDetail={plotDetail} totalPayment={totalPayment} />
+          <SellInfo
+            plotDetail={plotDetail}
+            totalPayment={totalPayment}
+            setShowCancelSaleForm={setShowCancelSaleForm}
+            showCancelSaleForm={showCancelSaleForm}
+          />
         </Grid.Col>
       </Grid>
       {plotDetail.plot[0].plot_status !== "not_sold" ? (

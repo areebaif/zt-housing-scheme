@@ -6,11 +6,12 @@ export type PlotBasicInfoProps = {
   plotDetail: PlotDetail;
   setShowForm: (val: boolean) => void;
   setIsEditForm: (val: boolean) => void;
+  showCancelSaleForm: boolean;
 };
 
 export const PlotBasicInfo: React.FC<PlotBasicInfoProps> = (props) => {
   //Props
-  const { plotDetail, setShowForm, setIsEditForm } = props;
+  const { plotDetail, setShowForm, setIsEditForm, showCancelSaleForm } = props;
 
   const allPlots = plotDetail.plot;
 
@@ -19,20 +20,24 @@ export const PlotBasicInfo: React.FC<PlotBasicInfoProps> = (props) => {
       <Card.Section withBorder inheritPadding py="xs">
         <Group position="apart">
           <Title order={3}>Basic Information</Title>
-          <Button
-            onClick={() => {
-              setShowForm(true);
-              {
-                plotDetail?.plot[0].plot_status === "not_sold"
-                  ? setIsEditForm(false)
-                  : setIsEditForm(true);
-              }
-            }}
-          >
-            {plotDetail?.plot[0].plot_status === "not_sold"
-              ? "Add Sale"
-              : "Edit Details"}
-          </Button>
+          {!showCancelSaleForm ? (
+            <Button
+              onClick={() => {
+                setShowForm(true);
+                {
+                  plotDetail?.plot[0].plot_status === "not_sold"
+                    ? setIsEditForm(false)
+                    : setIsEditForm(true);
+                }
+              }}
+            >
+              {plotDetail?.plot[0].plot_status === "not_sold"
+                ? "Add Sale"
+                : "Edit Details"}
+            </Button>
+          ) : (
+            <></>
+          )}
         </Group>
       </Card.Section>
       <Card.Section inheritPadding py="xs">
