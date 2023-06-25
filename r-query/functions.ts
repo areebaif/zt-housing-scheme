@@ -6,6 +6,7 @@ import { PaymentStatusByPlot } from "@/pages/api/payment/paymentStatus";
 import { TableRowItem } from "../components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 import { PostReturnType } from "@/pages/api/payment/add";
 import { NotSoldPlotsSelectFields } from "@/pages/api/plot/notSold";
+import { refundPlotData } from "@/pages/api/plot/refundSummary";
 
 export const fetchAllPlots = async () => {
   const response = await fetch("/api/plot/all", {
@@ -162,5 +163,19 @@ export const cancelSale = async (data: {
     throw new Error("Network response was not ok");
   }
   const res: PostReturnType = await response.json();
+  return res;
+};
+
+export const fetchRefundSummary = async () => {
+  const response = await fetch(`/api/plot/refundSummary`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const res: refundPlotData[] = await response.json();
   return res;
 };

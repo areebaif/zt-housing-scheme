@@ -21,7 +21,7 @@ type RefundPlotSQLQuery = {
   payment_status: PaymentStatus;
 };
 
-type refundPlotData = {
+export type refundPlotData = {
   sale: {
     sale_id: number;
     sale_price: number;
