@@ -59,7 +59,7 @@ model Sale {
   customer_id Int
   sold_date DateTime
   total_sale_price Int
-  sale_status SaleStatus?
+  sale_status SaleStatus? @default(active)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
@@ -98,7 +98,7 @@ model Payments {
   payment_type PaymentType
   sale_id Int
   payment_date DateTime
-  payment_status PaymentStatus?
+  payment_status PaymentStatus? @default(active)
   payment_value Int
   created_at DateTime @default(now())
 }

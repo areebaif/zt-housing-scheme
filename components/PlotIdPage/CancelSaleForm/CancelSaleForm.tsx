@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { Button, Grid, Group, TransferListData } from "@mantine/core";
+import { Button, Grid, Group, TransferListData, Loader } from "@mantine/core";
 import { PaymentRefundTable } from "@/components";
 import { PlotBasicInfo, SellInfo } from "@/components";
 import { PlotDetail } from "@/pages/api/plot/[id]";
@@ -54,12 +54,20 @@ export const CancelSaleForm: React.FC<CancelSaleFormProps> = (props) => {
     onSuccess: () => {
       queryClient.invalidateQueries();
 
-      //router.push(`/`);
+      router.push(`/`);
     },
     onError: () => {
       return <div>error occured: Please try again later</div>;
     },
   });
+
+  if (mutation.isLoading) {
+    return <Loader />;
+  }
+
+  if (mutation.isError) {
+    return <div>Cannot cancel sale at this time, please try again later</div>;
+  }
 
   const onCancelSale = () => {
     const refundPayments = paymentRefundData[1].map((item) => item.value);
@@ -67,7 +75,6 @@ export const CancelSaleForm: React.FC<CancelSaleFormProps> = (props) => {
       saleId: plotDetail.sale?.plotSaleId!,
       refundPayments: refundPayments,
     };
-    console.log(data);
     mutation.mutate(data);
   };
   return (

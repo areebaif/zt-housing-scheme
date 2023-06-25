@@ -10,7 +10,7 @@ export enum PaymentValueStatus {
 
 export type PaymentStatusByPlot = {
   paymentStatus: PaymentStatusBySaleIdCustomerId[];
-}
+};
 
 export type PaymentPlanBySaleIdCustomerId = {
   // the Id is paymentPlanId
@@ -92,6 +92,9 @@ export default async function paymentStatus(
     const sumPaymentHistoryBySaleId = await prisma.$queryRaw<
       SumPaymentHistory[]
     >`select Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of, SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate from Sale left join Payments on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id group by Sale.id,Customer.id;`;
+
+    // the plot metadata
+    // since refunded plots no longer have sale_id this works
     const plotData = await prisma.plot.findMany({
       select: { id: true, sale_id: true },
     });

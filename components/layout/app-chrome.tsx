@@ -126,6 +126,12 @@ const logoutData = [
     link: "/plot/paymentStatus",
   },
   {
+    icon: <IconMessages size={16} />,
+    color: "pink",
+    label: "refunds",
+    link: "/plot/refunds",
+  },
+  {
     icon: <IconLogin size={16} />,
     color: "violet",
     label: "Logout",
@@ -145,6 +151,12 @@ const loginData = [
     color: "blue",
     label: "Payment Status",
     link: "/plot/paymentStatus",
+  },
+  {
+    icon: <IconMessages size={16} />,
+    color: "blue",
+    label: "refunds",
+    link: "/plot/refund",
   },
   {
     icon: <IconLogin size={16} />,
