@@ -5,6 +5,7 @@ import { Button, Grid, Group, TransferListData } from "@mantine/core";
 import { PaymentRefundTable } from "@/components";
 import { PlotBasicInfo, SellInfo } from "@/components";
 import { PlotDetail } from "@/pages/api/plot/[id]";
+import { cancelSale } from "@/r-query/functions";
 
 type CancelSaleFormProps = {
   plotDetail: PlotDetail;
@@ -18,6 +19,7 @@ type CancelSaleFormProps = {
 export const CancelSaleForm: React.FC<CancelSaleFormProps> = (props) => {
   // hooks
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   //props
   const {
@@ -47,12 +49,26 @@ export const CancelSaleForm: React.FC<CancelSaleFormProps> = (props) => {
   // plotDetails.sale.saleId
   // I need sale ID and cancelled payments to sedn to backend
 
+  const mutation = useMutation({
+    mutationFn: cancelSale,
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+
+      //router.push(`/`);
+    },
+    onError: () => {
+      return <div>error occured: Please try again later</div>;
+    },
+  });
+
   const onCancelSale = () => {
-    console.log(
-      "Hola I am here",
-      plotDetail.sale?.plotSaleId,
-      paymentRefundData
-    );
+    const refundPayments = paymentRefundData[1].map((item) => item.value);
+    const data = {
+      saleId: plotDetail.sale?.plotSaleId!,
+      refundPayments: refundPayments,
+    };
+    console.log(data);
+    mutation.mutate(data);
   };
   return (
     <>

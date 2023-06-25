@@ -118,7 +118,6 @@ export const postPlotPayment = async (data: {
 };
 
 export const postDeletePayment = async (paymentId: number) => {
-  console.log(paymentId, "holla");
   const response = await fetch(`/api/payment/delete`, {
     method: "POST",
     headers: {
@@ -144,5 +143,24 @@ export const fetchPaymentStatus = async () => {
     throw new Error("Network response was not ok");
   }
   const res: PaymentStatusByPlot = await response.json();
+  return res;
+};
+
+export const cancelSale = async (data: {
+  saleId: number;
+  refundPayments: any[];
+}) => {
+  const { saleId, refundPayments } = data;
+  const response = await fetch(`/api/plot/rescind`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ saleId: saleId, refundPayments: refundPayments }),
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const res: PostReturnType = await response.json();
   return res;
 };

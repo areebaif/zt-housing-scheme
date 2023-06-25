@@ -32,6 +32,16 @@ enum RegistryStatus {
   registry_transferred_to_customer
 }
 
+enum SaleStatus {
+  cancel
+  active
+}
+
+enum PaymentStatus {
+  refund
+  active
+}
+
 model Plot {
   id Int @id
   dimension String? @db.VarChar(255)
@@ -49,8 +59,16 @@ model Sale {
   customer_id Int
   sold_date DateTime
   total_sale_price Int
+  sale_status SaleStatus?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+}
+
+model RescindedSalePlotMetdata {
+  id Int @id @default(autoincrement())
+  sale_id Int
+  sale_price Int
+  plot_id Int
 }
 
 model Customer {
@@ -80,6 +98,7 @@ model Payments {
   payment_type PaymentType
   sale_id Int
   payment_date DateTime
+  payment_status PaymentStatus?
   payment_value Int
   created_at DateTime @default(now())
 }
