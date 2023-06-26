@@ -1,18 +1,34 @@
 import * as React from "react";
-import { Card, Title, Flex, Text } from "@mantine/core";
+import { Card, Title, Flex, Text, Group, Button } from "@mantine/core";
 import { PlotDetail } from "@/pages/api/plot/[id]";
 
 export type SellInfoProps = {
   plotDetail: PlotDetail;
   totalPayment: number;
+  setShowCancelSaleForm: (val: boolean) => void;
+  showCancelSaleForm: boolean;
 };
 
 export const SellInfo: React.FC<SellInfoProps> = (props) => {
-  const { plotDetail, totalPayment } = props;
+  const {
+    plotDetail,
+    totalPayment,
+    setShowCancelSaleForm,
+    showCancelSaleForm,
+  } = props;
   return (
     <Card style={{ height: "100%" }} shadow="sm" p="lg" radius="md" withBorder>
       <Card.Section withBorder inheritPadding py="xs">
-        <Title order={3}>Sell Information </Title>
+        <Group position="apart">
+          <Title order={3}>Sell Information </Title>
+          {!showCancelSaleForm && plotDetail.sale ? (
+            <Button onClick={() => setShowCancelSaleForm(true)}>
+              Cancel Sale
+            </Button>
+          ) : (
+            <></>
+          )}
+        </Group>
       </Card.Section>
       <Card.Section inheritPadding py="xs">
         <Flex
