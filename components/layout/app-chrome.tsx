@@ -133,7 +133,7 @@ const logoutData = [
   {
     icon: <IconAlertCircle size={16} />,
     color: "pink",
-    label: "refunds",
+    label: "Refund Summary",
     link: "/plot/refunds",
   },
   {
@@ -160,7 +160,7 @@ const loginData = [
   {
     icon: <IconAlertCircle size={16} />,
     color: "blue",
-    label: "refunds",
+    label: "Refund Summary",
     link: "/plot/refund",
   },
   {
