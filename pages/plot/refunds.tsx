@@ -2,13 +2,28 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { fetchRefundSummary } from "@/r-query/functions";
-import { Loader, Card, Grid, Title, Box, Divider, Text } from "@mantine/core";
-import { PaymentType, PaymentStatus } from "@prisma/client";
+import {
+  Loader,
+  Card,
+  Grid,
+  Title,
+  Box,
+  Divider,
+  Text,
+  TransferListData,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { refundPlotData } from "../api/plot/refundSummary";
+import { RefundPaymentModal } from "@/components";
 
 export const RefundSummary: React.FC = () => {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [paymentRefundData, setPaymentRefundData] =
+    React.useState<TransferListData>([[], []]);
   const { data: session, status } = useSession({
     required: true,
   });
+  const [PlotItemData, setPlotItemData] = React.useState<refundPlotData>();
 
   const fetchRefundStatus = useQuery(["refundSummary"], fetchRefundSummary, {
     enabled: status === "authenticated",
@@ -24,7 +39,35 @@ export const RefundSummary: React.FC = () => {
     return <span>Error: error occured</span>;
   }
   const refundSummary = fetchRefundStatus.data.data;
-  console.log(refundSummary, "holla");
+
+  const onModelOpen = (data: refundPlotData) => {
+    setPlotItemData(data);
+    const paymentsData = data.payments;
+
+    const notRefundedPayments = paymentsData.filter(
+      (item) => item.payment_status !== "refund"
+    );
+    const paymentRefundValues: TransferListData = [[], []];
+    notRefundedPayments?.map((payment) => {
+      paymentRefundValues[0].push({
+        value: payment.paymentId.toString(),
+        label: `${payment.payment_type} - ${payment.description} - ${new Date(
+          payment.payment_date
+        ).toDateString()} - ${`${payment.payment_value}`.replace(
+          /\B(?=(\d{3})+(?!\d))/g,
+          ","
+        )}`,
+      });
+    });
+    setPaymentRefundData(paymentRefundValues);
+    open();
+  };
+
+  const onModalClose = () => {
+    setPlotItemData(undefined);
+    setPaymentRefundData([[], []]);
+    close();
+  };
 
   return (
     <Card
@@ -81,7 +124,9 @@ export const RefundSummary: React.FC = () => {
             <React.Fragment key={index}>
               <Divider my="sm" />
               <Grid
-                //onClick={() => router.push(`/plot/${element.id}`)}
+                onClick={() => {
+                  onModelOpen(element);
+                }}
                 sx={(theme) => ({
                   "&:hover": {
                     backgroundColor:
@@ -135,13 +180,26 @@ export const RefundSummary: React.FC = () => {
                   <Text
                     sx={(theme) => ({ paddingLeft: theme.spacing.xl })}
                     fz="xl"
-                  >{`${total}/${refundedPayments}`}</Text>
+                  >{`${refundedPayments}/${total}`}</Text>
                 </Grid.Col>
               </Grid>
             </React.Fragment>
           );
         })}
       </Box>
+      {opened ? (
+        <RefundPaymentModal
+          plotData={PlotItemData}
+          opened={opened}
+          close={() => {
+            onModalClose();
+          }}
+          paymentRefundData={paymentRefundData}
+          setPaymentRefundData={setPaymentRefundData}
+        />
+      ) : (
+        <></>
+      )}
     </Card>
   );
 };

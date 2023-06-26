@@ -7,6 +7,7 @@ import { PlotBasicInfo } from "@/components/PlotIdPage/PlotBasicInfo";
 import { SellInfo } from "@/components/PlotIdPage/SellInfo";
 import { PaymentRefundTable } from "./PlotIdPage/PaymentRefundTable";
 import { CancelSaleForm } from "./PlotIdPage/CancelSaleForm/CancelSaleForm";
+import { RefundPaymentModal } from "./RefundsPage/RefundPaymentModal";
 
 export {
   AppChrome,
@@ -18,4 +19,5 @@ export {
   SellInfo,
   PaymentRefundTable,
   CancelSaleForm,
+  RefundPaymentModal,
 };
