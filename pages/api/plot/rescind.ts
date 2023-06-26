@@ -3,17 +3,11 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "../../../db/prisma";
 import { ReturnError } from "../customer/all";
-
-// export interface PlotsSelectFields {
-//   id: number;
-//   dimension: string | null;
-//   square_feet: number | null;
-//   plot_status: string;
-// }
+import { PostReturnType } from "../payment/add";
 
 export default async function allPlots(
   req: NextApiRequest,
-  res: NextApiResponse<any | ReturnError>
+  res: NextApiResponse<PostReturnType | ReturnError>
 ) {
   try {
     const saleId = req.body.saleId;

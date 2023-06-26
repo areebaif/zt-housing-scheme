@@ -1,7 +1,7 @@
 import * as React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { fetchRefundSummary } from "@/r-query/functions";
+import { fetchRefundSummary, refundPayment } from "@/r-query/functions";
 import {
   Loader,
   Card,
@@ -17,6 +17,8 @@ import { refundPlotData } from "../api/plot/refundSummary";
 import { RefundPaymentModal } from "@/components";
 
 export const RefundSummary: React.FC = () => {
+  // hooks
+  const queryClient = useQueryClient();
   const [opened, { open, close }] = useDisclosure(false);
   const [paymentRefundData, setPaymentRefundData] =
     React.useState<TransferListData>([[], []]);
@@ -31,11 +33,24 @@ export const RefundSummary: React.FC = () => {
     cacheTime: Infinity,
   });
 
-  if (fetchRefundStatus.isLoading) {
+  const mutation = useMutation({
+    mutationFn: refundPayment,
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+
+      //router.push(`/`);
+      onModalClose();
+    },
+    onError: () => {
+      return <div>error occured: Please try again later</div>;
+    },
+  });
+
+  if (fetchRefundStatus.isLoading || mutation.isLoading) {
     return <Loader />;
   }
 
-  if (fetchRefundStatus.isError) {
+  if (fetchRefundStatus.isError || mutation.isError) {
     return <span>Error: error occured</span>;
   }
   const refundSummary = fetchRefundStatus.data.data;
@@ -67,6 +82,11 @@ export const RefundSummary: React.FC = () => {
     setPlotItemData(undefined);
     setPaymentRefundData([[], []]);
     close();
+  };
+
+  const onSubmit = () => {
+    const refundPayments = paymentRefundData[1].map((item) => item.value);
+    mutation.mutate(refundPayments);
   };
 
   return (
@@ -196,6 +216,7 @@ export const RefundSummary: React.FC = () => {
           }}
           paymentRefundData={paymentRefundData}
           setPaymentRefundData={setPaymentRefundData}
+          onSubmit={onSubmit}
         />
       ) : (
         <></>

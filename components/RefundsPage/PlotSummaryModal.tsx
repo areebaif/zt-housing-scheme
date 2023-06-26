@@ -33,11 +33,13 @@ export const PlotSummaryModal: React.FC<modalPlotSummaryProps> = ({
         withBorder
         style={{ margin: "25px 0 0 0" }}
       >
-        <Grid>
-          <Grid.Col sx={(theme) => ({ textAlign: "center" })} span={12}>
-            <Title order={5}>Plot Information</Title>
-          </Grid.Col>
-        </Grid>
+        <Card.Section withBorder inheritPadding py="xs">
+          <Grid>
+            <Grid.Col sx={(theme) => ({ textAlign: "center" })} span={12}>
+              <Title order={5}>Plot Information</Title>
+            </Grid.Col>
+          </Grid>
+        </Card.Section>
         <Card.Section withBorder inheritPadding py="xs">
           <Grid gutter={5} gutterXs="md" gutterMd="xl" gutterXl={50}>
             <Grid.Col span={"auto"}>
