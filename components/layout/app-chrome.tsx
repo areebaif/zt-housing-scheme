@@ -19,7 +19,12 @@ import {
 } from "@mantine/core";
 
 import { User } from "./User";
-import { IconMessages, IconDatabase, IconLogin } from "@tabler/icons-react";
+import {
+  IconMessages,
+  IconDatabase,
+  IconLogin,
+  IconAlertCircle,
+} from "@tabler/icons-react";
 
 export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
   return (
@@ -126,7 +131,7 @@ const logoutData = [
     link: "/plot/paymentStatus",
   },
   {
-    icon: <IconMessages size={16} />,
+    icon: <IconAlertCircle size={16} />,
     color: "pink",
     label: "refunds",
     link: "/plot/refunds",
@@ -153,7 +158,7 @@ const loginData = [
     link: "/plot/paymentStatus",
   },
   {
-    icon: <IconMessages size={16} />,
+    icon: <IconAlertCircle size={16} />,
     color: "blue",
     label: "refunds",
     link: "/plot/refund",

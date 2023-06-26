@@ -176,6 +176,6 @@ export const fetchRefundSummary = async () => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  const res: refundPlotData[] = await response.json();
+  const res: { data: refundPlotData[] } = await response.json();
   return res;
 };
