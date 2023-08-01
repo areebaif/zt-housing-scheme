@@ -182,7 +182,7 @@ export const RefundSummary: React.FC = () => {
                   span={"auto"}
                 >
                   <Text fz="xl">
-                    {`${element.sale.sale_price}`.replace(
+                    {`${element.sale.total_sale_price}`.replace(
                       /\B(?=(\d{3})+(?!\d))/g,
                       ","
                     )}
