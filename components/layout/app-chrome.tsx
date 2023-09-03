@@ -32,7 +32,7 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
       padding="md"
       navbar={<Navigation />}
       header={
-        <Header pl="xl" height={103}>
+        <Header pl="xl" height={103} >
           <Group position="apart" pr="xl" mr="sm">
             <Flex gap="xl">
               <Link href={"/"}>
@@ -69,7 +69,6 @@ const Navigation: React.FC = () => {
       <Navbar.Section grow mt="md">
         <MainLinks />
       </Navbar.Section>
-
       <Navbar.Section>
         <User />
       </Navbar.Section>

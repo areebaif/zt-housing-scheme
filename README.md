@@ -32,6 +32,8 @@ Create .env.local file in the root of the project and have the following environ
 
 In your terminal, in the root of the project run `npm install`
 
+- Prisma ORM: To use database commands succesfully generate prisma client. In the root of your project run `npx prisma generate client`
+
 ### Start development server
 
 ```bash
@@ -49,8 +51,3 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-Prisma ORM
-
-- To use the prisma command with your terminal prefix prisma command with npx since we installed prisma with package manager
-- prisma command: `npx prisma generate client`

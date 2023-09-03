@@ -64,13 +64,6 @@ model Sale {
   updated_at DateTime @updatedAt
 }
 
-model RescindedSalePlotMetdata {
-  id Int @id @default(autoincrement())
-  sale_id Int
-  sale_price Int
-  plot_id Int
-}
-
 model Customer {
   id Int @id @default(autoincrement())
   name String  @db.VarChar(255)
@@ -80,6 +73,13 @@ model Customer {
   cnic String @unique  @db.VarChar(15)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+}
+
+model RescindedSalePlotMetdata {
+  id Int @id @default(autoincrement())
+  sale_id Int
+  sale_price Int
+  plot_id Int
 }
 
 model Payment_Plan {
