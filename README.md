@@ -21,7 +21,7 @@ Create .env.local file in the root of the project and have the following environ
 
 1. `DATABASE_URL = 'mysql://root@127.0.0.1:3309/<DATABASE_NAME>'`
    Note: In the .env.local file, 3309 is the port number and it is the same port number you used to connect to the planetscale database
-2. `NEXTAUTH_SECRET=`[ Open your terminal adn use this command to generate a secret `openssl rand -base64 32`]
+2. `NEXTAUTH_SECRET=``[Contact admin for credentials]`
 3. `EMAIL_SERVER_HOST=smtp.sendgrid.net`
 4. `EMAIL_FROM=zt.housing.scheme@gmail.com`
 5. `EMAIL_SERVER_PORT=587`
@@ -51,3 +51,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+
+### Branching Strategy
+
+Our base branch that everything comes from is called main. All branches originate from the main branch.
