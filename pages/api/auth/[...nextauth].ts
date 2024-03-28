@@ -6,7 +6,6 @@ import { prisma } from "@/db/prisma";
 //import { User } from "@prisma/client";
 import { User } from "next-auth";
 
-
 if (
   !process.env.EMAIL_SERVER_HOST ||
   !process.env.EMAIL_SERVER_PORT ||
@@ -22,13 +21,13 @@ export const authOptions = {
   session: {
     strategy: "jwt" as SessionStrategy,
     // Seconds - How long until an idle session expires and is no longer valid.
-    // maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 5 * 24 * 60 * 60, // 30 days
     // Seconds - Throttle how frequently to write to database to extend a session.
   },
   jwt: {
     // The maximum age of the NextAuth.js issued JWT in seconds.
     // Defaults to `session.maxAge`.
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge: 60 * 60 * 24 * 5,
   },
   callbacks: {
     async signIn(props: { user: User & { verifiedUser?: boolean } }) {

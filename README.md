@@ -21,10 +21,10 @@ Create .env.local file in the root of the project and have the following environ
 
 1. `DATABASE_URL = 'mysql://root@127.0.0.1:3309/<DATABASE_NAME>'`
    Note: In the .env.local file, 3309 is the port number and it is the same port number you used to connect to the planetscale database
-2. `NEXTAUTH_SECRET=``[Contact admin for credentials]`
-3. `EMAIL_SERVER_HOST=smtp.sendgrid.net`
-4. `EMAIL_FROM=zt.housing.scheme@gmail.com`
-5. `EMAIL_SERVER_PORT=587`
+2. `NEXTAUTH_SECRET=[Contact admin for credentials]`
+3. `EMAIL_SERVER_HOST=[Contact admin for credentials]`
+4. `EMAIL_FROM=[Contact admin for credentials]`
+5. `EMAIL_SERVER_PORT=[Contact admin for credentials]`
 6. `EMAIL_SERVER_USER=[Contact admin for credentials]`
 7. `EMAIL_SERVER_PASSWORD=[Contact admin for credentials]`
 
