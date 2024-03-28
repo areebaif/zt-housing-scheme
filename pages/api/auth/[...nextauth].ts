@@ -21,7 +21,7 @@ export const authOptions = {
   session: {
     strategy: "jwt" as SessionStrategy,
     // Seconds - How long until an idle session expires and is no longer valid.
-    maxAge: 5 * 24 * 60 * 60, // 30 days
+    maxAge: 5 * 24 * 60 * 60, // 5 days
     // Seconds - Throttle how frequently to write to database to extend a session.
   },
   jwt: {
