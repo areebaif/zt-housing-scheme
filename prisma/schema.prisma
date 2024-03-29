@@ -42,7 +42,14 @@ enum PaymentStatus {
   active
 }
 
+model HousingScheme {
+  id Int @id @default(autoincrement())
+  name String  @db.VarChar(500)
+}
+
 model Plot {
+  uniqueId String? @default(uuid())
+  housing_scheme Int?
   id Int @id
   dimension String? @db.VarChar(255)
   square_feet Int?
