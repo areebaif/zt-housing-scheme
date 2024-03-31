@@ -1,0 +1,964 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ZT Housing Scheme",
+    "description": "This is the api design for zt housing scheme server based on opneAPI 3.0 specifications.",
+    "contact": {
+      "email": "zt.housing.scheme@gmail.com"
+    },
+    "version": "1.0.11"
+  },
+  "servers": [
+    {
+      "url": "https://zt-housing-scheme.vercel.app/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "plot",
+      "description": "operations related to creating, reading, updating and deleting plot data"
+    },
+    {
+      "name": "customer",
+      "description": "operations related to creating, reading, updating and deleting customer info in the database."
+    },
+    {
+      "name": "payment",
+      "description": "operations related to creating, reading, updating and deleting payments info in the database."
+    }
+  ],
+  "paths": {
+    "/api/customer/all": {
+      "get": {
+        "tags": [
+          "customer"
+        ],
+        "summary": "list customers",
+        "description": "read customer infor from database.",
+        "operationId": "listCustomer",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "example": 1
+                      },
+                      "value": {
+                        "type": "string",
+                        "example": "44444-4444-444-4"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Ahmed"
+                      },
+                      "son_of": {
+                        "type": "string",
+                        "example": "Ahmed"
+                      },
+                      "phone": {
+                        "type": "string"
+                      },
+                      "address": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payment/add": {
+      "post": {
+        "tags": [
+          "payment"
+        ],
+        "summary": "create payment",
+        "description": "add payments against customers in the databse",
+        "operationId": "createPayment",
+        "requestBody": {
+          "description": "The request body contains saleId and info about payment such as value date",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "saleId": {
+                    "type": "number"
+                  },
+                  "payment": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number"
+                      },
+                      "dateParsed": {
+                        "type": "string"
+                      },
+                      "dateISOString": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "number"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "paymentType": {
+                        "type": "string",
+                        "enum": [
+                          "down_payment",
+                          "development_charge",
+                          "installment",
+                          "other"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid data supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payment/delete": {
+      "post": {
+        "tags": [
+          "payment"
+        ],
+        "summary": "delete payment in the database",
+        "description": "delet payment",
+        "operationId": "deletePayment",
+        "requestBody": {
+          "description": "The request body contains PaymentId to delete payment in the database",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "paymentId": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid data supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payment/paymentStatus": {
+      "get": {
+        "tags": [
+          "payment"
+        ],
+        "summary": "list payment status of delayed and upcoming payments",
+        "description": "operation to get status of payments",
+        "operationId": "listPaymentStatus",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "paymentStatus": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number"
+                          },
+                          "payment_type": {
+                            "type": "string",
+                            "enum": [
+                              "down_payment",
+                              "development_charge",
+                              "installment",
+                              "other"
+                            ]
+                          },
+                          "sale_id": {
+                            "type": "number"
+                          },
+                          "payment_date": {
+                            "type": "string"
+                          },
+                          "payment_value": {
+                            "type": "number"
+                          },
+                          "plot_id": {
+                            "type": "string"
+                          },
+                          "customer_id": {
+                            "type": "number"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "son_of": {
+                            "type": "string"
+                          },
+                          "cnic": {
+                            "type": "string"
+                          },
+                          "lastPaymentDate": {
+                            "type": "string"
+                          },
+                          "paymentValueStatus": {
+                            "type": "string",
+                            "enum": [
+                              "partial payment",
+                              "not paid"
+                            ]
+                          },
+                          "paymentCollectionValue": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid data supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payment/refundPayment": {
+      "post": {
+        "tags": [
+          "payment"
+        ],
+        "summary": "refund payment in case a sale is rescinded",
+        "description": "changes the status of payment",
+        "operationId": "refundPayment",
+        "requestBody": {
+          "description": "The request body contains array of paymentId to refund",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid data supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plot/{id}": {
+      "get": {
+        "tags": [
+          "plot"
+        ],
+        "summary": "Get a plot by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Numeric ID of the plot to get"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "plot": {
+                      "type": "object",
+                      "properties": {
+                        "uniqueId": {
+                          "type": "string"
+                        },
+                        "housing_scheme": {
+                          "type": "number"
+                        },
+                        "id": {
+                          "type": "number"
+                        },
+                        "dimension": {
+                          "type": "string"
+                        },
+                        "square_feet": {
+                          "type": "number"
+                        },
+                        "sale_id": {
+                          "type": "number"
+                        },
+                        "sale_price": {
+                          "type": "number"
+                        },
+                        "fully_sold_date": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "plot_status": {
+                          "type": "string",
+                          "enum": [
+                            "not_sold",
+                            "partially_paid",
+                            "fully_paid",
+                            "registry_transferred"
+                          ]
+                        }
+                      }
+                    },
+                    "sale": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "sold_price": {
+                          "type": "number"
+                        },
+                        "sold_date": {
+                          "type": "string"
+                        },
+                        "plotSaleId": {
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "customer": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "son_of": {
+                          "type": "string"
+                        },
+                        "phone_number": {
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "cnic": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      }
+                    },
+                    "payment_history": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "payment_type": {
+                          "type": "string",
+                          "enum": [
+                            "down_payment",
+                            "development_charge",
+                            "installment",
+                            "other"
+                          ]
+                        },
+                        "sale_id": {
+                          "type": "number"
+                        },
+                        "payment_date": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "payment_status": {
+                          "type": "string",
+                          "enum": [
+                            "active",
+                            "refund"
+                          ]
+                        },
+                        "payment_value": {
+                          "type": "number"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      }
+                    },
+                    "payment_plan": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "payment_type": {
+                          "type": "string",
+                          "enum": [
+                            "down_payment",
+                            "development_charge",
+                            "installment",
+                            "other"
+                          ]
+                        },
+                        "sale_id": {
+                          "type": "number"
+                        },
+                        "payment_date": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "payment_value": {
+                          "type": "number"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid data supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plot/add": {
+      "post": {
+        "tags": [
+          "plot"
+        ],
+        "summary": "add plot sale in the databse",
+        "description": "add plot sale",
+        "operationId": "addPlotSale",
+        "requestBody": {
+          "description": "The request body contains ionformation to add plot sale",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "paymentPlan": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "dateParsed": {
+                          "type": "string"
+                        },
+                        "dateISOString": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "number"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "paymentType": {
+                          "type": "string",
+                          "enum": [
+                            "down_payment",
+                            "development_charge",
+                            "installment",
+                            "other"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "customer": {
+                    "type": "object",
+                    "properties": {
+                      "customerCNIC": {
+                        "type": "string"
+                      },
+                      "customerName": {
+                        "type": "string"
+                      },
+                      "sonOf": {
+                        "type": "string"
+                      },
+                      "newCustomer": {
+                        "type": "boolean"
+                      },
+                      "customerPhone": {
+                        "type": "string"
+                      },
+                      "customerAddress": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "plotId": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "squareFeet": {
+                          "type": "string"
+                        },
+                        "dimension": {
+                          "type": "string"
+                        },
+                        "sellPrice": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "sellPrice": {
+                    "type": "number"
+                  },
+                  "soldDateString": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid data supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plot/all": {
+      "get": {
+        "tags": [
+          "plot"
+        ],
+        "summary": "list plots",
+        "description": "read plot infor from database.",
+        "operationId": "listPlot",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number"
+                      },
+                      "dimension": {
+                        "type": "string"
+                      },
+                      "square_feet": {
+                        "type": "number"
+                      },
+                      "plot_status": {
+                        "type": "string",
+                        "enum": [
+                          "not_sold",
+                          "partially_paid",
+                          "fully_paid",
+                          "registry_transferred"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plot/edit": {
+      "post": {
+        "tags": [
+          "plot"
+        ],
+        "summary": "edit plot sale in the databse",
+        "description": "edit plot sale",
+        "operationId": "editPlotSale",
+        "requestBody": {
+          "description": "The request body contains ionformation to edit plot sale",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "paymentPlan": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "dateParsed": {
+                          "type": "string"
+                        },
+                        "dateISOString": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "number"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "paymentType": {
+                          "type": "string",
+                          "enum": [
+                            "down_payment",
+                            "development_charge",
+                            "installment",
+                            "other"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "customer": {
+                    "type": "object",
+                    "properties": {
+                      "customerCNIC": {
+                        "type": "string"
+                      },
+                      "customerName": {
+                        "type": "string"
+                      },
+                      "sonOf": {
+                        "type": "string"
+                      },
+                      "newCustomer": {
+                        "type": "boolean"
+                      },
+                      "customerPhone": {
+                        "type": "string"
+                      },
+                      "customerAddress": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "plotId": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "squareFeet": {
+                          "type": "string"
+                        },
+                        "dimension": {
+                          "type": "string"
+                        },
+                        "sellPrice": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "sellPrice": {
+                    "type": "number"
+                  },
+                  "soldDateString": {
+                    "type": "string"
+                  },
+                  "isEditPaymentPlan": {
+                    "type": "boolean"
+                  },
+                  "plotSaleId": {
+                    "type": "number"
+                  },
+                  "isEditPlotIdDetail": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid data supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
