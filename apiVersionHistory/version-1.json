@@ -25,6 +25,10 @@
     {
       "name": "payment",
       "description": "operations related to creating, reading, updating and deleting payments info in the database."
+    },
+    {
+      "name": "user",
+      "description": "user that have access to create, read, update, delete information"
     }
   ],
   "paths": {
@@ -927,6 +931,320 @@
         },
         "responses": {
           "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid data supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plot/notSold": {
+      "get": {
+        "tags": [
+          "plot"
+        ],
+        "summary": "list of unsold plots",
+        "description": "read plot infor from database.",
+        "operationId": "listUnsoldPlot",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "plot_status": {
+                        "type": "string",
+                        "enum": [
+                          "not_sold",
+                          "partially_paid",
+                          "fully_paid",
+                          "registry_transferred"
+                        ]
+                      },
+                      "id": {
+                        "type": "number"
+                      },
+                      "dimension": {
+                        "type": "string"
+                      },
+                      "square_feet": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plot/refundSummary": {
+      "get": {
+        "tags": [
+          "plot"
+        ],
+        "summary": "list of refunded plots",
+        "description": "read rescind plot sale infor from database.",
+        "operationId": "listRescindSalePlot",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "Sale": {
+                            "type": "object",
+                            "properties": {
+                              "sale_id": {
+                                "type": "number"
+                              },
+                              "sale_price": {
+                                "type": "number"
+                              },
+                              "plotId": {
+                                "type": "string"
+                              },
+                              "total_sale_price": {
+                                "type": "number"
+                              },
+                              "sold_date": {
+                                "type": "string",
+                                "format": "date"
+                              }
+                            }
+                          },
+                          "customer": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "cnic": {
+                                "type": "string"
+                              },
+                              "son_of": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "payments": {
+                            "type": "object",
+                            "properties": {
+                              "paymentId": {
+                                "type": "number"
+                              },
+                              "payment_type": {
+                                "type": "string",
+                                "enum": [
+                                  "down_payment",
+                                  "development_charge",
+                                  "installment",
+                                  "other"
+                                ]
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "payment_date": {
+                                "type": "string",
+                                "format": "date"
+                              },
+                              "payment_value": {
+                                "type": "number"
+                              },
+                              "payment_status": {
+                                "type": "string",
+                                "enum": [
+                                  "active",
+                                  "refund"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plot/rescind": {
+      "post": {
+        "tags": [
+          "plot"
+        ],
+        "summary": "cancel sale of plot",
+        "description": "cancel sale of plot",
+        "operationId": "cancelSale",
+        "requestBody": {
+          "description": "The request body contains saleId and info about payment such as value to cancel sales.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "saleId": {
+                    "type": "string"
+                  },
+                  "refundPayments": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid data supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "something went wrong with the server"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/addUser": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "add user",
+        "description": "add user",
+        "operationId": "createUser",
+        "requestBody": {
+          "description": "The request body contains saleId and info about payment such as value to cancel sales.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "saleId": {
+                    "type": "string"
+                  },
+                  "refundPayments": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
             "description": "Successful operation",
             "content": {
               "application/json": {
