@@ -1,11 +1,10 @@
 import * as React from "react";
 import { useRouter } from "next/router";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Button, Grid, Group, TransferListData, Loader } from "@mantine/core";
-import { PaymentRefundTable } from "@/components";
-import { PlotBasicInfo, SellInfo } from "@/components";
-import { PlotDetail } from "@/pages/api/plot/[id]";
-import { cancelSale } from "@/r-query/functions";
+import { PaymentRefundTable, PlotBasicInfo, SellInfo } from "@/components";
+import { PlotDetail } from "@/pages/api/housingScheme/[housingSchemeId]/plot/[id]";
+import { cancelPlotSale } from "@/r-query/functions";
 
 type CancelSaleFormProps = {
   plotDetail: PlotDetail;
@@ -20,7 +19,7 @@ export const CancelSaleForm: React.FC<CancelSaleFormProps> = (props) => {
   // hooks
   const queryClient = useQueryClient();
   const router = useRouter();
-
+  const housingSchemeId = router.query?.housingSchemeId as string;
   //props
   const {
     plotDetail,
@@ -50,7 +49,7 @@ export const CancelSaleForm: React.FC<CancelSaleFormProps> = (props) => {
   // I need sale ID and cancelled payments to sedn to backend
 
   const mutation = useMutation({
-    mutationFn: cancelSale,
+    mutationFn: cancelPlotSale,
     onSuccess: () => {
       queryClient.invalidateQueries();
 
@@ -74,6 +73,7 @@ export const CancelSaleForm: React.FC<CancelSaleFormProps> = (props) => {
     const data = {
       saleId: plotDetail.sale?.plotSaleId!,
       refundPayments: refundPayments,
+      housingSchemeId,
     };
     mutation.mutate(data);
   };

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Card, Title, Grid, Group, Text } from "@mantine/core";
-import { PlotDetail } from "@/pages/api/plot/[id]";
+import { PlotDetail } from "@/pages/api/housingScheme/[housingSchemeId]/plot/[id]";
 
 export type PlotBasicInfoProps = {
   plotDetail: PlotDetail;

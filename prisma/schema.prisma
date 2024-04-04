@@ -45,12 +45,13 @@ enum PaymentStatus {
 model HousingScheme {
   id Int @id @default(autoincrement())
   name String  @db.VarChar(500)
+  // sale Sale[]
 }
 
 model Plot {
   uniqueId String? @default(uuid())
   housing_scheme Int?
-  id Int @id
+  id Int @id 
   dimension String? @db.VarChar(255)
   square_feet Int?
   sale_id Int?
@@ -59,16 +60,20 @@ model Plot {
   created_at DateTime @default(now())
   updated_at DateTime  @updatedAt
   plot_status Status
+  @@unique(name: "plotId", [housing_scheme, id])
 }
 
 model Sale {
   id Int @id
+  housing_scheme Int
   customer_id Int
   sold_date DateTime
   total_sale_price Int
   sale_status SaleStatus? @default(active)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  // housingScheme    HousingScheme    @relation(fields: [housing_scheme], references: [id])
+
 }
 
 model Customer {

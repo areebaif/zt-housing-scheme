@@ -1,6 +1,6 @@
 import { Modal, TransferListData, Button, Group } from "@mantine/core";
 import { PaymentRefundTable } from "../PlotIdPage/PaymentRefundTable";
-import { refundPlotData } from "@/pages/api/plot/refundSummary";
+import { refundPlotData } from "@/pages/api/housingScheme/[housingSchemeId]/plot/refunds";
 import { PlotSummaryModal } from "./PlotSummaryModal";
 
 type RefundPaymentModalProps = {

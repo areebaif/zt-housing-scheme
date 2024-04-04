@@ -32,7 +32,7 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
       padding="md"
       navbar={<Navigation />}
       header={
-        <Header pl="xl" height={103} >
+        <Header pl="xl" height={103}>
           <Group position="apart" pr="xl" mr="sm">
             <Flex gap="xl">
               <Link href={"/"}>
@@ -116,64 +116,43 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
   );
 }
 
-const logoutData = [
+const linkData = (housingSchemeId: string, isLoggedIn: boolean) => [
   {
     icon: <IconDatabase size={16} />,
     color: "teal",
     label: "Sale Summary",
-    link: "/",
+    link: `/housingScheme/${housingSchemeId}`,
   },
   {
     icon: <IconMessages size={16} />,
     color: "blue",
     label: "Payment Status",
-    link: "/plot/paymentStatus",
+    link: `/housingScheme/${housingSchemeId}/payments`,
   },
   {
     icon: <IconAlertCircle size={16} />,
     color: "pink",
     label: "Refund Summary",
-    link: "/plot/refunds",
+    link: `/housingScheme/${housingSchemeId}/refunds`,
   },
   {
     icon: <IconLogin size={16} />,
     color: "violet",
     label: "Logout",
-    link: "/auth/signout",
-  },
-];
-
-const loginData = [
-  {
-    icon: <IconDatabase size={16} />,
-    color: "teal",
-    label: "Sale Summary",
-    link: "/",
-  },
-  {
-    icon: <IconMessages size={16} />,
-    color: "blue",
-    label: "Payment Status",
-    link: "/plot/paymentStatus",
-  },
-  {
-    icon: <IconAlertCircle size={16} />,
-    color: "blue",
-    label: "Refund Summary",
-    link: "/plot/refund",
-  },
-  {
-    icon: <IconLogin size={16} />,
-    color: "violet",
-    label: "Login",
-    link: "/auth/signin",
+    link: `${isLoggedIn ? `/auth/signout` : `/auth/signin`}`,
   },
 ];
 
 export function MainLinks() {
   const { data: session } = useSession();
+  const router = useRouter();
+  const housingSchemeId = router.query?.housingSchemeId as string;
   const links = session
-    ? logoutData.map((link) => <MainLink {...link} key={link.label} />)
-    : loginData.map((link) => <MainLink {...link} key={link.label} />);
+    ? linkData(housingSchemeId, true).map((link) => (
+        <MainLink {...link} key={link.label} />
+      ))
+    : linkData(housingSchemeId, false).map((link) => (
+        <MainLink {...link} key={link.label} />
+      ));
   return <div>{links}</div>;
 }

@@ -4,7 +4,7 @@ import { Plot } from "@prisma/client";
 import { Text, Group, Button, Loader, Card, Title, Grid } from "@mantine/core";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { TableRowItem } from "./PaymentInputTable";
-import { postPlotPayment } from "@/r-query/functions";
+import { createPayment } from "@/r-query/functions";
 import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInput";
 
 type AddPayment = {
@@ -35,7 +35,7 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
   const [tableRows, setTableRows] = React.useState<TableRowItem[]>([]);
 
   const mutation = useMutation({
-    mutationFn: postPlotPayment,
+    mutationFn: createPayment,
     onSuccess: () => {
       queryClient.invalidateQueries();
       // setPayment form false

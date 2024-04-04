@@ -2,8 +2,7 @@ import * as React from "react";
 import { Flex, Button, Box, Select, NumberInput, Table } from "@mantine/core";
 import { Plot } from "@prisma/client";
 import { AllPlotId } from "../../PlotUpsertForm";
-import { NotSoldPlotsSelectFields } from "@/pages/api/plot/notSold";
-
+import { NotSoldPlotsSelectFields } from "@/pages/api/housingScheme/[housingSchemeId]/plot";
 type PlotIdInput = {
   plot: Plot[];
   allPlotSale: AllPlotId[];

@@ -13,8 +13,8 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Payments } from "@prisma/client";
-import { PlotDetail } from "@/pages/api/plot/[id]";
-import { postDeletePayment } from "@/r-query/functions";
+import { PlotDetail } from "@/pages/api/housingScheme/[housingSchemeId]/plot/[id]";
+import { deletePayment } from "@/r-query/functions";
 
 export type PaymentHistoryTableProps = {
   tableRows?: Payments[];
@@ -36,7 +36,7 @@ export const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = (
   }>();
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: postDeletePayment,
+    mutationFn: deletePayment,
     onSuccess: () => {
       queryClient.invalidateQueries();
       close();

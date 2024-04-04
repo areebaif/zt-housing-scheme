@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { PaymentType, Payment_Plan, Plot } from "@prisma/client";
-import { prisma } from "../../../db/prisma";
-import { PostReturnType } from "../payment/add";
+import { prisma } from "@/db/prisma";
+import { PostReturnType } from "@/pages/api/payments";
 import { CustomerFormPost } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
 import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 import { AllPlotId } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
@@ -25,6 +25,7 @@ export default async function editPlots(
   res: NextApiResponse<PostReturnType>
 ) {
   try {
+    const { housingSchemeId } = req.query;
     const paymentPlan = req.body.paymentPlan as TableRowItem[];
     const customer = req.body.customer as CustomerFormPost;
     const plotId = req.body.plotId as AllPlotId[];
@@ -33,7 +34,12 @@ export default async function editPlots(
     const isEditPaymentPlan = req.body.isEditPaymentPlan as boolean;
     const plotSaleId = req.body.plotSaleId as number | undefined;
     const isEditPlotIdDetail = req.body.isEditPlotIdDetail as boolean;
-
+    if (typeof housingSchemeId !== "string") {
+      return res.status(404).json({
+        error: "incorrect query parameter, expect query parameter as string",
+      });
+    }
+    const id = housingSchemeId as string;
     if (typeof plotSaleId !== "number")
       throw new Error("plotSale id is not defined");
 
@@ -109,10 +115,14 @@ export default async function editPlots(
           },
         });
         // update new plots
+        // here I need to update by bla bla
         const updateNewPlot = plotId.map((plot) => {
           return prisma.plot.update({
             where: {
-              id: plot.id,
+              plotId: {
+                housing_scheme: parseInt(id),
+                id: plot.id,
+              },
             },
             data: {
               sale_price: plot.sellPrice,
@@ -199,7 +209,10 @@ export default async function editPlots(
         const newPlot = plotId.map((plot) => {
           return prisma.plot.update({
             where: {
-              id: plot.id,
+              plotId: {
+                housing_scheme: parseInt(id),
+                id: plot.id,
+              },
             },
             data: {
               sale_price: plot.sellPrice,
@@ -270,7 +283,10 @@ export default async function editPlots(
         const newPlots = plotId.map((plot) => {
           return prisma.plot.update({
             where: {
-              id: plot.id,
+              plotId: {
+                housing_scheme: parseInt(id),
+                id: plot.id,
+              },
             },
             data: {
               sale_price: plot.sellPrice,
@@ -328,7 +344,10 @@ export default async function editPlots(
         const newPlotsUpdate = plotId.map((plot) => {
           return prisma.plot.update({
             where: {
-              id: plot.id,
+              plotId: {
+                housing_scheme: parseInt(id),
+                id: plot.id,
+              },
             },
             data: {
               sale_price: plot.sellPrice,

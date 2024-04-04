@@ -1,5 +1,5 @@
 import { Card, Grid, Title, Divider, Text } from "@mantine/core";
-import { refundPlotData } from "@/pages/api/plot/refundSummary";
+import { refundPlotData } from "@/pages/api/housingScheme/[housingSchemeId]/plot/refunds";
 
 type modalPlotSummaryProps = {
   plotId: string;
