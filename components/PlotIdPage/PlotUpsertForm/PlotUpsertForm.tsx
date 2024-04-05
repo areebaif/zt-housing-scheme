@@ -120,7 +120,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     onSuccess: () => {
       queryClient.invalidateQueries();
       setShowForm(false);
-      router.push(`/plot/${plot[0].id}`);
+      router.push(`/housingScheme/${housingSchemeId}/plot/${plot[0].id}`);
     },
     onError: () => {
       return <div>error occured: Please try again later</div>;

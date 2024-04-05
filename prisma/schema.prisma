@@ -49,9 +49,9 @@ model HousingScheme {
 }
 
 model Plot {
-  uniqueId String? @default(uuid())
-  housing_scheme Int?
-  id Int @id 
+  uniqueId String @id @default(uuid())
+  housing_scheme Int
+  id Int  
   dimension String? @db.VarChar(255)
   square_feet Int?
   sale_id Int?
@@ -65,7 +65,7 @@ model Plot {
 
 model Sale {
   id Int @id
-  housing_scheme Int
+  housing_scheme Int?
   customer_id Int
   sold_date DateTime
   total_sale_price Int

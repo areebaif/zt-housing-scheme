@@ -24,12 +24,13 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
     name,
     cnic,
     setShowAddPaymentForm,
-    
+
     plotSaleId,
   } = props;
   const queryClient = useQueryClient();
   // router
   const router = useRouter();
+  const housingSchemeId = router.query?.housingSchemeId as string;
 
   // table props
   const [tableRows, setTableRows] = React.useState<TableRowItem[]>([]);
@@ -40,7 +41,7 @@ export const AddPayment: React.FC<AddPayment> = (props: AddPayment) => {
       queryClient.invalidateQueries();
       // setPayment form false
       setShowAddPaymentForm(false);
-      router.push(`/plot/${plotNumber[0].id}`);
+      router.push(`/housingScheme/${housingSchemeId}/plot/${plotNumber[0].id}`);
     },
   });
 

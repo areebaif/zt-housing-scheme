@@ -53,7 +53,7 @@ export const CancelSaleForm: React.FC<CancelSaleFormProps> = (props) => {
     onSuccess: () => {
       queryClient.invalidateQueries();
 
-      router.push(`/`);
+      router.push(`/housingScheme/${housingSchemeId}`);
     },
     onError: () => {
       return <div>error occured: Please try again later</div>;

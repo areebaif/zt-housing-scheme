@@ -7,7 +7,7 @@ import { PostReturnType } from "@/pages/api/payments";
 
 type RefundPlotSQLQuery = {
   sale_id: number;
-  sale_price: number;
+  //sale_price: number;
   plotId: string;
   total_sale_price: number;
   sold_date: string;
@@ -25,7 +25,7 @@ type RefundPlotSQLQuery = {
 export type refundPlotData = {
   sale: {
     sale_id: number;
-    sale_price: number;
+    //sale_price: number;
     plotId: string;
     total_sale_price: number;
     sold_date: string;
@@ -54,6 +54,7 @@ export default async function refundSummary(
   try {
     if (req.method === "GET") {
       const id = req.query.housingSchemeId;
+
       if (typeof id !== "string") {
         return res.status(404).json({
           error: "type mismatch: expected housingSchemeId as string",
@@ -63,14 +64,14 @@ export default async function refundSummary(
       const housingSchemeId = parseInt(HousingId);
       const plotData = await prisma.$queryRaw<
         RefundPlotSQLQuery[]
-      >`select RescindedSalePlotMetdata.sale_id,RescindedSalePlotMetdata.sale_price, GROUP_CONCAT(RescindedSalePlotMetdata.plot_id) as plotId, Sale.total_sale_price, Sale.sold_date ,Customer.name,Customer.cnic,Customer.son_of,  Payments.id as paymentId,Payments.payment_type, Payments.description, Payments.payment_date, Payments.payment_value, Payments.payment_status from RescindedSalePlotMetdata  join Sale on RescindedSalePlotMetdata.sale_id=Sale.id join Customer on Sale.customer_id=Customer.id join Payments on Payments.sale_id=Sale.id and Sale.housing_scheme= ${housingSchemeId}  Group By RescindedSalePlotMetdata.sale_id, RescindedSalePlotMetdata.sale_price,Sale.total_sale_price,Customer.name,Customer.cnic,Customer.son_of, Payments.id, Sale.sold_date`;
+      >`select RescindedSalePlotMetdata.sale_id, GROUP_CONCAT(RescindedSalePlotMetdata.plot_id) as plotId, Sale.total_sale_price, Sale.sold_date ,Customer.name,Customer.cnic,Customer.son_of,  Payments.id as paymentId,Payments.payment_type, Payments.description, Payments.payment_date, Payments.payment_value, Payments.payment_status from RescindedSalePlotMetdata  join Sale on RescindedSalePlotMetdata.sale_id=Sale.id join Customer on Sale.customer_id=Customer.id join Payments on Payments.sale_id=Sale.id and Sale.housing_scheme= ${housingSchemeId}  Group By RescindedSalePlotMetdata.sale_id,Sale.total_sale_price,Customer.name,Customer.cnic,Customer.son_of, Payments.id, Sale.sold_date`;
 
       const parsedPlotData: refundPlotData[] = [];
 
       plotData.forEach((item, index) => {
         const {
           sale_id,
-          sale_price,
+          //sale_price,
           plotId,
           total_sale_price,
           sold_date,
@@ -91,7 +92,7 @@ export default async function refundSummary(
           parsedPlotData.push({
             sale: {
               sale_id,
-              sale_price,
+              //sale_price,
               plotId,
               total_sale_price,
               sold_date,
@@ -126,7 +127,7 @@ export default async function refundSummary(
     }
     if (req.method === "POST") {
       const saleId = req.body.saleId;
-      const refundPayments = req.body.refundPayments as string[];  
+      const refundPayments = req.body.refundPayments as string[];
       const revertSalePlotMetaData = await prisma.plot.findMany({
         where: {
           sale_id: parseInt(saleId),

@@ -79,25 +79,6 @@ export const getPlotByHousingSchemeIdAndPlotId = async (
   return res;
 };
 
-export const listPlotRefundsByHousingSchemeId = async (
-  housingSchemeId: string
-) => {
-  const response = await fetch(
-    `/api/housingScheme/${housingSchemeId}/plot/refunds`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  const res: { data: refundPlotData[] } = await response.json();
-  return res;
-};
-
 export const editPaymentStatus = async (refundPayments: string[]) => {
   const response = await fetch(`/api/payments/refunds`, {
     method: "POST",
@@ -200,13 +181,16 @@ export const createSalePlot = async (data: any) => {
 
 export const editSalePlot = async (data: any) => {
   const housingSchemeId = data.housingSchemeId;
-  const response = await fetch(`/api/plot/edit`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `/api/housingScheme/${housingSchemeId}/plot/edit`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Network response was not ok");
@@ -235,5 +219,24 @@ export const cancelPlotSale = async (data: {
     throw new Error("Network response was not ok");
   }
   const res: PostReturnType = await response.json();
+  return res;
+};
+
+export const listPlotRefundsByHousingSchemeId = async (
+  housingSchemeId: string
+) => {
+  const response = await fetch(
+    `/api/housingScheme/${housingSchemeId}/plot/refunds`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const res: { data: refundPlotData[] } = await response.json();
   return res;
 };
