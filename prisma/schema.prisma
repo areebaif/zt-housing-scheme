@@ -65,7 +65,7 @@ model Plot {
 
 model Sale {
   id Int @id
-  housing_scheme Int?
+  housing_scheme Int
   customer_id Int
   sold_date DateTime
   total_sale_price Int

@@ -1,7 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Loader, Button } from "@mantine/core";
+import { Loader, Button, Flex } from "@mantine/core";
 // Hook Imports
 import { useQuery } from "@tanstack/react-query";
 import { listHousingScheme } from "@/r-query/functions";
@@ -26,11 +26,17 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      {housingScheme.map((item, index) => (
-        <Button key={index} href={`/housingScheme/${item.id}`} component={Link}>
-          {item.name}
-        </Button>
-      ))}
+      <Flex gap="md">
+        {housingScheme.map((item, index) => (
+          <Button
+            key={index}
+            href={`/housingScheme/${item.id}`}
+            component={Link}
+          >
+            {item.name}
+          </Button>
+        ))}
+      </Flex>
     </>
   );
 };
