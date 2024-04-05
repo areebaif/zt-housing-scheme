@@ -98,7 +98,7 @@ export default async function paymentStatus(
     // we are doing left join becuase there are plots which have been sold but they dont have any payments
     const sumPaymentHistoryBySaleId = await prisma.$queryRaw<
       SumPaymentHistory[]
-    >`select Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of, SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate from Sale left join Payments on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id and sale.housing_scheme = ${housingSchemeId} group by Sale.id,Customer.id;`;
+    >`select Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of, SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate from Sale left join Payments on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id and Sale.housing_scheme = ${housingSchemeId} group by Sale.id,Customer.id;`;
 
     // the plot metadata
     // since refunded plots no longer have sale_id this works
