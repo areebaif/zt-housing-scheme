@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Grid, Text, Card, Title, Badge } from "@mantine/core";
 // Type Imports
-import { PlotsSelectFields } from "@/pages/api/plot/all";
+import { PlotsSelectFields } from "@/pages/api/housingScheme";
 
 type TotalsSummaryProps = {
   plots: PlotsSelectFields[];

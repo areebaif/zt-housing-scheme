@@ -1,8 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
-import { ReturnError } from "../customer/all";
-import { prisma } from "../../../db/prisma";
+import { ReturnError } from "@/pages/api/customers";
+import { prisma } from "@/db/prisma";
 
 export interface PlotDetail {
   plot: Plot[];
@@ -27,10 +27,14 @@ export default async function allPosts(
 ) {
   try {
     const plotId = req.query.id as string;
+    const housingSchemeId = req.query.housingSchemeId as string;
 
     const plot = await prisma.plot.findUnique({
       where: {
-        id: parseInt(plotId),
+        plotId: {
+          id: parseInt(plotId),
+          housing_scheme: parseInt(housingSchemeId),
+        },
       },
     });
     if (!plot) throw new Error("no plot found with number ");

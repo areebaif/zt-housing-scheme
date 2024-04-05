@@ -9,7 +9,7 @@ import {
   Button,
   Title,
 } from "@mantine/core";
-import { CustomerSelectFields } from "@/pages/api/customer/all";
+import { CustomerSelectFields } from "@/pages/api/customers";
 import { formatCnic } from "@/utilities";
 
 type CustomerDetailsInputProps = {

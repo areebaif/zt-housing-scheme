@@ -1,13 +1,14 @@
 import * as React from "react";
+import { useRouter } from "next/router";
 // Hook Imports
 import { useQuery } from "@tanstack/react-query";
 import { Card, Title, Loader } from "@mantine/core";
 import { Plot } from "@prisma/client";
-import { fetchNotSoldPlots } from "@/r-query/functions";
+import { listNotSoldPlotsByHousingSchemeId } from "@/r-query/functions";
 import { AllPlotId } from "../../PlotUpsertForm";
 import { PlotIdInputTable } from "./PlotIdInputTable";
 import { PlotDetailEditCard } from "./PlotDetailsEditCard";
-import { NotSoldPlotsSelectFields } from "@/pages/api/plot/notSold";
+import { NotSoldPlotsSelectFields } from "@/pages/api/housingScheme/[housingSchemeId]/plot";
 
 type PlotDetailsInputCardProps = {
   plot: Plot[];
@@ -34,16 +35,22 @@ export const PlotDetailsInputCard: React.FC<PlotDetailsInputCardProps> = (
     sellPrice,
     setSellPrice,
   } = props;
+  const router = useRouter();
+  const housingSchemeId = router.query?.housingSchemeId as string;
   const [isEditFlag, setIsEditFlag] = React.useState(isEditForm);
   const [notSoldPlots, setNotSoldPlots] = React.useState<
     NotSoldPlotsSelectFields[]
   >([]);
 
-  const fetchPlots = useQuery(["notSoldPlots"], fetchNotSoldPlots, {
-    staleTime: Infinity,
-    cacheTime: Infinity,
-    enabled: showForm,
-  });
+  const fetchPlots = useQuery(
+    ["notSoldPlots", [housingSchemeId, 0]],
+    () => listNotSoldPlotsByHousingSchemeId(housingSchemeId, 0),
+    {
+      staleTime: Infinity,
+      cacheTime: Infinity,
+      enabled: showForm,
+    }
+  );
   const plots = fetchPlots.data;
   React.useEffect(() => {
     if (plots?.length) {

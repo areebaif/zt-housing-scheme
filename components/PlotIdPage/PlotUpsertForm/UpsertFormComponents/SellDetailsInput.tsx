@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Card, NumberInput, Flex, Title, Text, Box } from "@mantine/core";
+import { Card, Flex, Title, Text, Box } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 
 type SellDetailsInputProps = {

@@ -1,74 +1,44 @@
 import * as React from "react";
+import Link from "next/link";
 import { useSession } from "next-auth/react";
-
+import { Loader, Button, Flex } from "@mantine/core";
 // Hook Imports
 import { useQuery } from "@tanstack/react-query";
+import { listHousingScheme } from "@/r-query/functions";
 
-import { Grid, Loader } from "@mantine/core";
-// Component Imports
-import { PlotSaleSummaryTable, TotalsSummary } from "@/components";
-// Utilities
-import { fetchAllPlots } from "@/r-query/functions";
-
-const AllPlots: React.FC = () => {
-  const fetchPlots = useQuery(["allPlots"], fetchAllPlots, {
-    staleTime: Infinity,
-    cacheTime: Infinity,
-  });
-  if (fetchPlots.isLoading) {
+const HomePage: React.FC = () => {
+  const fetchHousingScheme = useQuery(
+    ["listHousingScheme"],
+    listHousingScheme,
+    {
+      staleTime: Infinity,
+      cacheTime: Infinity,
+    }
+  );
+  if (fetchHousingScheme.isLoading) {
     return <Loader />;
   }
 
-  if (fetchPlots.isError) {
+  if (fetchHousingScheme.isError) {
     return <span>Error: error occured</span>;
   }
-
-  const plots = fetchPlots.data;
-  // table data
-  const notSoldPlots = plots?.filter((element) => {
-    return element.plot_status === "not_sold";
-  });
-  const partiallySold = plots?.filter((element) => {
-    return element.plot_status === "partially_paid";
-  });
-
-  const fullySold = plots?.filter((element) => {
-    return element.plot_status === "fully_paid";
-  });
-
-  const registryTransferred = plots?.filter((element) => {
-    return element.plot_status === "registry_transferred";
-  });
+  const housingScheme = fetchHousingScheme.data;
 
   return (
-    <React.Fragment>
-      <TotalsSummary plots={plots} />
-      <Grid>
-        <Grid.Col span={6}>
-          <PlotSaleSummaryTable tableHead="Not Sold" tableRows={notSoldPlots} />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <PlotSaleSummaryTable
-            tableHead="Sold - Partial Payment"
-            tableRows={partiallySold}
-          />
-        </Grid.Col>
-
-        <Grid.Col span={6}>
-          <PlotSaleSummaryTable
-            tableHead="Sold - Full Payment"
-            tableRows={fullySold}
-          />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <PlotSaleSummaryTable
-            tableHead="Registry Transferred"
-            tableRows={registryTransferred}
-          />
-        </Grid.Col>
-      </Grid>
-    </React.Fragment>
+    <>
+      <Flex gap="md">
+        {housingScheme.map((item, index) => (
+          <Button
+            key={index}
+            href={`/housingScheme/${item.id}`}
+            component={Link}
+          >
+            {item.name}
+          </Button>
+        ))}
+      </Flex>
+    </>
   );
 };
 
-export default AllPlots;
+export default HomePage;

@@ -2,22 +2,28 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { fetchPaymentStatus } from "@/r-query/functions";
 import { Table, Card, Loader, Title, Group, NumberInput } from "@mantine/core";
 import { compare, beforeDateInput } from "@/utilities";
-import { PaymentStatusBySaleIdCustomerId } from "../api/payment/paymentStatus";
+import { listPaymentsByHousingSchemeId } from "@/r-query/functions";
+import { PaymentStatusBySaleIdCustomerId } from "@/pages/api/housingScheme/[housingSchemeId]/payments";
 
 const PaymentStatus: React.FC = () => {
   const router = useRouter();
+  const housingSchemeId = router.query.housingSchemeId;
+  const id = housingSchemeId as string;
   const { data: session, status } = useSession({
     required: true,
   });
   const [numberInput, setNumberInput] = React.useState(40);
-  const fetchStatus = useQuery(["upcomingPayments"], fetchPaymentStatus, {
-    enabled: status === "authenticated",
-    staleTime: Infinity,
-    cacheTime: Infinity,
-  });
+  const fetchStatus = useQuery(
+    ["upcomingPayments", id],
+    () => listPaymentsByHousingSchemeId(id),
+    {
+      enabled: status === "authenticated" && (id ? true : false),
+      staleTime: Infinity,
+      cacheTime: Infinity,
+    }
+  );
 
   if (fetchStatus.isLoading) {
     return <Loader />;

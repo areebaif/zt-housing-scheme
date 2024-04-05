@@ -1,15 +1,30 @@
-import { Plot, Status, Customer, Payments, Payment_Plan } from "@prisma/client";
-import { PlotsSelectFields } from "../pages/api/plot/all";
-import { PlotDetail } from "../pages/api/plot/[id]";
-import { CustomerSelectFields, ReturnError } from "@/pages/api/customer/all";
-import { PaymentStatusByPlot } from "@/pages/api/payment/paymentStatus";
+import { HousingScheme } from "@prisma/client";
+import { PlotsSelectFields } from "@/pages/api/housingScheme";
+import { PlotDetail } from "@/pages/api/housingScheme/[housingSchemeId]/plot/[id]";
+import { CustomerSelectFields } from "@/pages/api/customers";
+import { PaymentStatusByPlot } from "@/pages/api/housingScheme/[housingSchemeId]/payments";
 import { TableRowItem } from "../components/PlotIdPage/AddPaymentForm/PaymentInputTable";
-import { PostReturnType } from "@/pages/api/payment/add";
-import { NotSoldPlotsSelectFields } from "@/pages/api/plot/notSold";
-import { refundPlotData } from "@/pages/api/plot/refundSummary";
+import { PostReturnType } from "@/pages/api/payments";
+import { NotSoldPlotsSelectFields } from "@/pages/api/housingScheme/[housingSchemeId]/plot";
+import { refundPlotData } from "@/pages/api/housingScheme/[housingSchemeId]/plot/refunds";
 
-export const fetchAllPlots = async () => {
-  const response = await fetch("/api/plot/all", {
+export const listHousingScheme = async () => {
+  const response = await fetch(`/api/housingScheme`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const res: HousingScheme[] = await response.json();
+  return res;
+};
+
+export const listPlotsByHousingSchemeId = async (id: string) => {
+  const response = await fetch(`/api/housingScheme/${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -23,28 +38,39 @@ export const fetchAllPlots = async () => {
   return res;
 };
 
-export const fetchNotSoldPlots = async () => {
-  const response = await fetch("/api/plot/notSold", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export const listPaymentsByHousingSchemeId = async (
+  housingSchemeId: string
+) => {
+  const response = await fetch(
+    `/api/housingScheme/${housingSchemeId}/payments`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  const res: NotSoldPlotsSelectFields[] = await response.json();
+  const res: PaymentStatusByPlot = await response.json();
   return res;
 };
 
-export const fetchPlotById = async (id: string) => {
-  if (!id) throw new Error("please provide valid Id");
-  const response = await fetch(`/api/plot/${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export const getPlotByHousingSchemeIdAndPlotId = async (
+  housingSchemeId: string,
+  plotId: string
+) => {
+  if (!plotId) throw new Error("please provide valid Id");
+  const response = await fetch(
+    `/api/housingScheme/${housingSchemeId}/plot/${plotId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -53,8 +79,76 @@ export const fetchPlotById = async (id: string) => {
   return res;
 };
 
-export const fetchAllCustomers = async () => {
-  const response = await fetch(`/api/customer/all`, {
+export const editPaymentStatus = async (refundPayments: string[]) => {
+  const response = await fetch(`/api/payments/refunds`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ refundPayments: refundPayments }),
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const res: PostReturnType = await response.json();
+  return res;
+};
+
+export const createPayment = async (data: {
+  payment: TableRowItem[];
+  saleId: number;
+}) => {
+  const response = await fetch(`/api/payments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const res: PostReturnType = await response.json();
+  return res;
+};
+
+export const deletePayment = async (paymentId: number) => {
+  const response = await fetch(`/api/payments/delete`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ paymentId: paymentId }),
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const res: PostReturnType = await response.json();
+  return res;
+};
+
+export const listNotSoldPlotsByHousingSchemeId = async (
+  housingSchemeId: string,
+  sold: number
+) => {
+  const response = await fetch(
+    `/api/housingScheme/${housingSchemeId}/plot?sold=${sold}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const res: NotSoldPlotsSelectFields[] = await response.json();
+  return res;
+};
+
+export const listCustomers = async () => {
+  const response = await fetch(`/api/customers`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -69,8 +163,9 @@ export const fetchAllCustomers = async () => {
   return res;
 };
 
-export const postAddPlotSale = async (data: any) => {
-  const response = await fetch(`/api/plot/add`, {
+export const createSalePlot = async (data: any) => {
+  const housingSchemeId = data.housingSchemeId;
+  const response = await fetch(`/api/housingScheme/${housingSchemeId}/plot`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -84,14 +179,18 @@ export const postAddPlotSale = async (data: any) => {
   return res;
 };
 
-export const postEditPlotSale = async (data: any) => {
-  const response = await fetch(`/api/plot/edit`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+export const editSalePlot = async (data: any) => {
+  const housingSchemeId = data.housingSchemeId;
+  const response = await fetch(
+    `/api/housingScheme/${housingSchemeId}/plot/edit`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Network response was not ok");
@@ -100,65 +199,22 @@ export const postEditPlotSale = async (data: any) => {
   return res;
 };
 
-export const postPlotPayment = async (data: {
-  payment: TableRowItem[];
-  saleId: number;
-}) => {
-  const response = await fetch(`/api/payment/add`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  const res: PostReturnType = await response.json();
-  return res;
-};
-
-export const postDeletePayment = async (paymentId: number) => {
-  const response = await fetch(`/api/payment/delete`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ paymentId: paymentId }),
-  });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  const res: PostReturnType = await response.json();
-  return res;
-};
-
-export const fetchPaymentStatus = async () => {
-  const response = await fetch(`/api/payment/paymentStatus`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  const res: PaymentStatusByPlot = await response.json();
-  return res;
-};
-
-export const cancelSale = async (data: {
+export const cancelPlotSale = async (data: {
   saleId: number;
   refundPayments: string[];
+  housingSchemeId: string;
 }) => {
-  const { saleId, refundPayments } = data;
-  const response = await fetch(`/api/plot/rescind`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ saleId: saleId, refundPayments: refundPayments }),
-  });
+  const { saleId, refundPayments, housingSchemeId } = data;
+  const response = await fetch(
+    `/api/housingScheme/${housingSchemeId}/plot/refunds`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ saleId: saleId, refundPayments: refundPayments }),
+    }
+  );
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -166,31 +222,21 @@ export const cancelSale = async (data: {
   return res;
 };
 
-export const fetchRefundSummary = async () => {
-  const response = await fetch(`/api/plot/refundSummary`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export const listPlotRefundsByHousingSchemeId = async (
+  housingSchemeId: string
+) => {
+  const response = await fetch(
+    `/api/housingScheme/${housingSchemeId}/plot/refunds`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
   const res: { data: refundPlotData[] } = await response.json();
-  return res;
-};
-
-export const refundPayment = async (refundPayments: string[]) => {
-  const response = await fetch(`/api/payment/refundPayment`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ refundPayments: refundPayments }),
-  });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  const res: PostReturnType = await response.json();
   return res;
 };

@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { Grid, Loader } from "@mantine/core";
-import { fetchPlotById } from "../../r-query/functions";
+import { getPlotByHousingSchemeIdAndPlotId } from "@/r-query/functions";
 
 import {
   PaymentPlanTable,
@@ -14,16 +14,17 @@ import {
 } from "@/components";
 import { AddPayment } from "@/components/PlotIdPage/AddPaymentForm/AddPayment";
 import { PlotUpsertForm } from "@/components/PlotIdPage/PlotUpsertForm/PlotUpsertForm";
-import { PlotDetail } from "../api/plot/[id]";
+import { PlotDetail } from "@/pages/api/housingScheme/[housingSchemeId]/plot/[id]";
 import { TableRowItem } from "@/components/PlotIdPage/AddPaymentForm/PaymentInputTable";
 
 const PlotId: React.FC = () => {
   const router = useRouter();
+  const plotId = router.query?.id as string;
+  const housingSchemeId = router.query?.housingSchemeId as string;
   const { data: session, status } = useSession({
     required: true,
   });
 
-  const plotId = router.query?.id as string;
   // this is the newSaleForm
   const [showForm, setShowForm] = React.useState(false);
   // This is EditSaleForm
@@ -32,8 +33,8 @@ const PlotId: React.FC = () => {
   const [showCancelSaleForm, setShowCancelSaleForm] = React.useState(false);
   // backend data fetch
   const fetchplot = useQuery({
-    queryKey: ["plotById", plotId],
-    queryFn: () => fetchPlotById(plotId),
+    queryKey: ["plotById", [housingSchemeId, plotId]],
+    queryFn: () => getPlotByHousingSchemeIdAndPlotId(housingSchemeId, plotId),
     enabled: Boolean(plotId) && status === "authenticated",
     staleTime: Infinity,
     cacheTime: Infinity,

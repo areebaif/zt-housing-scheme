@@ -2,9 +2,7 @@ import * as React from "react";
 import { Plot } from "@prisma/client";
 
 import { Card, Title, Group, Button, TextInput, Table } from "@mantine/core";
-import notSoldPlots, {
-  NotSoldPlotsSelectFields,
-} from "@/pages/api/plot/notSold";
+import { NotSoldPlotsSelectFields } from "@/pages/api/housingScheme/[housingSchemeId]/plot";
 import { AllPlotId } from "../../PlotUpsertForm";
 type PlotDetailEditProps = {
   plot: Plot[];

@@ -8,9 +8,11 @@ import { SellInfo } from "@/components/PlotIdPage/SellInfo";
 import { PaymentRefundTable } from "./PlotIdPage/PaymentRefundTable";
 import { CancelSaleForm } from "./PlotIdPage/CancelSaleForm/CancelSaleForm";
 import { RefundPaymentModal } from "./RefundsPage/RefundPaymentModal";
+import { AppChromeMainPage } from "./layout/home-page";
 
 export {
   AppChrome,
+  AppChromeMainPage,
   PlotSaleSummaryTable,
   TotalsSummary,
   PaymentHistoryTable,

@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { prisma } from "../../../db/prisma";
-import { ReturnError } from "../customer/all";
-import { PostReturnType } from "./add";
+import { prisma } from "@/db/prisma";
+import { ReturnError } from "@/pages/api/customers";
+import { PostReturnType } from ".";
 
 export default async function refundPayments(
   req: NextApiRequest,

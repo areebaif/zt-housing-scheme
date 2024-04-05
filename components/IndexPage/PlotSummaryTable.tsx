@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PlotsSelectFields } from "@/pages/api/plot/all";
+import { PlotsSelectFields } from "@/pages/api/housingScheme";
 import { useRouter } from "next/router";
 import { Title, Card, Text, Grid, Box, Divider } from "@mantine/core";
 
@@ -12,12 +12,14 @@ export const PlotSaleSummaryTable: React.FC<PlotSaleSummaryTableProps> = (
 ) => {
   const { tableHead, tableRows } = PlotSaleSummaryTableProps;
   const router = useRouter();
+  const housingSchemeId = router.query.housingSchemeId;
+  const id = housingSchemeId as string;
 
   const rows = tableRows?.map((element, index) => (
     <React.Fragment key={index}>
       <Divider my="sm" />
       <Grid
-        onClick={() => router.push(`/plot/${element.id}`)}
+        onClick={() => router.push(`/housingScheme/${id}/plot/${element.id}`)}
         sx={(theme) => ({
           "&:hover": {
             backgroundColor:

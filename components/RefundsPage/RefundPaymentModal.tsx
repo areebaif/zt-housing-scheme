@@ -1,6 +1,6 @@
 import { Modal, TransferListData, Button, Group } from "@mantine/core";
 import { PaymentRefundTable } from "../PlotIdPage/PaymentRefundTable";
-import { refundPlotData } from "@/pages/api/plot/refundSummary";
+import { refundPlotData } from "@/pages/api/housingScheme/[housingSchemeId]/plot/refunds";
 import { PlotSummaryModal } from "./PlotSummaryModal";
 
 type RefundPaymentModalProps = {
@@ -26,7 +26,7 @@ export const RefundPaymentModal: React.FC<RefundPaymentModalProps> = ({
     plotId: sale.plotId,
     name: customer.name,
     sonOf: customer.son_of,
-    salePrice: sale.sale_price,
+    salePrice: sale.total_sale_price,
     saleDate: sale.sold_date,
     payments,
   };

@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Plot } from "@prisma/client";
 import { Card, Button, Table } from "@mantine/core";
+import { NotSoldPlotsSelectFields } from "@/pages/api/housingScheme/[housingSchemeId]/plot";
 import { AllPlotId } from "../../PlotUpsertForm";
-import { NotSoldPlotsSelectFields } from "@/pages/api/plot/notSold";
 import { PlotIdInput } from "./PlotIdInput";
 
 type PlotIdInputTableProps = {

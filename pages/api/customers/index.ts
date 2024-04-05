@@ -1,9 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Plot } from "@prisma/client";
-import { Customer } from "@prisma/client";
-
-import { prisma } from "../../../db/prisma";
+import { prisma } from "@/db/prisma";
 
 export interface CustomerSelectFields {
   id: number;

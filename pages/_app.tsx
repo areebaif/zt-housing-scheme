@@ -4,10 +4,14 @@ import { Analytics } from "@vercel/analytics/react";
 import { MantineProvider, Text } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
-import { AppChrome } from "@/components";
+import { AppChrome, AppChromeMainPage } from "@/components";
 import dynamic from "next/dynamic";
 
-const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
+const App = ({
+  Component,
+  router,
+  pageProps: { session, ...pageProps },
+}: AppProps) => {
   const [queryClient] = React.useState(() => new QueryClient());
   if (process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true") {
     return (
@@ -22,10 +26,21 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
       <SessionProvider session={session}>
         <QueryClientProvider client={queryClient}>
           <MantineProvider withGlobalStyles withNormalizeCSS>
-            <AppChrome>
+            {router.route.startsWith("/housingScheme") ? (
+              <AppChrome>
+                <Component {...pageProps} />
+                <Analytics />
+              </AppChrome>
+            ) : (
+              <AppChromeMainPage>
+                <Component {...pageProps} />
+                <Analytics />
+              </AppChromeMainPage>
+            )}
+            {/* <AppChrome>
               <Component {...pageProps} />
               <Analytics />
-            </AppChrome>
+            </AppChrome> */}
           </MantineProvider>
         </QueryClientProvider>
       </SessionProvider>

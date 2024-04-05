@@ -3,21 +3,20 @@ import { useRouter } from "next/router";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { Plot } from "@prisma/client";
 import { Group, Button, Loader } from "@mantine/core";
+import { formatAddTime } from "@/utilities";
+import { CustomerSelectFields } from "@/pages/api/customers";
 import {
   SellDetailsInput,
   PlotDetailsInputCard,
   CustomerDetailsInput,
+  PaymentPlanInputCard,
 } from ".";
 import {
-  fetchAllCustomers,
-  postAddPlotSale,
-  postEditPlotSale,
+  listCustomers,
+  createSalePlot,
+  editSalePlot,
 } from "@/r-query/functions";
 import { TableRowItem } from "../AddPaymentForm/PaymentInputTable";
-import { PaymentPlanInputCard } from ".";
-//import { PaymentInput } from "@/components/PlotIdPage/AddPaymentForm/PaymentInput";
-import { formatAddTime } from "@/utilities";
-import { CustomerSelectFields } from "@/pages/api/customer/all";
 
 export type AllPlotId = {
   id: number;
@@ -35,6 +34,7 @@ export type CustomerFormPost = {
 };
 
 export type FormPostProps = {
+  housingSchemeId: string;
   plotId: AllPlotId[];
   sellPrice: number;
   soldDateString: string;
@@ -81,6 +81,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   const queryClient = useQueryClient();
   // // router props
   const router = useRouter();
+  const housingSchemeId = router.query?.housingSchemeId as string;
   // plot metadata props
   const [allPlotSale, setAllPlotSale] = React.useState<AllPlotId[]>([]);
   const [isEditPlotIdDetail, setIsEditPlotIdDetail] = React.useState(false);
@@ -109,17 +110,17 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
   // fetch exisitng customer data from backend
   const fetchCustomers = useQuery({
     queryKey: ["allCustomers"],
-    queryFn: () => fetchAllCustomers(),
+    queryFn: () => listCustomers(),
     staleTime: Infinity,
     cacheTime: Infinity,
   });
 
   const mutation = useMutation({
-    mutationFn: !isEditForm ? postAddPlotSale : postEditPlotSale,
+    mutationFn: !isEditForm ? createSalePlot : editSalePlot,
     onSuccess: () => {
       queryClient.invalidateQueries();
       setShowForm(false);
-      router.push(`/plot/${plot[0].id}`);
+      router.push(`/housingScheme/${housingSchemeId}/plot/${plot[0].id}`);
     },
     onError: () => {
       return <div>error occured: Please try again later</div>;
@@ -153,6 +154,7 @@ export const PlotUpsertForm: React.FC<AddSaleFormProps> = (
     }
     const soldDateString = formatAddTime(`${sellDate}`);
     const data: FormPostProps = {
+      housingSchemeId,
       plotId: allPlotSale,
       sellPrice,
       soldDateString,

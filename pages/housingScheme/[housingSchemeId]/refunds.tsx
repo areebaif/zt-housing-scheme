@@ -1,7 +1,11 @@
 import * as React from "react";
+import { useRouter } from "next/router";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { fetchRefundSummary, refundPayment } from "@/r-query/functions";
+import {
+  listPlotRefundsByHousingSchemeId,
+  editPaymentStatus,
+} from "@/r-query/functions";
 import {
   Loader,
   Card,
@@ -13,12 +17,15 @@ import {
   TransferListData,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { refundPlotData } from "../api/plot/refundSummary";
+import { refundPlotData } from "@/pages/api/housingScheme/[housingSchemeId]/plot/refunds";
 import { RefundPaymentModal } from "@/components";
 
 export const RefundSummary: React.FC = () => {
   // hooks
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const housingSchemeId = router.query.housingSchemeId;
+  const id = housingSchemeId as string;
   const [opened, { open, close }] = useDisclosure(false);
   const [paymentRefundData, setPaymentRefundData] =
     React.useState<TransferListData>([[], []]);
@@ -27,14 +34,18 @@ export const RefundSummary: React.FC = () => {
   });
   const [PlotItemData, setPlotItemData] = React.useState<refundPlotData>();
 
-  const fetchRefundStatus = useQuery(["refundSummary"], fetchRefundSummary, {
-    enabled: status === "authenticated",
-    staleTime: Infinity,
-    cacheTime: Infinity,
-  });
+  const fetchRefundStatus = useQuery(
+    ["refundSummary", id],
+    () => listPlotRefundsByHousingSchemeId(id),
+    {
+      enabled: status === "authenticated" && (id ? true : false),
+      staleTime: Infinity,
+      cacheTime: Infinity,
+    }
+  );
 
   const mutation = useMutation({
-    mutationFn: refundPayment,
+    mutationFn: editPaymentStatus,
     onSuccess: () => {
       queryClient.invalidateQueries();
 

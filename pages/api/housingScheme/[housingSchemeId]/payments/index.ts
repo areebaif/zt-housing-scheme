@@ -1,7 +1,6 @@
-import { PaymentType } from "@prisma/client";
+import { PaymentType, Payment_Plan } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-import { prisma } from "../../../db/prisma";
+import { prisma } from "@/db/prisma";
 
 export enum PaymentValueStatus {
   partiallyPaid = "partial payment",
@@ -68,35 +67,44 @@ export default async function paymentStatus(
   res: NextApiResponse<any>
 ) {
   try {
-    // payment_value, sale_id (total payment plan value by sale id)
-    const sumPaymentPlanBySaleId = await prisma.payment_Plan.groupBy({
-      by: ["sale_id"],
-      _sum: {
-        payment_value: true,
-      },
-    });
-    // payment_type	sale_id	payment_date	payment_value	created_at
-    const paymentPlanBySaleId = await prisma.payment_Plan.findMany({
-      orderBy: [
-        {
-          payment_date: "asc",
-        },
-        {
-          sale_id: "asc",
-        },
-      ],
-    });
+    const id = req.query.housingSchemeId;
+
+    if (typeof id !== "string") {
+      return res
+        .status(404)
+        .json({ error: "type mismatch: expected housingSchemeId as string" });
+    }
+    const HousingId = id as string;
+    const housingSchemeId = parseInt(HousingId);
+
+    // [{ _sum: { payment_value: 8600000 }, sale_id: 1 }]
+    const sumPaymentPlanBySaleId: { _sum: number; sale_id: number }[] =
+      await prisma.$queryRaw`select sum(payment_value) as _sum, sale_id from Payment_Plan where sale_id in (select sale.id as sale_id from sale where sale.Housing_scheme = ${housingSchemeId} ) group by sale_id`;
+    /*
+    {
+    id: 23,
+    payment_type: 'installment',
+    sale_id: 5,
+    payment_date: 2023-08-03T16:17:53.000Z,
+    payment_value: 440000,
+    created_at: 2023-02-25T16:21:20.300Z,
+    updated_at: 2023-02-25T16:21:20.300Z
+  },
+    */
+    const paymentPlanBySaleId: Payment_Plan[] =
+      await prisma.$queryRaw`select * from Payment_Plan where sale_id in (select sale.id as sale_id from sale where sale.Housing_scheme = ${housingSchemeId} ) ORDER BY payment_date ASC, sale_id ASC`;
 
     // totalPaid	lastPaymentDate	sale_id	customer_id,	name	son_of	cnic
     // we are doing left join becuase there are plots which have been sold but they dont have any payments
     const sumPaymentHistoryBySaleId = await prisma.$queryRaw<
       SumPaymentHistory[]
-    >`select Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of, SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate from Sale left join Payments on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id group by Sale.id,Customer.id;`;
+    >`select Sale.id as sale_id,Sale.customer_id,Customer.name,Customer.cnic,Customer.son_of, SUM(Payments.payment_value) as totalPaid, MAX(Payments.payment_date) as lastPaymentDate from Sale left join Payments on Sale.id=Payments.sale_id join Customer on Customer.id=Sale.customer_id and sale.housing_scheme = ${housingSchemeId} group by Sale.id,Customer.id;`;
 
     // the plot metadata
     // since refunded plots no longer have sale_id this works
     const plotData = await prisma.plot.findMany({
       select: { id: true, sale_id: true },
+      where: { housing_scheme: housingSchemeId },
     });
 
     const sumPaymentHistoryBySaleIdCustomerId: SumPaymentHistoryWithPlotId[] =
@@ -134,8 +142,8 @@ export default async function paymentStatus(
           if (payments.sale_id === sumPaymentPlan.sale_id) {
             returnObject = {
               ...payments,
-              totalPlannedPayments: sumPaymentPlan._sum.payment_value
-                ? sumPaymentPlan._sum.payment_value
+              totalPlannedPayments: sumPaymentPlan._sum
+                ? sumPaymentPlan._sum
                 : 0,
             };
             returnObject.remainingPayment = returnObject.totalPaid
