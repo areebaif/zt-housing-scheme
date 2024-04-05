@@ -79,7 +79,7 @@ export default async function paymentStatus(
 
     // [{ _sum: { payment_value: 8600000 }, sale_id: 1 }]
     const sumPaymentPlanBySaleId: { _sum: number; sale_id: number }[] =
-      await prisma.$queryRaw`select sum(payment_value) as _sum, sale_id from Payment_Plan where sale_id in (select Sale.id as Sale_id from Sale where Sale.Housing_scheme = ${housingSchemeId} ) group by sale_id`;
+      await prisma.$queryRaw`select sum(payment_value) as _sum, sale_id from Payment_Plan where sale_id in (select Sale.id as sale_id from Sale where Sale.Housing_scheme = ${housingSchemeId} ) group by sale_id`;
     /*
     {
     id: 23,
