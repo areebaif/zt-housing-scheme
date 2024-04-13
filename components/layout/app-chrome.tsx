@@ -138,7 +138,7 @@ const linkData = (housingSchemeId: string, isLoggedIn: boolean) => [
   {
     icon: <IconLogin size={16} />,
     color: "violet",
-    label: "Logout",
+    label: `${isLoggedIn ? `logout` : `login`}`,
     link: `${isLoggedIn ? `/auth/signout` : `/auth/signin`}`,
   },
 ];
