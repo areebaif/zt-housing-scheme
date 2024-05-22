@@ -14,16 +14,16 @@ export const AppChromeMainPage: React.FC<React.PropsWithChildren> = (props) => {
         <Header pl="xl" height={103}>
           <Group position="apart" pr="xl" mr="sm">
             <Flex gap="xl">
-              <Link href={"/"}>
+              {/* <Link href={"/"}>
                 <Image src={"/zt-logo3.png"} height={100} width={100}></Image>{" "}
-              </Link>
+              </Link> */}
               <Title pt="xl" mt="xs" order={2}>
                 Sale and Payments Dashboard
               </Title>
             </Flex>
-            <Link href={"https://www.facebook.com/zahidtown"}>
+            {/* <Link href={"https://www.facebook.com/zahidtown"}>
               <Image src={"/facebook-logo.png"} height={45} width={45}></Image>
-            </Link>
+            </Link> */}
           </Group>
         </Header>
       }
