@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Image } from "@mantine/core";
+import { IconHome } from "@tabler/icons-react";
 // Mantine Imports
 import {
   AppShell,
@@ -48,6 +49,11 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
                   : "Muhammad Hussain Town Phase-I"}
               </Title>
             </Flex>
+            <Box mt={"xl"}>
+              <Link href={"/"}>
+                <IconHome size={48} color="black" />
+              </Link>
+            </Box>
             {/* <Link href={"https://www.facebook.com/zahidtown"}>
               <Image src={"/facebook-logo.png"} height={45} width={45}></Image>
             </Link> */}
